@@ -1,0 +1,2 @@
+// CUTO-Masterのメインルーチン
+package main
