@@ -1,42 +1,15 @@
 package remote
 
 import (
-	"net"
 	"testing"
 	"time"
 
 	"cuto/servant/config"
+	"cuto/testutil"
 )
-
-type testConn struct {
-	Written string
-}
 
 func init() {
 	config.ReadConfig()
-}
-
-func (c *testConn) Close() error                       { return nil }
-func (c *testConn) LocalAddr() net.Addr                { return nil }
-func (c *testConn) RemoteAddr() net.Addr               { return nil }
-func (c *testConn) SetDeadline(t time.Time) error      { return nil }
-func (c *testConn) SetReadDeadline(t time.Time) error  { return nil }
-func (c *testConn) SetWriteDeadline(t time.Time) error { return nil }
-
-func (c *testConn) Read(b []byte) (int, error) {
-	msgBytes := []byte(testReqMsg)
-	for i, c := range msgBytes {
-		b[i] = c
-	}
-
-	return len(testReqMsg), nil
-}
-
-const testReqMsg = `{"type":"request","id":1234,"path":"C:\\work\\test.bat","param":"test","workspace": "C:\\work"}`
-
-func (c *testConn) Write(b []byte) (int, error) {
-	c.Written = string(b)
-	return len(c.Written), nil
 }
 
 func TestStart_ポート番号に定義外の値を渡すとエラーが発生する(t *testing.T) {
@@ -48,7 +21,8 @@ func TestStart_ポート番号に定義外の値を渡すとエラーが発生�
 }
 
 func TestReceiveMessage_セッションキューにセッションを追加できる(t *testing.T) {
-	conn := new(testConn)
+	conn := testutil.NewConnStub()
+	conn.ReadStr = `{"type":"request","id":1234,"path":"C:\\work\\test.bat","param":"test","workspace": "C:\\work"}`
 	sq := make(chan *Session)
 
 	go receiveMessage(conn, sq)
@@ -59,9 +33,9 @@ func TestReceiveMessage_セッションキューにセッションを追加で�
 			t.Error("セッションにコネクションオブジェクトがセットされていません。")
 		}
 
-		if session.Body != testReqMsg {
+		if session.Body != conn.ReadStr {
 			t.Error("セッションにセットされたメッセージが間違っています。")
-			t.Logf("想定値: %s", testReqMsg)
+			t.Logf("想定値: %s", conn.ReadStr)
 			t.Logf("実績値: %s", session.Body)
 		}
 	case <-time.After(time.Second * 3):

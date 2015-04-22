@@ -10,6 +10,7 @@ import (
 
 	"cuto/message"
 	"cuto/servant/config"
+	"cuto/testutil"
 )
 
 func doTestRequest(req *message.Request, conf *config.ServantConfig, stCh chan<- string) *message.Response {
@@ -42,14 +43,14 @@ func TestDo_ジョブを実行し結果を送信できる(t *testing.T) {
 
 	conf := config.ReadConfig()
 
-	conn := new(testConn)
+	conn := testutil.NewConnStub()
 	session := Session{Conn: conn, Body: reqMsg, doRequest: doTestRequest}
 	session.Do(conf)
 
 	expected := `{"type":"response","nid":1234,"jid":"001","rc":1,"stat":1,"detail":"detail","var":"","st":"20150331131524.123456789","et":"20150331131525.123456789"}`
-	if conn.Written != expected {
+	if conn.WriteStr != expected {
 		t.Errorf("送信されたジョブ実行結果が間違っています。")
 		t.Logf("想定値: %s", expected)
-		t.Logf("実績値: %s", conn.Written)
+		t.Logf("実績値: %s", conn.WriteStr)
 	}
 }
