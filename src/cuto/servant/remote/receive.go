@@ -39,25 +39,30 @@ func StartReceive(bindAddr string, port int, multi int) (<-chan *Session, error)
 	}
 
 	sq := make(chan *Session, multi)
-	go acceptLoop(listener, sq)
+	go receiveLoop(listener, sq)
 
 	return sq, nil
 }
 
-func acceptLoop(listener net.Listener, sq chan<- *Session) {
+func receiveLoop(listener net.Listener, sq chan<- *Session) {
 	for {
-		conn, err := listener.Accept()
-		if err != nil {
-			log.Error(err)
-			continue
-		}
-
-		console.Display("CTS014I")
-		go receiveMessage(conn, sq)
+		receiveLoopProcess(listener, sq)
 	}
 }
 
-func receiveMessage(conn net.Conn, sq chan<- *Session) {
+func receiveLoopProcess(listener net.Listener, sq chan<- *Session) error {
+	conn, err := listener.Accept()
+	if err != nil {
+		log.Error(err)
+		return err
+	}
+
+	console.Display("CTS014I")
+	go receiveMessage(conn, sq)
+	return nil
+}
+
+func receiveMessage(conn net.Conn, sq chan<- *Session) error {
 	const timeout = 10
 	const bufSize = 1024
 
@@ -67,15 +72,16 @@ func receiveMessage(conn net.Conn, sq chan<- *Session) {
 	err = conn.SetReadDeadline(time.Now().Add(timeout * time.Second))
 	if err != nil {
 		log.Error(fmt.Sprintf("[%v]: %v\n", conn.RemoteAddr(), err))
-		return
+		return err
 	}
 
 	buf := make([]byte, bufSize)
 	readLen, err = conn.Read(buf)
 	if err != nil {
 		log.Error(fmt.Sprintf("[%v]: %v\n", conn.RemoteAddr(), err))
-		return
+		return err
 	}
 
 	sq <- NewSession(conn, string(buf[:readLen]))
+	return nil
 }
