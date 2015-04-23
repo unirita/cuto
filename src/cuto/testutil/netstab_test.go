@@ -55,7 +55,10 @@ func TestListenerClose_正常クローズできる(t *testing.T) {
 	l := NewListenerStub()
 	err := l.Close()
 	if err != nil {
-		t.Fatalf("想定外のエラーが発生した: %s", err)
+		t.Errorf("想定外のエラーが発生した: %s", err)
+	}
+	if !l.IsClosed {
+		t.Errorf("クローズされていないことになっている。")
 	}
 }
 
@@ -131,6 +134,9 @@ func TestConnClose_正常クローズできる(t *testing.T) {
 	err := c.Close()
 	if err != nil {
 		t.Fatalf("想定外のエラーが発生した: %s", err)
+	}
+	if !c.IsClosed {
+		t.Errorf("クローズされていないことになっている。")
 	}
 }
 

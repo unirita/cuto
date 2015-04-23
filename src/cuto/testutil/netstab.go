@@ -9,6 +9,7 @@ import (
 type ListenerStub struct {
 	AcceptErr error
 	CloseErr  error
+	IsClosed  bool
 
 	addr net.Addr
 }
@@ -23,6 +24,7 @@ type ConnStub struct {
 	SetDeadlineErr      error
 	SetReadDeadlineErr  error
 	SetWriteDeadlineErr error
+	IsClosed            bool
 
 	localAddr  net.Addr
 	remoteAddr net.Addr
@@ -62,7 +64,11 @@ func (l *ListenerStub) Accept() (c net.Conn, err error) {
 }
 
 func (l *ListenerStub) Close() error {
-	return l.CloseErr
+	if l.CloseErr != nil {
+		return l.CloseErr
+	}
+	l.IsClosed = true
+	return nil
 }
 
 func (l *ListenerStub) Addr() net.Addr {
@@ -86,7 +92,11 @@ func (c *ConnStub) Write(b []byte) (n int, err error) {
 }
 
 func (c *ConnStub) Close() error {
-	return c.CloseErr
+	if c.CloseErr != nil {
+		return c.CloseErr
+	}
+	c.IsClosed = true
+	return nil
 }
 
 func (c *ConnStub) LocalAddr() net.Addr {
