@@ -22,12 +22,18 @@ type Session struct {
 	Conn net.Conn
 	Body string
 
-	doRequest func(req *message.Request, conf *config.ServantConfig, stCh chan<- string) *message.Response
+	endHeartbeatCh chan endSig
+	doRequest      func(req *message.Request, conf *config.ServantConfig, stCh chan<- string) *message.Response
 }
 
 // Sessionオブジェクトのコンストラクタ
 func NewSession(conn net.Conn, body string) *Session {
-	return &Session{Conn: conn, Body: body, doRequest: job.DoJobRequest}
+	s := new(Session)
+	s.Conn = conn
+	s.Body = body
+	s.doRequest = job.DoJobRequest
+	s.startHeartbeat()
+	return s
 }
 
 // セッションに対応したジョブ実行要求に基いてジョブを実行する。
@@ -51,10 +57,9 @@ func (s *Session) Do(conf *config.ServantConfig) {
 	stCh := make(chan string, 1)
 	go s.waitAndSendStartTime(stCh)
 
-	endCh := s.startHeartBeat()
 	res := s.doRequest(req, conf, stCh)
-	endCh <- endSig{}
 
+	s.endHeartbeat()
 	close(stCh)
 
 	var resMsg string
@@ -70,25 +75,26 @@ func (s *Session) Do(conf *config.ServantConfig) {
 }
 
 // ハートビートを開始する。
-func (s *Session) startHeartBeat() chan endSig {
-	ch := make(chan endSig, 1)
-
+func (s *Session) startHeartbeat() {
+	s.endHeartbeatCh = make(chan endSig, 1)
 	go func() {
 		t := time.Duration(config.Servant.Job.HeartbeatSpanSec) * time.Second
-
-	HEARTBEATLOOP:
 		for {
 			select {
-			case <-ch:
-				break HEARTBEATLOOP
+			case <-s.endHeartbeatCh:
+				return
 			case <-time.After(t):
 				log.Debug("send heatbeat...")
 				s.Conn.Write([]byte(message.HEARTBEAT))
 			}
 		}
 	}()
+}
 
-	return ch
+// ハートビートメッセージを停止する
+func (s *Session) endHeartbeat() {
+	s.endHeartbeatCh <- endSig{}
+	close(s.endHeartbeatCh)
 }
 
 // スタート時刻の決定を待ち、masterへ送信する。
