@@ -3,34 +3,30 @@ package testutil
 import (
 	"errors"
 	"net"
-	"reflect"
 	"testing"
 	"time"
 )
 
 func TestNewListenerStub_Listener型のスタブオブジェクトを生成できる(t *testing.T) {
 	l := NewListenerStub()
-	stubType := reflect.TypeOf(l)
-	expectType := reflect.TypeOf((*net.Listener)(nil)).Elem()
-	if !stubType.Implements(expectType) {
+	_, ok := interface{}(l).(net.Listener)
+	if !ok {
 		t.Fatalf("生成されたオブジェクトがnet.Listener型ではない。")
 	}
 }
 
 func TestNewConnStub_Conn型のスタブオブジェクトを生成できる(t *testing.T) {
 	c := NewConnStub()
-	stubType := reflect.TypeOf(c)
-	expectType := reflect.TypeOf((*net.Conn)(nil)).Elem()
-	if !stubType.Implements(expectType) {
+	_, ok := interface{}(c).(net.Conn)
+	if !ok {
 		t.Fatalf("生成されたオブジェクトがnet.Conn型ではない。")
 	}
 }
 
 func TestNewAddrStub_Addr型のスタブオブジェクトを生成できる(t *testing.T) {
 	a := NewAddrStub("127.0.0.1:12345")
-	stubType := reflect.TypeOf(a)
-	expectType := reflect.TypeOf((*net.Addr)(nil)).Elem()
-	if !stubType.Implements(expectType) {
+	_, ok := interface{}(a).(net.Addr)
+	if !ok {
 		t.Fatalf("生成されたオブジェクトがnet.Addr型ではない。")
 	}
 }
