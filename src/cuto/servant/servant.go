@@ -14,6 +14,8 @@ import (
 	"cuto/servant/remote"
 )
 
+var isTest bool = false
+
 // サーバントメインルーチン
 func Run() (int, error) {
 	// セッションの用意
@@ -26,18 +28,24 @@ func Run() (int, error) {
 	signalCh := make(chan os.Signal)
 	signal.Notify(signalCh, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
 
-LOOP:
+	eventLoop(signalCh, sq)
+	return 0, nil
+}
+
+func eventLoop(signalCh <-chan os.Signal, sq <-chan *remote.Session) {
 	for {
 		select {
 		case ch := <-signalCh: // OSからシグナルキャッチ
 			if isEnd := isEndSig(ch); isEnd {
-				break LOOP
+				return
 			}
 		case session := <-sq: // マスタからの要求受信
 			go session.Do(config.Servant)
+			if isTest {
+				return
+			}
 		}
 	}
-	return 0, nil
 }
 
 func isEndSig(sig os.Signal) bool {

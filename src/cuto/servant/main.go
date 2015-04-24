@@ -27,11 +27,11 @@ const (
 
 // エントリポイント
 func main() {
-	os.Exit(realMain())
+	args := fetchArgs()
+	os.Exit(realMain(args))
 }
 
-func realMain() int {
-	args := fetchArgs()
+func realMain(args *arguments) int {
 	if args.v {
 		showVersion()
 		return rc_OK
