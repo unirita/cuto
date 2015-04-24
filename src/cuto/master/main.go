@@ -10,6 +10,7 @@ import (
 
 	"cuto/console"
 	"cuto/log"
+	"cuto/message"
 
 	"cuto/master/config"
 	"cuto/master/jobnet"
@@ -60,6 +61,8 @@ func realMain(args *arguments) int {
 	if args.configPath == "" {
 		args.configPath = defaultConfig
 	}
+
+	message.MasterVersion = Version
 
 	if err := config.Load(args.configPath); err != nil {
 		console.Display("CTM004E", args.configPath)

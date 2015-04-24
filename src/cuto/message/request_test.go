@@ -8,6 +8,7 @@ import (
 func TestRequest_実行命令メッセージをパースできる(t *testing.T) {
 	message := `{
     "type":"request",
+    "version":"1.2.3",
     "nid":1234,
     "jid":"job1",
     "path":"C:\\work\\test.bat",
@@ -27,6 +28,9 @@ func TestRequest_実行命令メッセージをパースできる(t *testing.T) 
 		t.Fatalf("想定外のエラーが発生しました: %s", err)
 	}
 
+	if req.Version != "1.2.3" {
+		t.Errorf("取得したversionの値が違います： %s", req.Version)
+	}
 	if req.NID != 1234 {
 		t.Errorf("取得したnidの値が違います： %d", req.NID)
 	}
@@ -65,6 +69,7 @@ func TestRequest_実行命令メッセージをパースできる(t *testing.T) 
 func TestRequest_JSON文字列としてパースできない場合はエラーとする(t *testing.T) {
 	message := `
     "type":"request",
+    "version":"1.2.3",
     "nid":1234,
     "jid":"job1",
     "path":"C:\\work\\test.bat",
@@ -88,6 +93,7 @@ func TestRequest_JSON文字列としてパースできない場合はエラー�
 func TestRequest_メッセージタイプが違う場合はエラーとする(t *testing.T) {
 	message := `{
 	"type":"somthingelse",
+    "version":"1.2.3",
     "nid":1234,
     "jid":"job1",
     "path":"C:\\work\\test.bat",
@@ -109,6 +115,8 @@ func TestRequest_メッセージタイプが違う場合はエラーとする(t 
 }
 
 func TestRequest_プロパティ値からJSONメッセージを生成できる(t *testing.T) {
+	MasterVersion = "1.2.3"
+
 	var req Request
 	req.NID = 1234
 	req.JID = `job1`
@@ -127,7 +135,7 @@ func TestRequest_プロパティ値からJSONメッセージを生成できる(t
 		t.Fatalf("想定外のエラーが発生しました: %s", err)
 	}
 
-	expect := `{"type":"request","nid":1234,"jid":"job1","path":"C:\\work\\test.bat","param":"test","env":"testenv","workspace":"C:\\work","warnrc":10,"warnstr":"warn","errrc":20,"errstr":"err","timeout":60}`
+	expect := `{"type":"request","version":"1.2.3","nid":1234,"jid":"job1","path":"C:\\work\\test.bat","param":"test","env":"testenv","workspace":"C:\\work","warnrc":10,"warnstr":"warn","errrc":20,"errstr":"err","timeout":60}`
 	if msg != expect {
 		t.Error("生成されたJSONメッセージが想定値と違います")
 		t.Logf("生成値: %s", msg)

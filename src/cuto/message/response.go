@@ -8,16 +8,20 @@ import (
 	"fmt"
 )
 
+// レスポンスメッセージ送信元servantのバージョン
+var ServantVersion string
+
 type Response struct {
-	Type   string `json:"type"`
-	NID    int    `json:"nid"`
-	JID    string `json:"jid"`
-	RC     int    `json:"rc"`
-	Stat   int    `json:"stat"`
-	Detail string `json:"detail"`
-	Var    string `json:"var"`
-	St     string `json:"st"`
-	Et     string `json:"et"`
+	Type    string `json:"type"`
+	Version string `json:"version"`
+	NID     int    `json:"nid"`
+	JID     string `json:"jid"`
+	RC      int    `json:"rc"`
+	Stat    int    `json:"stat"`
+	Detail  string `json:"detail"`
+	Var     string `json:"var"`
+	St      string `json:"st"`
+	Et      string `json:"et"`
 }
 
 const responseMessageType = "response"
@@ -45,6 +49,7 @@ func (r *Response) ParseJSON(message string) error {
 // return : JSONフォーマット整形後の文字列。
 func (r Response) GenerateJSON() (string, error) {
 	r.Type = responseMessageType
+	r.Version = ServantVersion
 	byteMessage, err := json.Marshal(r)
 	if err != nil {
 		return ``, err

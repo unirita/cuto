@@ -5,6 +5,7 @@ import "testing"
 func TestResponse_実行結果メッセージをパースできる(t *testing.T) {
 	message := `{
     "type":"response",
+	"version":"1.2.3",
 	"nid":1234,
 	"jid":"job1",
     "rc":10,
@@ -21,6 +22,9 @@ func TestResponse_実行結果メッセージをパースできる(t *testing.T)
 		t.Fatalf("想定外のエラーが発生しました: %s", err)
 	}
 
+	if res.Version != `1.2.3` {
+		t.Errorf("取得したversionの値が違います： %s", res.Version)
+	}
 	if res.NID != 1234 {
 		t.Errorf("取得したnidの値が違います： %d", res.NID)
 	}
@@ -50,6 +54,7 @@ func TestResponse_実行結果メッセージをパースできる(t *testing.T)
 func TestResponse_JSON文字列としてパースできない場合はエラーとする(t *testing.T) {
 	message := `
     "type":"response",
+	"version":"1.2.3",
 	"nid":1234,
 	"jid":"job1",
     "rc":10,
@@ -71,6 +76,7 @@ func TestResponse_JSON文字列としてパースできない場合はエラー�
 func TestResponse_メッセージタイプが違う場合はエラーとする(t *testing.T) {
 	message := `{
 	"type":"somthingelse",
+	"version":"1.2.3",
 	"nid":1234,
 	"jid":"job1",
     "rc":10,
@@ -90,6 +96,8 @@ func TestResponse_メッセージタイプが違う場合はエラーとする(t
 }
 
 func TestResponse_プロパティ値からJSONメッセージを生成できる(t *testing.T) {
+	ServantVersion = "1.2.3"
+
 	var res Response
 	res.NID = 1234
 	res.JID = `job1`
@@ -106,7 +114,7 @@ func TestResponse_プロパティ値からJSONメッセージを生成できる(
 		t.Fatalf("想定外のエラーが発生しました: %s", err)
 	}
 
-	expect := `{"type":"response","nid":1234,"jid":"job1","rc":10,"stat":2,"detail":"something","var":"somevalue","st":"2015-03-26 13:21:15.000","et":"2015-03-26 19:21:16.000"}`
+	expect := `{"type":"response","version":"1.2.3","nid":1234,"jid":"job1","rc":10,"stat":2,"detail":"something","var":"somevalue","st":"2015-03-26 13:21:15.000","et":"2015-03-26 19:21:16.000"}`
 	if msg != expect {
 		t.Error("生成されたJSONメッセージが想定値と違います")
 		t.Logf("生成値: %s", msg)

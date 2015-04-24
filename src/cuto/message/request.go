@@ -8,9 +8,13 @@ import (
 	"fmt"
 )
 
+// リクエストメッセージ送信元masterのバージョン
+var MasterVersion string
+
 // 要求メッセージ。
 type Request struct {
 	Type      string `json:"type"`
+	Version   string `json:"version"`
 	NID       int    `json:"nid"`
 	JID       string `json:"jid"`
 	Path      string `json:"path"`
@@ -50,6 +54,7 @@ func (r *Request) ParseJSON(message string) error {
 // return : JSONメッセージフォーマットの文字列。
 func (r Request) GenerateJSON() (string, error) {
 	r.Type = requestMessageType
+	r.Version = MasterVersion
 	byteMessage, err := json.Marshal(r)
 	if err != nil {
 		return ``, err

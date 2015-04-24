@@ -37,6 +37,8 @@ func realMain(args *arguments) int {
 		return rc_OK
 	}
 
+	message.ServantVersion = Version
+
 	// システム変数のセット
 	message.AddSysValue("ROOT", "", util.GetRootPath())
 

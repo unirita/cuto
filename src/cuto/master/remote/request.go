@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"cuto/log"
 	"cuto/master/config"
 	"cuto/message"
 )
@@ -37,6 +38,7 @@ func SendRequest(host string, port int, req string, stCh chan<- string) (string,
 
 	defer conn.Close()
 
+	log.Debug(req)
 	_, err = conn.Write([]byte(req))
 	if err != nil {
 		return ``, err
@@ -53,6 +55,7 @@ WAITRESPONSE:
 				return ``, err
 			}
 			res = string(buf)
+			log.Debug(res)
 			if res == message.HEARTBEAT {
 				// ハートビートメッセージの場合はバッファサイズを初期化して再度read待ちをする。
 				//@todo 1度目の受信でジョブの起動ステータスを更新したい。
