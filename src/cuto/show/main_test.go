@@ -58,7 +58,7 @@ func vefiry_stdout(output_file, vefiry_file string) error {
 }
 
 func TestRealMain_1日分のジョブネットを表示(t *testing.T) {
-	vefiry_file := "showtest_verify1.log"
+	vefiry_file := "showtest_verify1.txt"
 	arg := &arguments{
 		jobnet: "",
 		from:   "20150415",

@@ -99,6 +99,7 @@ var msgs = map[string]string{
 	"CTU003E": "EXCEPTION OCCURED - %v",
 	"CTU004E": "AN INTERNAL ERROR OCCURRED. - %v",
 	"CTU005W": "FAILED TO JOB INFORMATION NID[%v]. - %v",
+	"CTU006E": "NOT FOUND CONFIG FILE. - %v",
 }
 
 // 標準出力へメッセージコードcodeに対応したメッセージを表示する。
