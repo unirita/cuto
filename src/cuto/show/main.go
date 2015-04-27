@@ -21,7 +21,7 @@ import (
 type arguments struct {
 	help   bool   // Usageを表示
 	v      bool   // バージョン情報表示
-	jobnet string // ジョブネットワーク名
+	flow   string // ジョブネットワーク名
 	from   string // From日付
 	to     string // To日付
 	status string // ジョブネットワークのステータス
@@ -102,7 +102,7 @@ func realMain(args *arguments) int {
 		showUsage()
 		return rc_PARMERR
 	}
-	param := NewShowParam(args.jobnet, from, to, status, &gen)
+	param := NewShowParam(args.flow, from, to, status, &gen)
 	rc, err := param.Run(config.DB.DBFile)
 	if err != nil {
 		console.DisplayError("CTU004E", err)
@@ -119,7 +119,7 @@ func fetchArgs() *arguments {
 	flag.Usage = showUsage
 	flag.BoolVar(&args.help, "help", false, "usage option.")
 	flag.BoolVar(&args.v, "v", false, "version option.")
-	flag.StringVar(&args.jobnet, "jobnet", "", "network name option.")
+	flag.StringVar(&args.flow, "flow", "", "flow name option.")
 	flag.StringVar(&args.from, "from", "", "From date.")
 	flag.StringVar(&args.to, "to", "", "To date.")
 	flag.StringVar(&args.status, "status", "", "Jobnetwork status.")

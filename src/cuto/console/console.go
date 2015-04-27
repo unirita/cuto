@@ -16,7 +16,7 @@ const USAGE = `Usage :
 
 Option :
     -v            :   Print master version.
-    -n Jobnetwork :   Designate a Jobnetwork name .
+    -n bpmn name  :   Designate a bpmn file name.(Without extensions.)
     -s            :   Execute Jobnetwork.
     -c ConfigFile :   Designate config file path.
                       If it is omitted, '<Current Directory>/master.ini' will be used.
@@ -28,11 +28,11 @@ var stack_msg = []string{"CTM019E", "CTS019E", "CTU003E"}
 
 // showユーティリティのUSAGE表示用の定義メッセージ
 const USAGE_SHOW = `Usage :
-    show.exe [-v] [-jobnet="Jobnetwork name"] [-From="From date"] [-to="To date"] [-status="normal" | "abnormal" | "running"] [-format="json" | "csv"]
+    show.exe [-v] [-flow="bpmn file name"] [-From="From date"] [-to="To date"] [-status="normal" | "abnormal" | "running"] [-format="json" | "csv"]
 
 Option :
     -v                 :   Print master version.
-    -jobnet=Jobnetwork :   Designate a Jobnetwork name .
+    -flow=flow name    :   Designate a bpmn name.
     -from=yyyymmdd     :   From date is designated.
     -to=yyyymmdd       :   To date is designated.
     -status=normal     :   Status indicates only something of NORMAL-END.
