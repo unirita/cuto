@@ -66,6 +66,12 @@ func (r *ResultMap) EndJobNetwork(status int, detail string) error {
 	r.JobnetResult.Status = status
 	r.JobnetResult.Detail = detail
 
+	for _, jobresult := range r.Jobresults {
+		if r.JobnetResult.Status < jobresult.Status {
+			r.JobnetResult.Status = jobresult.Status
+		}
+	}
+
 	if err := r.updateJobNetwork(); err != nil {
 		return err
 	}

@@ -8,7 +8,7 @@ import (
 )
 
 func TestJobnameHasInvalidRune_禁則文字を含まない(t *testing.T) {
-	target := "ソ !#%&'()-=^~@`[{]};+,. _"
+	target := "ソ !#%'()-=^~@`[{]};+,. _"
 	if JobnameHasInvalidRune(target) {
 		t.Error("禁則文字を含んでいないが失敗した。")
 	}
@@ -72,6 +72,13 @@ func TestJobnameHasInvalidRune_小なりを含む(t *testing.T) {
 
 func TestJobnameHasInvalidRune_ドルマークを含む(t *testing.T) {
 	target := "$abc"
+	if !JobnameHasInvalidRune(target) {
+		t.Errorf("禁則文字[%v]を含んでいるが、trueが返った。", target)
+	}
+}
+
+func TestJobnameHasInvalidRune_アンパサンドを含む(t *testing.T) {
+	target := "&abc"
 	if !JobnameHasInvalidRune(target) {
 		t.Errorf("禁則文字[%v]を含んでいるが、trueが返った。", target)
 	}

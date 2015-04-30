@@ -345,6 +345,8 @@ func (n *Network) start() error {
 	if err != nil {
 		return err
 	}
+
+	n.ID = n.Result.JobnetResult.ID
 	message.AddSysValue(`JOBNET`, `ID`, strconv.Itoa(n.ID))
 	message.AddSysValue(`JOBNET`, `SD`, n.Result.JobnetResult.StartDate)
 

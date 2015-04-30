@@ -123,7 +123,7 @@ func (j *jobInstance) createShell() *exec.Cmd {
 		param = fmt.Sprintf("/nologo %s %s", script, j.param)
 	} else if strings.HasSuffix(j.path, ".jar") { // JAVA
 		shell = "java.exe"
-		param = fmt.Sprintf("%s %s", script, j.param)
+		param = fmt.Sprintf("-jar %s %s", script, j.param)
 	} else if strings.HasSuffix(j.path, ".ps1") { // PowerShell
 		shell = "powershell.exe"
 		param = fmt.Sprintf("%s %s", script, j.param)

@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-const invalid_jobname_ptr = "\\/:*?\"<>|$"
+const invalid_jobname_ptr = "\\/:*?\"<>|$&"
 
 // 指定したジョブ名に、禁止文字が存在するか確認する。
 // 現在の仕様では 「 \/:*?"<>|$ 」の記号が使用禁止。
