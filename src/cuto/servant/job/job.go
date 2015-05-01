@@ -82,14 +82,14 @@ func DoJobRequest(req *message.Request, conf *config.ServantConfig, stCh chan<- 
 
 	err := job.run(cmd, stCh)
 	if err != nil {
-		log.Error(err)
+		console.DisplayError("CTS019E", err)
 		job.stat = db.ABNORMAL
 		job.detail = err.Error()
 	} else {
 		rcSt := job.judgeRC()
 		ptnSt, err := job.writeFileAndJodgeJoblog()
 		if err != nil {
-			log.Error(err)
+			console.DisplayError("CTS019E", err)
 			job.stat = db.ABNORMAL
 			job.detail = err.Error()
 		} else {
@@ -292,7 +292,7 @@ func (j *jobInstance) createResponse() *message.Response {
 func (j *jobInstance) setVariableValue() {
 	file, err := os.Open(j.joblogFile)
 	if err != nil {
-		log.Error(err)
+		console.DisplayError("CTS019E", err)
 	}
 	defer file.Close()
 
