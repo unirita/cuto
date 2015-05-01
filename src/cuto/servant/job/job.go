@@ -119,13 +119,13 @@ func (j *jobInstance) createShell() *exec.Cmd {
 	}
 	// 拡張子に応じた、実行シェルを作成
 	if strings.HasSuffix(j.path, ".vbs") || strings.HasSuffix(j.path, ".js") { // WSH
-		shell = "cscript.exe"
+		shell = "cscript"
 		param = fmt.Sprintf("/nologo %s %s", script, j.param)
 	} else if strings.HasSuffix(j.path, ".jar") { // JAVA
-		shell = "java.exe"
+		shell = "java"
 		param = fmt.Sprintf("-jar %s %s", script, j.param)
 	} else if strings.HasSuffix(j.path, ".ps1") { // PowerShell
-		shell = "powershell.exe"
+		shell = "powershell"
 		param = fmt.Sprintf("%s %s", script, j.param)
 	} else { // bat or exe
 		shell = script

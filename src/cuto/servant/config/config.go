@@ -20,9 +20,9 @@ const (
 	defaultBindPort         = 2015
 	defaultHeartbeatSpanSec = 30
 	defaultMultiProc        = 20
-	defaultJobDir           = `.\jobscript`
-	defaultJoblogDir        = `.\joblog`
-	defaultLogDir           = `.\log`
+	defaultJobDir           = `jobscript`
+	defaultJoblogDir        = `joblog`
+	defaultLogDir           = `log`
 	defaultOutputLevel      = `info`
 	defaultMaxSizeKB        = 10240
 	defaultMaxGeneration    = 2
@@ -89,15 +89,19 @@ var RootPath string
 
 func init() {
 	RootPath = util.GetRootPath()
-	FilePath = fmt.Sprintf("%s%c%s%c%s", RootPath, os.PathSeparator, dirName, os.PathSeparator, fileName)
+	//	FilePath = fmt.Sprintf("%s%c%s%c%s", RootPath, os.PathSeparator, dirName, os.PathSeparator, fileName)
+	FilePath = fmt.Sprintf(".%c%s%c%s", os.PathSeparator, dirName, os.PathSeparator, fileName)
 }
 
 // 設定ファイルを読み込む
 // 読み込みに失敗する場合はDefaultServantConfig関数でデフォルト値を設定する。
 //
 // 戻り値: 設定値を格納したServantConfig構造体オブジェクト
-func ReadConfig() *ServantConfig {
+func ReadConfig(configPath string) *ServantConfig {
 	var err error
+	if len(configPath) > 0 {
+		FilePath = configPath
+	}
 	Servant, err = loadFile(FilePath)
 	if err != nil {
 		console.Display("CTS004W", FilePath)
@@ -113,7 +117,7 @@ func ReadConfig() *ServantConfig {
 // 戻り値: 設定値を格納したServantConfig構造体オブジェクト
 func ReloadConfig() *ServantConfig {
 	//@TODO 今はとりあえずファイル読むだけ
-	return ReadConfig()
+	return ReadConfig(FilePath)
 }
 
 // 設定値のエラー検出を行う。

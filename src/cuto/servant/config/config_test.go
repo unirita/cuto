@@ -23,7 +23,7 @@ func generateTestConfig() *ServantConfig {
 func TestReadConfig_設定ファイルが開けない場合はデフォルト値をセットする(t *testing.T) {
 	RootPath = `C:\cuto`
 	FilePath = `noexistsfilepath`
-	ReadConfig()
+	ReadConfig("")
 
 	if Servant.Sys.BindAddress != defaultBindAddress {
 		t.Errorf("bind_addressの設定値[%s]が想定と違っている。", Servant.Sys.BindAddress)
@@ -37,13 +37,13 @@ func TestReadConfig_設定ファイルが開けない場合はデフォルト値
 	if Servant.Job.MultiProc != defaultMultiProc {
 		t.Errorf("heartbeat_span_secの設定値[%d]が想定と違っている。", Servant.Job.MultiProc)
 	}
-	if Servant.Dir.JobDir != `C:\cuto\jobscript` {
+	if Servant.Dir.JobDir != `jobscript` {
 		t.Errorf("job_dirの設定値[%s]が想定と違っている。", Servant.Dir.JobDir)
 	}
-	if Servant.Dir.JoblogDir != `C:\cuto\joblog` {
+	if Servant.Dir.JoblogDir != `joblog` {
 		t.Errorf("joblog_dirの設定値[%s]が想定と違っている。", Servant.Dir.JoblogDir)
 	}
-	if Servant.Dir.LogDir != `C:\cuto\log` {
+	if Servant.Dir.LogDir != `log` {
 		t.Errorf("log_dirの設定値[%s]が想定と違っている。", Servant.Dir.LogDir)
 	}
 	if Servant.Log.OutputLevel != defaultOutputLevel {

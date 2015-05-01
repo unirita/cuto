@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	config.ReadConfig()
+	config.ReadConfig("")
 }
 
 func TestStartReceive_ポート番号に定義外の値を渡すとエラーが発生する(t *testing.T) {

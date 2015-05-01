@@ -1,0 +1,5 @@
+#Type,JobNetwork ID,JobNetwork Name,Start Date,End Date,Status,Detail Message,Create Date,Update Date
+JOBNET,101,jn101,2015-04-27 14:15:24.999,2015-04-27 14:25:24.999,1,,2015-04-27 14:15:24.999,2015-04-27 14:25:24.999
+#Type,JobNework ID,Job ID,Job Name,Start Date,End Date,Status,Detail Message,Return Code,Node,Port,Variable,CreateDate,Update Date
+JOB,101,job1,jobName1,2015-04-27 14:15:24.999,2015-04-27 14:25:24.999,1,NORMAL,0,localhost,2015,Var1,2015-04-27 14:15:24.999,2015-04-27 14:25:24.999
+JOB,101,job2,jobName2,2015-04-27 14:15:24.999,2015-04-27 14:25:24.999,2,ABNORMAL,1,localhost,2015,Var2,2015-04-27 14:15:24.999,2015-04-27 14:25:24.999

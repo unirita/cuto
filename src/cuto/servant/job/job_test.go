@@ -20,13 +20,15 @@ var conf *config.ServantConfig
 
 // ジョブログなどの掃除
 func init() {
-	root := os.Getenv("GOPATH")
-	err := os.Chdir(root + "\\test\\cuto\\servant\\job")
+	s := os.PathSeparator
+	testPath := fmt.Sprintf("%s%c%s%c%s%c%s%c%s", os.Getenv("GOPATH"), s, "test", s, "cuto", s, "servant", s, "job")
+	err := os.Chdir(testPath)
+	config.RootPath = testPath
 	if err != nil {
 		panic(err.Error())
 	}
-	config.RootPath, _ = os.Getwd()
-	conf = config.ReadConfig()
+	configPath := fmt.Sprintf("%s%c%s", testPath, s, "servant.ini")
+	conf = config.ReadConfig(configPath)
 	os.RemoveAll(conf.Dir.JoblogDir)
 	err = os.Mkdir(conf.Dir.JoblogDir, 0666)
 	if err != nil {

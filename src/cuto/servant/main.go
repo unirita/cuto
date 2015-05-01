@@ -17,7 +17,8 @@ import (
 )
 
 type arguments struct {
-	v bool
+	v          bool
+	configPath string // 設定ファイルのパス
 }
 
 const (
@@ -36,7 +37,6 @@ func realMain(args *arguments) int {
 		showVersion()
 		return rc_OK
 	}
-
 	message.ServantVersion = Version
 
 	// システム変数のセット
@@ -44,7 +44,7 @@ func realMain(args *arguments) int {
 
 	console.Display("CTS001I", Version)
 
-	config.ReadConfig()
+	config.ReadConfig(args.configPath)
 	if err := config.Servant.DetectError(); err != nil {
 		console.Display("CTS005E", err)
 		return rc_error
@@ -75,6 +75,7 @@ func realMain(args *arguments) int {
 func fetchArgs() *arguments {
 	args := new(arguments)
 	flag.BoolVar(&args.v, "v", false, "version option")
+	flag.StringVar(&args.configPath, "c", "", "config file option")
 	flag.Parse()
 	return args
 }
