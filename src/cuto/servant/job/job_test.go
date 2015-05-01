@@ -34,6 +34,11 @@ func init() {
 	}
 }
 
+// メッセージ・DB向けの時刻フォーマットをジョブログファイル名向けのフォーマットに変換する。
+func stToTimestamp(st string) string {
+	return st[0:4] + st[5:7] + st[8:10] + st[11:13] + st[14:16] + st[17:]
+}
+
 // ジョブログファイル名をフルパスで作成する。
 // ”開始日(YYYYMMDD)\インスタンスID.ジョブ名（拡張子なし）.開始日時（yyyyMMddHHmmss.sss).log
 func createJoblogFileName(req *message.Request, st string, nID int) string {
@@ -100,7 +105,7 @@ func TestDoJobRequest_ジョブが正常に実行できる(t *testing.T) {
 		t.Error("ジョブ終了時間が無い.")
 	}
 
-	file, err := os.Open(createJoblogFileName(req, res.St, res.NID))
+	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID))
 	if err != nil {
 		t.Error("ジョブログがない。", err.Error())
 	}
@@ -162,7 +167,7 @@ func TestDoJobRequest_パス指定あり引数なしジョブが正常に実行�
 	if len(res.Et) == 0 {
 		t.Error("ジョブ終了時間が無い.")
 	}
-	file, err := os.Open(createJoblogFileName(req, res.St, res.NID))
+	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID))
 	if err != nil {
 		t.Error("ジョブログがない。", err.Error())
 	}
@@ -242,7 +247,7 @@ func TestDoJobRequest_RCで警告終了するジョブ_閾値と同じ(t *testin
 	if res.Stat != db.WARN {
 		t.Error("statが警告終了ではない")
 	}
-	file, err := os.Open(createJoblogFileName(req, res.St, res.NID))
+	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID))
 	if err != nil {
 		t.Error("ジョブログが存在しない.")
 	}
@@ -285,7 +290,7 @@ func TestDoJobRequest_RCで警告終了するがチェックしないジョブ(t
 	if res.Stat != db.NORMAL {
 		t.Error("statが正常終了ではない")
 	}
-	file, err := os.Open(createJoblogFileName(req, res.St, res.NID))
+	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID))
 	if err != nil {
 		t.Error("ジョブログが存在しない.")
 	}
@@ -330,7 +335,7 @@ func TestDoJobRequest_RCで警告終了しないジョブ_閾値未満(t *testin
 	if res.Stat != db.NORMAL {
 		t.Error("statが正常終了ではない")
 	}
-	file, err := os.Open(createJoblogFileName(req, res.St, res.NID))
+	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID))
 	if err != nil {
 		t.Error("ジョブログが存在しない.")
 	}
@@ -375,7 +380,7 @@ func TestDoJobRequest_標準出力で警告終了するジョブ_RC確認なし(
 	if res.Stat != db.WARN {
 		t.Error("statが警告終了ではない")
 	}
-	file, err := os.Open(createJoblogFileName(req, res.St, res.NID))
+	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID))
 	if err != nil {
 		t.Error("ジョブログが存在しない.")
 	}
@@ -420,7 +425,7 @@ func TestDoJobRequest_標準出力で警告終了するがチェックしない�
 	if res.Stat != db.NORMAL {
 		t.Error("statが正常終了ではない")
 	}
-	file, err := os.Open(createJoblogFileName(req, res.St, res.NID))
+	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID))
 	if err != nil {
 		t.Error("ジョブログが存在しない.")
 	}
@@ -465,7 +470,7 @@ func TestDoJobRequest_JSジョブが正常に実行できる(t *testing.T) {
 	if strings.Index(res.Et, "20140330110120") != -1 {
 		t.Error("テストのテスト")
 	}
-	file, err := os.Open(createJoblogFileName(req, res.St, res.NID))
+	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID))
 	if err != nil {
 		t.Error("ジョブログがない。", err.Error())
 	}
@@ -510,7 +515,7 @@ func TestDoJobRequest_標準エラー出力で警告終了するVBSジョブ_RC�
 	if res.Stat != db.WARN {
 		t.Error("statが警告終了ではない")
 	}
-	file, err := os.Open(createJoblogFileName(req, res.St, res.NID))
+	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID))
 	if err != nil {
 		t.Error("ジョブログが存在しない.")
 	}
@@ -553,7 +558,7 @@ func TestDoJobRequest_RCで異常終了するジョブ_閾値と同じ(t *testin
 	if res.Stat != db.ABNORMAL {
 		t.Error("statが異常終了ではない")
 	}
-	file, err := os.Open(createJoblogFileName(req, res.St, res.NID))
+	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID))
 	if err != nil {
 		t.Error("ジョブログが存在しない.")
 	}
@@ -598,7 +603,7 @@ func TestDoJobRequest_RCで異常終了するがチェックしないジョブ(t
 	if res.Stat != db.NORMAL {
 		t.Error("statが正常終了ではない")
 	}
-	file, err := os.Open(createJoblogFileName(req, res.St, res.NID))
+	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID))
 	if err != nil {
 		t.Error("ジョブログが存在しない.")
 	}
@@ -641,7 +646,7 @@ func TestDoJobRequest_RCで異常終了して標準出力で警告終了する�
 	if res.Stat != db.ABNORMAL {
 		t.Error("statが異常終了ではない")
 	}
-	file, err := os.Open(createJoblogFileName(req, res.St, res.NID))
+	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID))
 	if err != nil {
 		t.Error("ジョブログが存在しない.")
 	}
@@ -684,7 +689,7 @@ func TestDoJobRequest_RCで警告終了して標準出力で異常終了する�
 	if res.Stat != db.ABNORMAL {
 		t.Error("statが異常終了ではない")
 	}
-	file, err := os.Open(createJoblogFileName(req, res.St, res.NID))
+	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID))
 	if err != nil {
 		t.Error("ジョブログが存在しない.")
 	}
@@ -729,7 +734,7 @@ func TestDoJobRequest_日本語ジョブ(t *testing.T) {
 	if res.Stat != db.NORMAL {
 		t.Error("statが異常終了")
 	}
-	file, err := os.Open(createJoblogFileName(req, res.St, res.NID))
+	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID))
 	if err != nil {
 		t.Error("ジョブログが存在しない.")
 	}
@@ -778,7 +783,7 @@ func TestDoJobRequest_powershellジョブを実行(t *testing.T) {
 		t.Error("ジョブ終了時間が無い.")
 	}
 
-	file, err := os.Open(createJoblogFileName(req, res.St, res.NID))
+	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID))
 	if err != nil {
 		t.Error("ジョブログがない。", err.Error())
 	}
