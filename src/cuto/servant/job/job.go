@@ -25,26 +25,27 @@ import (
 
 // 実行ジョブ情報
 type jobInstance struct {
-	config     *config.ServantConfig // サーバントの設定情報
-	nID        int                   // ネットワークID
-	path       string                // ジョブファイル
-	param      string                // 実行時パラメータ
-	env        string                // 環境変数
-	workDir    string                // 作業フォルダ
-	wrnRC      int                   // 警告終了の戻り値
-	wrnPtn     string                // 警告終了の文字列パターン
-	errRC      int                   // 異常終了の戻り値
-	errPtn     string                // 異常終了の文字列パターン
-	timeout    int                   // 実行タイムアウトまでの時間（秒）
-	jID        string                // ジョブID
-	rc         int                   // ジョブの戻り値
-	stat       int                   // ジョブステータス
-	detail     string                // 異常終了時のメッセージ
-	variable   string                // 変数情報
-	st         string                // ジョブ開始日時
-	et         string                // ジョブ終了日時
-	joblog     string                // ジョブログ内容
-	joblogFile string                // ジョブログファイル名
+	config          *config.ServantConfig // サーバントの設定情報
+	nID             int                   // ネットワークID
+	path            string                // ジョブファイル
+	param           string                // 実行時パラメータ
+	env             string                // 環境変数
+	workDir         string                // 作業フォルダ
+	wrnRC           int                   // 警告終了の戻り値
+	wrnPtn          string                // 警告終了の文字列パターン
+	errRC           int                   // 異常終了の戻り値
+	errPtn          string                // 異常終了の文字列パターン
+	timeout         int                   // 実行タイムアウトまでの時間（秒）
+	jID             string                // ジョブID
+	rc              int                   // ジョブの戻り値
+	stat            int                   // ジョブステータス
+	detail          string                // 異常終了時のメッセージ
+	variable        string                // 変数情報
+	st              string                // ジョブ開始日時
+	et              string                // ジョブ終了日時
+	joblog          string                // ジョブログ内容
+	joblogFile      string                // ジョブログファイル名
+	joblogTimestamp string                // ジョブログファイル名に使用するタイムスタンプ文字列
 }
 
 // 実行ジョブ情報のコンストラクタ
@@ -154,13 +155,15 @@ func (j *jobInstance) run(cmd *exec.Cmd, stCh chan<- string) error {
 	if err := cmd.Start(); err != nil {
 		return err
 	}
-	j.st = util.DateJoblogFormat(time.Now()) // ジョブ開始日時の取得
+	startTime := time.Now()
+	j.st = util.DateFormat(startTime) // ジョブ開始日時の取得
+	j.joblogTimestamp = util.DateJoblogFormat(startTime)
 	stCh <- j.st
 
 	console.Display("CTS010I", j.path, j.nID, j.jID, cmd.Process.Pid)
 
 	err := j.waitCmdTimeout(cmd)
-	j.et = util.DateJoblogFormat(time.Now()) // ジョブ終了日時の取得
+	j.et = util.DateFormat(time.Now()) // ジョブ終了日時の取得
 
 	if err != nil {
 		if e2, ok := err.(*exec.ExitError); ok {
@@ -266,12 +269,12 @@ func (j *jobInstance) createJoblogFileName() string {
 		job = job[:extpos]
 	}
 	// 開始日フォルダの作成
-	joblogDir := fmt.Sprintf("%v%c%v", j.config.Dir.JoblogDir, os.PathSeparator, j.st[:8])
+	joblogDir := fmt.Sprintf("%v%c%v", j.config.Dir.JoblogDir, os.PathSeparator, j.joblogTimestamp[:8])
 	if _, err := os.Stat(joblogDir); err != nil {
 		os.Mkdir(joblogDir, 0666)
 	}
 	log.Debug("joblogDir = ", joblogDir)
-	return fmt.Sprintf("%v%c%v.%v.%v.log", joblogDir, os.PathSeparator, j.nID, job, j.st)
+	return fmt.Sprintf("%v%c%v.%v.%v.log", joblogDir, os.PathSeparator, j.nID, job, j.joblogTimestamp)
 }
 
 // レスポンスメッセージの作成

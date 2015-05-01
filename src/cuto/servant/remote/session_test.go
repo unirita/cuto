@@ -35,6 +35,7 @@ func doTestRequest(req *message.Request, conf *config.ServantConfig, stCh chan<-
 func TestDo_ジョブを実行し結果を送信できる(t *testing.T) {
 	reqMsg := `{
 	"type":"request",
+	"varsion":"1.2.3",
 	"nid":1234,
 	"jid":"001",
 	"path":"C:\\work\\test.bat",
@@ -48,6 +49,7 @@ func TestDo_ジョブを実行し結果を送信できる(t *testing.T) {
 }`
 
 	conf := readTestConfig()
+	message.ServantVersion = "2.3.4"
 
 	conn := testutil.NewConnStub()
 	session := Session{Conn: conn, Body: reqMsg, doJobRequest: doTestRequest}
@@ -57,7 +59,7 @@ func TestDo_ジョブを実行し結果を送信できる(t *testing.T) {
 		t.Fatalf("想定外のエラーが発生した: %s", err)
 	}
 
-	expected := `{"type":"response","version":"","nid":1234,"jid":"001","rc":1,"stat":1,"detail":"detail","var":"","st":"20150331131524.123456789","et":"20150331131525.123456789"}`
+	expected := `{"type":"response","version":"2.3.4","nid":1234,"jid":"001","rc":1,"stat":1,"detail":"detail","var":"","st":"20150331131524.123456789","et":"20150331131525.123456789"}`
 	if conn.WriteStr != expected {
 		t.Errorf("送信されたジョブ実行結果が間違っています。")
 		t.Logf("想定値: %s", expected)
@@ -86,6 +88,7 @@ func TestDo_パースできないリクエストメッセージが来たらエ�
 func TestDo_使用不可能な変数が使用されたら異常終了のレスポンスを返す(t *testing.T) {
 	reqMsg := `{
 	"type":"request",
+	"varsion":"1.2.3",
 	"nid":1234,
 	"jid":"001",
 	"path":"C:\\work\\test.bat",
@@ -116,6 +119,7 @@ func TestDo_使用不可能な変数が使用されたら異常終了のレス�
 func TestDo_コネクションオブジェクトへのWriteに失敗したらエラー(t *testing.T) {
 	reqMsg := `{
 	"type":"request",
+	"varsion":"1.2.3",
 	"nid":1234,
 	"jid":"001",
 	"path":"C:\\work\\test.bat",
