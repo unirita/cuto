@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"cuto/db"
+	"cuto/db/tx"
 	"cuto/log"
 	"cuto/master/config"
 	"cuto/master/remote"
@@ -181,6 +182,7 @@ func (j *Job) start(req *message.Request) {
 	jobres.Status = db.RUNNING
 
 	j.Instance.Result.Jobresults[j.ID()] = jobres
+	tx.InsertJob(j.Instance.Result.GetConnection(), jobres)
 }
 
 // ジョブ実行結果にジョブの開始時刻をセットする。
@@ -198,6 +200,7 @@ func (j *Job) waitAndSetResultStartDate(stCh <-chan string) {
 		return
 	}
 	jobres.StartDate = st
+	tx.UpdateJob(j.Instance.Result.GetConnection(), jobres)
 }
 
 // ジョブの終了メッセージから、ジョブ状態の更新を行う。
@@ -217,6 +220,7 @@ func (j *Job) end(res *message.Response) {
 	jobres.Variable = res.Var
 
 	message.AddJobValue(j.Name, res)
+	tx.UpdateJob(j.Instance.Result.GetConnection(), jobres)
 }
 
 // サーバントへ送受信失敗した場合の異常終了処理
@@ -227,5 +231,6 @@ func (j *Job) abnormalEnd(err error) error {
 	}
 	jobres.Status = db.ABNORMAL
 	jobres.Detail = err.Error()
+	tx.UpdateJob(j.Instance.Result.GetConnection(), jobres)
 	return err
 }
