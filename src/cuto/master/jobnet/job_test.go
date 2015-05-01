@@ -5,6 +5,7 @@ import (
 	"testing"
 	"time"
 
+	"cuto/db"
 	"cuto/db/tx"
 	"cuto/message"
 )
@@ -12,6 +13,13 @@ import (
 func newTestNetwork() *Network {
 	n, _ := NewNetwork("test")
 	n.Result = &tx.ResultMap{JobnetResult: nil, Jobresults: make(tx.JobMap)}
+
+	dbpath := getTestDBPath()
+	conn, err := db.Open(dbpath)
+	if err != nil {
+		panic(err)
+	}
+	n.Result.SetConnection(conn)
 	return n
 }
 

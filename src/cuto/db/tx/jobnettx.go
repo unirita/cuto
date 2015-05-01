@@ -135,3 +135,8 @@ func (r *ResultMap) updateJobNetwork() error {
 	isCommit = true
 	return nil
 }
+
+// DBコネクションを外部から渡す。テスト用のメソッド。
+func (r *ResultMap) SetConnection(conn db.IConnection) {
+	r.conn = conn
+}
