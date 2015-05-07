@@ -90,7 +90,7 @@ var RootPath string
 func init() {
 	RootPath = util.GetRootPath()
 	//	FilePath = fmt.Sprintf("%s%c%s%c%s", RootPath, os.PathSeparator, dirName, os.PathSeparator, fileName)
-	FilePath = fmt.Sprintf(".%c%s%c%s", os.PathSeparator, dirName, os.PathSeparator, fileName)
+	FilePath = fmt.Sprintf(".%c%s", os.PathSeparator, fileName)
 }
 
 // 設定ファイルを読み込む

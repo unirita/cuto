@@ -120,7 +120,7 @@ func TestRealMain_ネットワーク名が指定されなかった場合(t *test
 	if rc != rc_ERROR {
 		t.Errorf("想定外のrc[%d]が返された。", rc)
 	}
-	if !strings.HasPrefix(out, "INVALID ARGUMENT.") {
+	if !strings.Contains(out, "INVALID ARGUMENT.") {
 		t.Error("出力内容が想定と違っている。")
 		t.Logf("出力: %s", out)
 	}
@@ -140,7 +140,7 @@ func TestRealMain_存在しない設定ファイルが指定された場合(t *t
 	if rc != rc_ERROR {
 		t.Errorf("想定外のrc[%d]が返された。", rc)
 	}
-	if !strings.HasPrefix(out, "FAILED TO READ EXPAND JOB CONFIG FILE") {
+	if !strings.Contains(out, "FAILED TO READ EXPAND JOB CONFIG FILE") {
 		t.Error("出力内容が想定と違っている。")
 		t.Logf("出力: %s", out)
 	}
@@ -160,7 +160,7 @@ func TestRealMain_不正な内容の設定ファイルが指定された場合(t
 	if rc != rc_ERROR {
 		t.Errorf("想定外のrc[%d]が返された。", rc)
 	}
-	if !strings.HasPrefix(out, "CONFIG PARM IS NOT EXACT FORMAT.") {
+	if !strings.Contains(out, "CONFIG PARM IS NOT EXACT FORMAT.") {
 		t.Error("出力内容が想定と違っている。")
 		t.Logf("出力: %s", out)
 	}
@@ -179,7 +179,7 @@ func TestRealMain_指定ネットワークの定義ファイルが存在しな�
 	if rc != rc_ERROR {
 		t.Errorf("想定外のrc[%d]が返された。", rc)
 	}
-	if !strings.HasPrefix(out, "FAILED TO READ JOBNETWORK FILE") {
+	if !strings.Contains(out, "FAILED TO READ BPMN FILE") {
 		t.Error("出力内容が想定と違っている。")
 		t.Logf("出力: %s", out)
 	}
@@ -199,7 +199,7 @@ func TestRealMain_ログディレクトリが存在しない場合(t *testing.T)
 	if rc != rc_ERROR {
 		t.Errorf("想定外のrc[%d]が返された。", rc)
 	}
-	if !strings.HasPrefix(out, "COULD NOT INITIALIZE LOGGER.") {
+	if !strings.Contains(out, "COULD NOT INITIALIZE LOGGER.") {
 		t.Error("出力内容が想定と違っている。")
 		t.Logf("出力: %s", out)
 	}
@@ -281,7 +281,7 @@ func TestRealMain_ジョブ実行を行う_拡張ジョブ定義にエラーあ�
 	if rc != rc_ERROR {
 		t.Errorf("想定外のrc[%d]が返された。", rc)
 	}
-	if !strings.HasPrefix(out, "FAILED TO READ EXPAND JOB CONFIG FILE") {
+	if !strings.Contains(out, "FAILED TO READ EXPAND JOB CONFIG FILE") {
 		t.Error("出力内容が想定と違っている。")
 		t.Logf("出力: %s", out)
 	}

@@ -1,5 +1,6 @@
 @echo off
 
+setlocal
 set GOPATH=%~dp0
 
 del "%GOPATH%src\cuto\master\master.exe"

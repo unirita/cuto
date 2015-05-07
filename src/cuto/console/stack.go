@@ -14,6 +14,6 @@ func PrintStack() {
 		if !ok {
 			break
 		}
-		log.Error("\t%v:%v", file, line)
+		log.Error("\t", file, ":", line)
 	}
 }

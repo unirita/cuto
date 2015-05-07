@@ -163,7 +163,8 @@ func (j *Job) Execute() (Element, error) {
 	defer j.end(res)
 
 	if isAbnormalEnd(res) {
-		return nil, fmt.Errorf("Job[id = %s] ended abnormally.", j.ID())
+		//return nil, fmt.Errorf("Job[id = %s] ended abnormally.", j.ID())
+		return nil, fmt.Errorf("")
 	}
 
 	return j.Next, nil
@@ -189,6 +190,8 @@ func (j *Job) start(req *message.Request) {
 
 	j.Instance.Result.Jobresults[j.ID()] = jobres
 	tx.InsertJob(j.Instance.Result.GetConnection(), jobres)
+
+	console.Display("CTM023I", j.Name, j.Instance.ID, j.id)
 }
 
 // ジョブ実行結果にジョブの開始時刻をセットする。
@@ -227,6 +230,12 @@ func (j *Job) end(res *message.Response) {
 
 	message.AddJobValue(j.Name, res)
 	tx.UpdateJob(j.Instance.Result.GetConnection(), jobres)
+
+	if jobres.Status != db.ABNORMAL {
+		console.Display("CTM024I", j.Name, j.Instance.ID, j.id, jobres.Status)
+	} else {
+		console.Display("CTM025W", j.Name, j.Instance.ID, j.id, jobres.Status, jobres.Detail)
+	}
 }
 
 // サーバントへ送受信失敗した場合の異常終了処理
@@ -238,6 +247,8 @@ func (j *Job) abnormalEnd(err error) error {
 	jobres.Status = db.ABNORMAL
 	jobres.Detail = err.Error()
 	tx.UpdateJob(j.Instance.Result.GetConnection(), jobres)
+
+	console.Display("CTM025W", j.Name, j.Instance.ID, j.id, jobres.Status, jobres.Detail)
 	return err
 }
 

@@ -39,11 +39,9 @@ const (
 const defaultConfig = `master.ini`
 
 func main() {
-	console.Display("CTM001I", os.Getpid())
 
 	args := fetchArgs()
 	rc := realMain(args)
-	console.Display("CTM002I", rc)
 	os.Exit(rc)
 }
 
@@ -83,42 +81,54 @@ func realMain(args *arguments) int {
 		return rc_ERROR
 	}
 	defer log.Term()
+	console.Display("CTM001I", os.Getpid(), Version)
+	// master終了時のコンソール出力
+	var rc int
+	defer func() {
+		console.Display("CTM002I", rc)
+	}()
 
 	nwk := jobnet.LoadNetwork(args.networkName)
 	if nwk == nil {
-		return rc_ERROR
+		rc = rc_ERROR
+		return rc
 	}
 	defer nwk.Terminate()
 
 	err := nwk.DetectFlowError()
 	if err != nil {
 		console.Display("CTM011E", nwk.MasterPath, err)
-		return rc_ERROR
+		rc = rc_ERROR
+		return rc
 	}
 
 	if args.startFlag == flag_OFF {
 		console.Display("CTM020I", nwk.MasterPath)
-		return rc_OK
+		rc = rc_OK
+		return rc
 	}
 
 	err = nwk.LoadJobEx()
 	if err != nil {
 		console.Display("CTM004E", nwk.JobExPath)
 		log.Error(err)
-		return rc_ERROR
+		rc = rc_ERROR
+		return rc
 	}
-
-	// @Todo: ネットワークへの仮ID付与を修正
-	//	nwk.ID = 12345678
 
 	err = nwk.Run()
 	if err != nil {
 		console.Display("CTM013I", nwk.Name, nwk.ID, "ABNORMAL")
-		log.Error(err)
-		return rc_ERROR
+		// ジョブ自体の異常終了では、エラーメッセージが空で返るので、出力しない
+		if len(err.Error()) != 0 {
+			log.Error(err)
+		}
+		rc = rc_ERROR
+		return rc
 	}
 	console.Display("CTM013I", nwk.Name, nwk.ID, "NORMAL")
-	return rc_OK
+	rc = rc_OK
+	return rc
 }
 
 // コマンドライン引数を解析し、arguments構造体を返す。
@@ -135,7 +145,7 @@ func fetchArgs() *arguments {
 
 // バージョンを表示する。
 func showVersion() {
-	fmt.Printf("cuto master version %s\n", Version)
+	fmt.Printf("%s\n", Version)
 }
 
 // オンラインヘルプを表示する。

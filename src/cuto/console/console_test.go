@@ -17,7 +17,7 @@ func TestDisplay_メッセージを出力できる_引数なし(t *testing.T) {
 
 	output := c.Stop()
 
-	if output != "INVALID ARGUMENT.\n" {
+	if output != "CTM003E INVALID ARGUMENT.\n" {
 		t.Errorf("stderrへの出力値[%s]が想定と違います。", output)
 	}
 }
@@ -30,7 +30,7 @@ func TestDisplay_メッセージを出力できる_引数あり(t *testing.T) {
 
 	output := c.Stop()
 
-	if output != "EXCEPTION OCCURED - something error.\n" {
+	if output != "CTM019E EXCEPTION OCCURED - something error.\n" {
 		t.Errorf("stderrへの出力値[%s]が想定と違います。", output)
 	}
 }
@@ -43,7 +43,7 @@ func TestDisplayError_メッセージをエラー出力できる_引数なし(t 
 
 	output := c.Stop()
 
-	if output != "INVALID ARGUMENT.\n" {
+	if output != "CTM003E INVALID ARGUMENT.\n" {
 		t.Errorf("stderrへの出力値[%s]が想定と違います。", output)
 	}
 }
@@ -56,21 +56,21 @@ func TestDisplayError_メッセージをエラー出力できる_引数あり(t 
 
 	output := c.Stop()
 
-	if output != "EXCEPTION OCCURED - something error.\n" {
+	if output != "CTM019E EXCEPTION OCCURED - something error.\n" {
 		t.Errorf("stderrへの出力値[%s]が想定と違います。", output)
 	}
 }
 
 func TestGetMessage_メッセージを文字列として取得できる_引数なし(t *testing.T) {
 	msg := GetMessage("CTM003E")
-	if msg != "INVALID ARGUMENT." {
+	if msg != "CTM003E INVALID ARGUMENT." {
 		t.Errorf("取得値[%s]が想定と違います。", msg)
 	}
 }
 
 func TestGetMessage_メッセージを文字列として取得できる_引数あり(t *testing.T) {
 	msg := GetMessage("CTM019E", "something error.")
-	if msg != "EXCEPTION OCCURED - something error." {
+	if msg != "CTM019E EXCEPTION OCCURED - something error." {
 		t.Errorf("取得値[%s]が想定と違います。", msg)
 	}
 }

@@ -160,7 +160,7 @@ func TestDoJobRequest_パス指定あり引数なしジョブが正常に実行�
 	}
 	if len(res.Var) == 0 {
 		t.Error("変数なし.")
-	} else if res.Var != "ENVENVENV \"\"" {
+	} else if res.Var != "ENVENVENV " {
 		t.Errorf("変数内容が不正.[%s]", res.Var)
 	}
 	if len(res.St) == 0 {
@@ -350,7 +350,7 @@ func TestDoJobRequest_標準出力で警告終了するジョブ_RC確認なし(
 		NID:       107,
 		JID:       "serviceTask_004",
 		Path:      "job.bat",
-		Param:     "",
+		Param:     "\"A B\"",
 		Env:       "TESTENV1=!!!WARNING!!!",
 		Workspace: "C:\\Go",
 		WarnRC:    0,
@@ -370,7 +370,7 @@ func TestDoJobRequest_標準出力で警告終了するジョブ_RC確認なし(
 	}
 	if len(res.Var) == 0 {
 		t.Error("変数なし.")
-	} else if res.Var != "!!!WARNING!!! \"\"" {
+	} else if res.Var != "!!!WARNING!!! \"A B\"" {
 		t.Errorf("変数内容が不正.[%s]", res.Var)
 	}
 	if len(res.St) == 0 {
@@ -395,7 +395,7 @@ func TestDoJobRequest_標準出力で警告終了するがチェックしない�
 		NID:       108,
 		JID:       "serviceTask_004",
 		Path:      "job.bat",
-		Param:     "",
+		Param:     "A",
 		Env:       "TESTENV1=!!!WARNING!!!",
 		Workspace: "C:\\Go",
 		WarnRC:    0,
@@ -415,7 +415,7 @@ func TestDoJobRequest_標準出力で警告終了するがチェックしない�
 	}
 	if len(res.Var) == 0 {
 		t.Error("変数なし.")
-	} else if res.Var != "!!!WARNING!!! \"\"" {
+	} else if res.Var != "!!!WARNING!!! A" {
 		t.Errorf("変数内容が不正.[%s]", res.Var)
 	}
 	if len(res.St) == 0 {

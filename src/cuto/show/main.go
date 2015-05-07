@@ -129,7 +129,7 @@ func fetchArgs() *arguments {
 	flag.StringVar(&args.to, "to", "", "To date.")
 	flag.StringVar(&args.status, "status", "", "Jobnetwork status.")
 	flag.StringVar(&args.format, "format", "", "Output format.")
-	flag.StringVar(&args.config, "config", "", "Input config-file.")
+	flag.StringVar(&args.config, "c", "", "Input config-file.")
 	flag.Parse()
 	return args
 }

@@ -37,12 +37,12 @@ func realMain(args *arguments) int {
 		showVersion()
 		return rc_OK
 	}
+	// 作業フォルダは実行モジュールと同じ場所にする
+	os.Chdir(util.GetCurrentPath())
 	message.ServantVersion = Version
 
 	// システム変数のセット
 	message.AddSysValue("ROOT", "", util.GetRootPath())
-
-	console.Display("CTS001I", Version)
 
 	config.ReadConfig(args.configPath)
 	if err := config.Servant.DetectError(); err != nil {
@@ -60,6 +60,7 @@ func realMain(args *arguments) int {
 		return rc_error
 	}
 	defer log.Term()
+	console.Display("CTS001I", os.Getpid(), Version)
 
 	// メイン処理開始
 	exitCode, err := Run()

@@ -132,9 +132,9 @@ func (j *jobInstance) createShell() *exec.Cmd {
 		shell = script
 		param = j.param
 	}
-	params := strings.Split(param, " ")
-
+	params := paramSplit(param)
 	cmd := exec.Command(shell, params...)
+
 	envs := strings.Split(j.env, "+")
 	cmd.Env = append(os.Environ(), envs...)
 	if len(j.workDir) > 0 {

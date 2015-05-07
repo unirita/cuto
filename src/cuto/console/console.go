@@ -48,7 +48,7 @@ Copyright 2015 unirita Inc.
 
 // コンソールメッセージ一覧
 var msgs = map[string]string{
-	"CTM001I": "CUTO MASTER STARTED. PID [%d]",
+	"CTM001I": "CUTO MASTER STARTED. PID [%d] VERSION [%v]",
 	"CTM002I": "CUTO MASTER ENDED. RC [%d]",
 	"CTM003E": "INVALID ARGUMENT.",
 	"CTM004E": "FAILED TO READ EXPAND JOB CONFIG FILE [%s].",
@@ -57,7 +57,7 @@ var msgs = map[string]string{
 	"CTM007E": "LICENSE VERIFICATION FAILED.",
 	"CTM008I": "REMINDER: EVALUATION PERIOD WILL EXPIRE IN [%d] DAYS.",
 	"CTM009I": "LICENSE VALID TILL %04d/%02d/%02d.",
-	"CTM010E": "FAILED TO READ JOBNETWORK FILE [%s].",
+	"CTM010E": "FAILED TO READ BPMN FILE [%s].",
 	"CTM011E": "[%s] IS NOT EXACT FORMAT. REASON [%s]",
 	"CTM012I": "[%s] STARTED. INSTANCE [%d]",
 	"CTM013I": "[%s] ENDED. INSTANCE [%d] STATUS [%s]",
@@ -67,14 +67,17 @@ var msgs = map[string]string{
 	"CTM017W": "UNABLE TO SEND MESSAGE. NODE[%s] PORT[%d] EC [%d] MSG [%s]",
 	"CTM018W": "TIME OUT WAITING JOB EXECUTE.",
 	"CTM019E": "EXCEPTION OCCURED - %s",
-	"CTM020I": "JOBNETWORK FILE [%s] IS VALID.",
+	"CTM020I": "BPMN FILE [%s] IS VALID.",
 	"CTM021E": "COULD NOT INITIALIZE LOGGER. REASON[%s]",
 	"CTM022I": "JOB [%s] IS RUNNING FOR %d MINUTES.",
+	"CTM023I": "JOB [%s] STARTED. INSTANCE [%d] JOBID [%s].",
+	"CTM024I": "JOB [%s] ENDED. INSTANCE [%d] JOBID [%s] STATUS [%d].",
+	"CTM025W": "JOB [%s] ABNORMAL ENDED. INSTANCE [%d] JOBID [%s] STATUS [%d] DETAIL [%s].",
 	"1":       "",
-	"CTS001I": "CUTO SERVANT STARTED. VERSION [%s]",
+	"CTS001I": "CUTO SERVANT STARTED. PID [%v] VERSION [%s]",
 	"CTS002I": "CUTO SERVANT ENDED. RC [%d].",
 	"CTS003E": "INVALID ARGUMENT.",
-	"CTS004W": "FAILED TO READ EXPAND JOB CONFIG FILE [%s]. USE DEFAULT VALUE",
+	"CTS004W": "FAILED TO READ CONFIG FILE [%s]. USE DEFAULT VALUE",
 	"CTS005E": "CONFIG PARM IS NOT EXACT FORMAT. REASON [%s]",
 	"CTS006W": "CONFIG PARM [%s / %s] USE DEFAULT VALUE [%v]",
 	"CTS007E": "LICENSE VERIFICATION FAILED.",
@@ -153,5 +156,5 @@ func DisplayError(code string, a ...interface{}) (int, error) {
 //
 // return : 取得したメッセージ
 func GetMessage(code string, a ...interface{}) string {
-	return fmt.Sprintf(msgs[code], a...)
+	return fmt.Sprintf("%s %s", code, fmt.Sprintf(msgs[code], a...))
 }
