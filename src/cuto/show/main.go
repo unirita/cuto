@@ -4,7 +4,6 @@
 package main
 
 import (
-	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -39,6 +38,12 @@ const (
 
 // デフォルトの設定ファイル名
 const defaultConfig = "master.ini"
+
+// ステータス指定
+const status_normal = "normal"
+const status_abnormal = "abnormal"
+const status_running = "running"
+const status_warn = "warn"
 
 func main() {
 	console.DisplayError("CTU001I", Version)
@@ -153,12 +158,14 @@ func getSeparatorType(value string) gen.Generator {
 func getStatusType(status string) (int, error) {
 	if len(status) == 0 { // ステータス指定無し
 		return -1, nil
-	} else if status == "normal" {
+	} else if status == status_normal {
 		return db.NORMAL, nil
-	} else if status == "abnormal" {
+	} else if status == status_abnormal {
 		return db.ABNORMAL, nil
-	} else if status == "running" {
+	} else if status == status_running {
 		return db.RUNNING, nil
+	} else if status == status_warn {
+		return db.WARN, nil
 	}
-	return 0, errors.New("Unknown status type.")
+	return 0, fmt.Errorf("Unknown status type [%v].", status)
 }
