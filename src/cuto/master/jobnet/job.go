@@ -5,7 +5,9 @@ package jobnet
 
 import (
 	"fmt"
+	"time"
 
+	"cuto/console"
 	"cuto/db"
 	"cuto/db/tx"
 	"cuto/log"
@@ -143,6 +145,10 @@ func (j *Job) Execute() (Element, error) {
 	stCh := make(chan string, 1)
 	go j.waitAndSetResultStartDate(stCh)
 
+	timerEndCh := make(chan struct{}, 1)
+	go j.startTimer(timerEndCh)
+	defer close(timerEndCh)
+
 	resMsg, err := j.sendRequest(j.Node, j.Port, reqMsg, stCh)
 	close(stCh)
 	if err != nil {
@@ -233,4 +239,23 @@ func (j *Job) abnormalEnd(err error) error {
 	jobres.Detail = err.Error()
 	tx.UpdateJob(j.Instance.Result.GetConnection(), jobres)
 	return err
+}
+
+func (j *Job) startTimer(endCh chan struct{}) {
+	span := config.Job.TimeTrackingSpanMin
+	if span == 0 {
+		// 出力間隔の設定が0の場合は出力しない。
+		return
+	}
+
+	rapTime := 0
+	for {
+		select {
+		case <-time.After(time.Duration(span) * time.Minute):
+			rapTime += span
+			console.Display("CTM022I", j.Name, rapTime)
+		case <-endCh:
+			return
+		}
+	}
 }

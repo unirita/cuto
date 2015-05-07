@@ -24,6 +24,7 @@ type jobSection struct {
 	DefaultPort          int    `toml:"default_port"`
 	DefaultTimeoutMin    int    `toml:"default_timeout_min"`
 	ConnectionTimeoutSec int    `toml:"connection_timeout_sec"`
+	TimeTrackingSpanMin  int    `toml:"time_tracking_span_min"`
 }
 
 // 設定ファイルのdirセクション
@@ -87,6 +88,9 @@ func DetectError() error {
 	}
 	if Job.ConnectionTimeoutSec <= 0 {
 		return fmt.Errorf("job.connection_timeout_sec(%d) must not be 0 or less.", Job.ConnectionTimeoutSec)
+	}
+	if Job.TimeTrackingSpanMin < 0 {
+		return fmt.Errorf("job.time_tracking_span_min(%d) must not be minus value.", Job.TimeTrackingSpanMin)
 	}
 	if Log.MaxSizeKB <= 0 {
 		return fmt.Errorf("log.max_size_kb(%d) must not be 0 or less.", Log.MaxSizeKB)

@@ -10,6 +10,7 @@ func generateTestConfig() {
 	Job.DefaultPort = 0
 	Job.DefaultTimeoutMin = 0
 	Job.ConnectionTimeoutSec = 1
+	Job.TimeTrackingSpanMin = 10
 	Dir.JobnetDir = `.\jobnet`
 	Dir.LogDir = `.\log`
 	DB.DBFile = `.\data\cuto.sqlite`
@@ -31,6 +32,7 @@ default_node='localhost'
 default_port=2015
 default_timeout_min=30
 connection_timeout_sec=60
+time_tracking_span_min=10
 
 [dir]
 jobnet_dir='jobnet'
@@ -63,6 +65,9 @@ max_generation=2
 	if Job.ConnectionTimeoutSec != 60 {
 		t.Errorf("connection_timeout_secの値[%d]は想定と違っている。", Job.ConnectionTimeoutSec)
 	}
+	if Job.TimeTrackingSpanMin != 10 {
+		t.Errorf("time_tracking_span_minの値[%d]は想定と違っている。", Job.TimeTrackingSpanMin)
+	}
 	if Dir.JobnetDir != `jobnet` {
 		t.Errorf("jobnet_dirの値[%s]は想定と違っている。", Dir.JobnetDir)
 	}
@@ -90,6 +95,7 @@ default_node=localhost
 default_port=2015
 default_timeout_min=30
 connection_timeout_sec=60
+time_tracking_span_min=10
 
 [dir]
 jobnet_dir='jobnet'
@@ -153,6 +159,14 @@ func TestDetectError_デフォルトの実行タイムアウト時間が負の�
 func TestDetectError_接続タイムアウト時間が0以下の場合はエラー(t *testing.T) {
 	generateTestConfig()
 	Job.ConnectionTimeoutSec = 0
+	if err := DetectError(); err == nil {
+		t.Error("エラーが発生しなかった。")
+	}
+}
+
+func TestDetectError_経過時間表示間隔が負の値の場合はエラー(t *testing.T) {
+	generateTestConfig()
+	Job.TimeTrackingSpanMin = -1
 	if err := DetectError(); err == nil {
 		t.Error("エラーが発生しなかった。")
 	}
