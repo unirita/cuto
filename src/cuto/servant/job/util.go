@@ -23,6 +23,7 @@ func readyRegex() *regexp.Regexp {
 }
 
 // ジョブの実行時引数を分割する。
+// 両端が二重引用符の場合は、引用符を除外する。
 func paramSplit(params string) []string {
 	var p []string
 	b := paramRegex.FindAll([]byte(params), -1)
