@@ -135,8 +135,13 @@ func (j *jobInstance) createShell() *exec.Cmd {
 	params := paramSplit(param)
 	cmd := exec.Command(shell, params...)
 
-	envs := strings.Split(j.env, "+")
-	cmd.Env = append(os.Environ(), envs...)
+	// 環境変数指定がない場合は、既存の物のみを追加する。
+	if len(j.env) > 0 {
+		envs := strings.Split(j.env, "+")
+		cmd.Env = append(envs, os.Environ()...)
+	} else {
+		cmd.Env = os.Environ()
+	}
 	if len(j.workDir) > 0 {
 		cmd.Dir = j.workDir
 	} else {
