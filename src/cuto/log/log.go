@@ -141,7 +141,7 @@ func generateConfigString(dir string, name string, level string, maxSizeKB int, 
         <rollingfile type="size" filename="%s" maxsize="%d" maxrolls="%d" />
     </outputs>
     <formats>
-        <format id="common" format="%%Date(2006-01-02 15:04:05.000) [%%LEV] %%Msg%%n"/>
+        <format id="common" format="%%Date(2006-01-02 15:04:05.000) [%d] [%%LEV] %%Msg%%n"/>
     </formats>
 </seelog>`
 
@@ -149,5 +149,5 @@ func generateConfigString(dir string, name string, level string, maxSizeKB int, 
 
 	// rollingfileのmaxrollsの数字は、書き込み中のログファイルを含まずにカウントするため引数をデクリメントする。
 	maxRolls--
-	return fmt.Sprintf(format, level, filename, maxSizeKB*1024, maxRolls)
+	return fmt.Sprintf(format, level, filename, maxSizeKB*1024, maxRolls, os.Getpid())
 }
