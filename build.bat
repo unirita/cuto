@@ -1,24 +1,33 @@
 @echo off
 
 setlocal
-set GOPATH=%~dp0
 
-del "%GOPATH%src\cuto\master\master.exe"
-del "%GOPATH%src\cuto\servant\servant.exe"
-del "%GOPATH%src\cuto\show\show.exe"
+del "%GOPATH%\src\cuto\master\master.exe"
+del "%GOPATH%\src\cuto\servant\servant.exe"
+del "%GOPATH%\src\cuto\show\show.exe"
 
+rem *****************
+rem Unit test
+rem *****************
+cd /d %GOPATH%\src\cuto
+call test_all_cover.bat x
+if %errorlevel% neq 0 goto err
+
+rem *****************
+rem All build
+rem *****************
 echo master building...
-cd /d "%GOPATH%src\cuto\master"
+cd /d "%GOPATH%\src\cuto\master"
 go build
 if %errorlevel% neq 0 goto err
 
 echo servant building...
-cd /d "%GOPATH%src\cuto\servant"
+cd /d "%GOPATH%\src\cuto\servant"
 go build
 if %errorlevel% neq 0 goto err
 
 echo show utility building...
-cd /d "%GOPATH%src\cuto\show"
+cd /d "%GOPATH%\src\cuto\show"
 go build
 if %errorlevel% neq 0 goto err
 

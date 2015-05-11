@@ -1,6 +1,6 @@
 @echo off
 
-set LOGFILE="%~dp0\cover_all.txt"
+set LOGFILE="%~dp0cover_all.txt"
 set RETCODE=0
 
 cd /d "%~dp0"
