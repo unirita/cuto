@@ -6,6 +6,8 @@ del "%GOPATH%\src\cuto\master\master.exe"
 del "%GOPATH%\src\cuto\servant\servant.exe"
 del "%GOPATH%\src\cuto\show\show.exe"
 
+if "%1" neq "" goto BUILD
+:UNIT_TEST
 rem *****************
 rem Unit test
 rem *****************
@@ -13,6 +15,7 @@ cd /d %GOPATH%\src\cuto
 call test_all_cover.bat x
 if %errorlevel% neq 0 goto err
 
+:BUILD
 rem *****************
 rem All build
 rem *****************
