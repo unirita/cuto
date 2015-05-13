@@ -53,17 +53,8 @@ func runTestServant(t *testing.T, waitInitCh chan<- struct{}) {
 		return
 	}
 
-	res := `{
-    "type":"response",
-	"nid":1234,
-	"jid":"j1",
-    "rc":0,
-	"stat":1,
-	"detail":"",
-	"var":"",
-	"st":"2015-04-01 12:34:56.789",
-	"et":"2015-04-01 12:35:46.123"
-}`
+	res := `{"type":"response","nid":1234,"jid":"j1","rc":0,"stat":1,"detail":"","var":"","st":"2015-04-01 12:34:56.789","et":"2015-04-01 12:35:46.123"}`
+	res += "\n"
 
 	if _, err := conn.Write([]byte(res)); err != nil {
 		t.Log(err)
