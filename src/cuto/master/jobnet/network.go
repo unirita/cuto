@@ -334,8 +334,13 @@ func (n *Network) Run() error {
 
 // ジョブネットワークの開始処理
 func (n *Network) start() error {
+	timeout := config.Job.DefaultTimeoutMin * 60 * 1000
+	if timeout <= 0 {
+		timeout = 60000
+	}
+
 	var err error
-	ok, err := n.globalMutex.Lock(config.Job.DefaultTimeoutMin)
+	ok, err := n.globalMutex.Lock(timeout)
 	if err != nil {
 		return err
 	} else if !ok {
