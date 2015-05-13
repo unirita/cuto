@@ -1,5 +1,5 @@
 # cuto
 
-Process Management as a Code.
+Process Control as a Code.
 
-Copyright. UNIRITA Inc,
+Copyright. (C) 2015 UNIRITA Inc,

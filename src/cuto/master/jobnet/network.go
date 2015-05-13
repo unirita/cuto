@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"strconv"
+	"sync"
 
 	"cuto/console"
 	"cuto/db"
@@ -22,15 +23,16 @@ import (
 
 // ジョブネット全体を表す構造体
 type Network struct {
-	ID         int                // ジョブネットワークID。
-	Name       string             // ジョブネットワーク名。
-	Start      Element            // スタートイベントのノード。
-	End        Element            // エンドイベントのノード。
-	MasterPath string             // ジョブネットワークファイルパス。
-	JobExPath  string             // 拡張ジョブ定義ファイルパス。
-	elements   map[string]Element // ジョブネットワークの構成要素Map。
-	Result     *tx.ResultMap      // 実行結果情報。
-	mutex      *util.MutexHandle  // ミューテックスハンドル
+	ID          int                // ジョブネットワークID。
+	Name        string             // ジョブネットワーク名。
+	Start       Element            // スタートイベントのノード。
+	End         Element            // エンドイベントのノード。
+	MasterPath  string             // ジョブネットワークファイルパス。
+	JobExPath   string             // 拡張ジョブ定義ファイルパス。
+	elements    map[string]Element // ジョブネットワークの構成要素Map。
+	Result      *tx.ResultMap      // 実行結果情報。
+	globalMutex *util.MutexHandle  // マスタ間ミューテックスハンドル
+	localMutex  sync.Mutex         // ゴルーチン間のミューテックス
 }
 
 // cuto masterが使用するミューテックス名。
@@ -55,7 +57,7 @@ func NewNetwork(name string) (*Network, error) {
 		name)
 
 	var err error
-	nwk.mutex, err = util.InitMutex(mutex_name)
+	nwk.globalMutex, err = util.InitMutex(mutex_name)
 	if err != nil {
 		return nil, err
 	}
@@ -137,7 +139,7 @@ func (n *Network) setElements(proc *parser.Process) error {
 			}
 
 			if f.To == eid {
-				return fmt.Errorf("Network is empty.")
+				return fmt.Errorf("ProcessFlow is empty.")
 			}
 
 			var ok bool
@@ -333,13 +335,13 @@ func (n *Network) Run() error {
 // ジョブネットワークの開始処理
 func (n *Network) start() error {
 	var err error
-	ok, err := n.mutex.Lock(config.Job.DefaultTimeoutMin)
+	ok, err := n.globalMutex.Lock(config.Job.DefaultTimeoutMin)
 	if err != nil {
 		return err
 	} else if !ok {
 		return fmt.Errorf("Lock Timeout.")
 	}
-	defer n.mutex.Unlock()
+	defer n.globalMutex.Unlock()
 
 	n.Result, err = tx.StartJobNetwork(n.Name, config.DB.DBFile)
 	if err != nil {
@@ -366,5 +368,5 @@ func (n *Network) end(err error) error {
 // 終了処理を行う。
 // 現在はミューテックスの破棄のみ。
 func (n *Network) Terminate() {
-	n.mutex.TermMutex()
+	n.globalMutex.TermMutex()
 }

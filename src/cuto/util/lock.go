@@ -4,7 +4,9 @@
 package util
 
 import (
+	"errors"
 	"fmt"
+	"os"
 	"syscall"
 	"unsafe"
 )
@@ -26,6 +28,7 @@ func InitMutex(name string) (*MutexHandle, error) {
 	hMutex, _, err := procCreateMutexW.Call(
 		0, 0, uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(mutexName))))
 	if hMutex == 0 {
+		fmt.Fprintf(os.Stderr, "Failed InitMutexW() err = %v", err)
 		return nil, err
 	}
 	return &MutexHandle{hMutex}, nil
@@ -34,14 +37,15 @@ func InitMutex(name string) (*MutexHandle, error) {
 // ロックを開始する。
 // 引数でタイムアウト時間（ミリ秒）を指定する。
 func (m *MutexHandle) Lock(timeout_milisec int) (bool, error) {
-	var success bool
-	r1, _, _ := procWaitForSingleObject.Call(m.handle, uintptr(timeout_milisec))
+	r1, _, msg := procWaitForSingleObject.Call(m.handle, uintptr(timeout_milisec))
 	if int(r1) == wAIT_OBJECT_0 || int(r1) == wAIT_ABANDONED {
-		success = true
+		// Lock成功
+		return true, nil
 	} else if int(r1) == wAIT_TIMEOUT {
-		success = false
+		fmt.Fprintf(os.Stderr, "Lock Timeout () msg = %v", msg)
+		return false, msg
 	}
-	return success, nil
+	return false, errors.New("Lock Unknown Error.")
 }
 
 // ロック中であれば、解除する。

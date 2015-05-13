@@ -4,6 +4,7 @@
 package tx
 
 import (
+	"sync"
 	"time"
 
 	"cuto/db"
@@ -15,8 +16,12 @@ import (
 // param - conn DBコネクション
 //
 // param - job JOBレコード構造体ポインタ
-func InsertJob(conn db.IConnection, job *db.JobResult) error {
+func InsertJob(conn db.IConnection, job *db.JobResult, mutex *sync.Mutex) error {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	var isCommit bool
+
 	tx, err := conn.GetDbMap().Begin()
 	if err != nil {
 		return err
@@ -47,7 +52,10 @@ func InsertJob(conn db.IConnection, job *db.JobResult) error {
 // param - conn DBコネクション
 //
 // param - job JOBレコード構造体ポインタ
-func UpdateJob(conn db.IConnection, job *db.JobResult) error {
+func UpdateJob(conn db.IConnection, job *db.JobResult, mutex *sync.Mutex) error {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	var isCommit bool
 	tx, err := conn.GetDbMap().Begin()
 	if err != nil {
