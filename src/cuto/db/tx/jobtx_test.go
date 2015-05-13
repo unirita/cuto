@@ -4,12 +4,15 @@
 package tx
 
 import (
+	"sync"
 	"testing"
 	"time"
 
 	"cuto/db"
 	"cuto/util"
 )
+
+var mutex sync.Mutex
 
 func TestInsertJob_ジョブの新規登録処理(t *testing.T) {
 	conn, err := db.Open(db_name)
@@ -27,7 +30,7 @@ func TestInsertJob_ジョブの新規登録処理(t *testing.T) {
 			Status:    db.RUNNING,
 			Node:      "TestNode01",
 			Port:      9999,
-		})
+		}, &mutex)
 	if err != nil {
 		t.Error("ジョブテーブルへの登録に失敗しました。 - ", err)
 	}
@@ -49,7 +52,7 @@ func TestInsertJob_ジョブの新規登録失敗(t *testing.T) {
 			Status:    db.RUNNING,
 			Node:      "TestNode01",
 			Port:      9999,
-		})
+		}, &mutex)
 	if err == nil {
 		t.Error("予定していた失敗が返りませんでした。 - ")
 	}
@@ -71,7 +74,7 @@ func TestUpdateJob_ジョブの更新処理(t *testing.T) {
 		Node:      "TestNode02",
 		Port:      9999,
 	}
-	err = InsertJob(conn, jobres)
+	err = InsertJob(conn, jobres, &mutex)
 	if err != nil {
 		t.Fatal("ジョブテーブルへの登録に失敗しました。 - ", err)
 	}
@@ -81,7 +84,7 @@ func TestUpdateJob_ジョブの更新処理(t *testing.T) {
 	jobres.Detail = "Attention!!"
 	jobres.Rc = 4
 
-	err = UpdateJob(conn, jobres)
+	err = UpdateJob(conn, jobres, &mutex)
 	if err != nil {
 		t.Error("ジョブテーブルの更新に失敗しました。 - ", err)
 	}
@@ -103,7 +106,7 @@ func TestUpdateJob_ジョブの登録前に更新(t *testing.T) {
 		Node:      "TestNode02",
 		Port:      9999,
 	}
-	err = UpdateJob(conn, jobres)
+	err = UpdateJob(conn, jobres, &mutex)
 	if err == nil {
 		t.Error("予定していた失敗が返りませんでした。 - ")
 	}
@@ -125,7 +128,7 @@ func TestUpdateJob_ジョブの更新失敗(t *testing.T) {
 		Node:      "TestNode02",
 		Port:      9999,
 	}
-	err = UpdateJob(conn, jobres)
+	err = UpdateJob(conn, jobres, &mutex)
 	if err == nil {
 		t.Error("予定していた失敗が返りませんでした。 - ")
 	}

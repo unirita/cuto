@@ -189,7 +189,7 @@ func (j *Job) start(req *message.Request) {
 	jobres.Status = db.RUNNING
 
 	j.Instance.Result.Jobresults[j.ID()] = jobres
-	tx.InsertJob(j.Instance.Result.GetConnection(), jobres)
+	tx.InsertJob(j.Instance.Result.GetConnection(), jobres, &j.Instance.localMutex)
 
 	console.Display("CTM023I", j.Name, j.Instance.ID, j.id)
 }
@@ -209,7 +209,7 @@ func (j *Job) waitAndSetResultStartDate(stCh <-chan string) {
 		return
 	}
 	jobres.StartDate = st
-	tx.UpdateJob(j.Instance.Result.GetConnection(), jobres)
+	tx.UpdateJob(j.Instance.Result.GetConnection(), jobres, &j.Instance.localMutex)
 }
 
 // ジョブの終了メッセージから、ジョブ状態の更新を行う。
@@ -229,7 +229,7 @@ func (j *Job) end(res *message.Response) {
 	jobres.Variable = res.Var
 
 	message.AddJobValue(j.Name, res)
-	tx.UpdateJob(j.Instance.Result.GetConnection(), jobres)
+	tx.UpdateJob(j.Instance.Result.GetConnection(), jobres, &j.Instance.localMutex)
 
 	if jobres.Status != db.ABNORMAL {
 		console.Display("CTM024I", j.Name, j.Instance.ID, j.id, jobres.Status)
@@ -246,7 +246,7 @@ func (j *Job) abnormalEnd(err error) error {
 	}
 	jobres.Status = db.ABNORMAL
 	jobres.Detail = err.Error()
-	tx.UpdateJob(j.Instance.Result.GetConnection(), jobres)
+	tx.UpdateJob(j.Instance.Result.GetConnection(), jobres, &j.Instance.localMutex)
 
 	console.Display("CTM025W", j.Name, j.Instance.ID, j.id, jobres.Status, jobres.Detail)
 	return err
