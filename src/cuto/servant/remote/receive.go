@@ -5,6 +5,7 @@
 package remote
 
 import (
+	"bufio"
 	"fmt"
 	"net"
 	"time"
@@ -12,6 +13,9 @@ import (
 	"cuto/console"
 	"cuto/log"
 )
+
+// 送受信メッセージの終端文字
+const MsgEnd = "\n"
 
 const protocol = "tcp"
 
@@ -64,24 +68,18 @@ func receiveLoopProcess(listener net.Listener, sq chan<- *Session) error {
 
 func receiveMessage(conn net.Conn, sq chan<- *Session) error {
 	const timeout = 10
-	const bufSize = 1024
 
-	var readLen int
-	var err error
-
-	err = conn.SetReadDeadline(time.Now().Add(timeout * time.Second))
-	if err != nil {
+	deadLine := time.Now().Add(timeout * time.Second)
+	if err := conn.SetReadDeadline(deadLine); err != nil {
 		log.Error(fmt.Sprintf("[%v]: %v\n", conn.RemoteAddr(), err))
 		return err
 	}
 
-	buf := make([]byte, bufSize)
-	readLen, err = conn.Read(buf)
-	if err != nil {
-		log.Error(fmt.Sprintf("[%v]: %v\n", conn.RemoteAddr(), err))
-		return err
+	scanner := bufio.NewScanner(conn)
+	if !scanner.Scan() {
+		log.Error(fmt.Sprintf("[%v]: %v\n", conn.RemoteAddr(), scanner.Err()))
+		return scanner.Err()
 	}
-
-	sq <- NewSession(conn, string(buf[:readLen]))
+	sq <- NewSession(conn, scanner.Text())
 	return nil
 }

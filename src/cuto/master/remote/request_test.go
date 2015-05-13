@@ -35,7 +35,7 @@ func runTestReceiver(t *testing.T, listener net.Listener, msq chan<- string, del
 	d := time.Duration(delay) * time.Second
 	time.Sleep(d)
 
-	_, err = conn.Write([]byte(`testresponse`))
+	_, err = conn.Write([]byte("testresponse\n"))
 	if err != nil {
 		t.Log(err)
 	}
@@ -62,13 +62,13 @@ func runTestReceiverWithHearbeat(t *testing.T, listener net.Listener, msq chan<-
 	s := 500 * time.Millisecond
 	for i := 0; i < delay*2; i++ {
 		time.Sleep(s)
-		_, err = conn.Write([]byte(message.HEARTBEAT))
+		_, err = conn.Write([]byte(message.HEARTBEAT + "\n"))
 		if err != nil {
 			t.Log(err)
 		}
 	}
 
-	_, err = conn.Write([]byte(`testresponse`))
+	_, err = conn.Write([]byte(`testresponse` + "\n"))
 	if err != nil {
 		t.Log(err)
 	}
@@ -95,9 +95,9 @@ func runTestReceiverWithStartTime(t *testing.T, listener net.Listener, msq chan<
 	d := time.Duration(delay) * time.Second
 	time.Sleep(d)
 
-	conn.Write([]byte(message.ST_HEADER + "20150401123456.789"))
+	conn.Write([]byte(message.ST_HEADER + "20150401123456.789" + "\n"))
 
-	_, err = conn.Write([]byte(`testresponse`))
+	_, err = conn.Write([]byte(`testresponse` + "\n"))
 	if err != nil {
 		t.Log(err)
 	}
@@ -126,7 +126,7 @@ func TestSendMessage_メッセージを送信できる(t *testing.T) {
 		t.Fatalf("エラーが発生しました: %s", err)
 	}
 
-	if message := <-msq; message != `testrequest` {
+	if message := <-msq; message != "testrequest\n" {
 		t.Errorf("リスナに届いたメッセージが間違っています: %s", message)
 	}
 
@@ -182,7 +182,7 @@ func TestSendMessage_ハートビートが返される場合はタイムアウ�
 		t.Fatalf("エラーが発生しました: %s", err)
 	}
 
-	if message := <-msq; message != `testrequest` {
+	if message := <-msq; message != "testrequest\n" {
 		t.Errorf("リスナに届いたメッセージが間違っています: %s", message)
 	}
 
@@ -223,7 +223,7 @@ func TestSendMessage_スタート時刻をチャンネルから取得できる(t
 		t.Fatal("十分な時間待ったが、スタート時刻が取得できなかった。")
 	}
 
-	if message := <-msq; message != `testrequest` {
+	if message := <-msq; message != "testrequest\n" {
 		t.Errorf("リスナに届いたメッセージが間違っています: %s", message)
 	}
 

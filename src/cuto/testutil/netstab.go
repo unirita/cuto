@@ -44,6 +44,7 @@ func NewListenerStub() *ListenerStub {
 
 func NewConnStub() *ConnStub {
 	conn := new(ConnStub)
+	conn.ReadStr = "\n"
 	conn.localAddr = NewAddrStub("127.0.0.1:54321")
 	conn.remoteAddr = NewAddrStub("127.0.0.1:12345")
 	return conn

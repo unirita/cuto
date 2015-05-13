@@ -4,6 +4,7 @@
 package remote
 
 import (
+	"bufio"
 	"fmt"
 	"net"
 	"strings"
@@ -13,6 +14,14 @@ import (
 	"cuto/master/config"
 	"cuto/message"
 )
+
+type response struct {
+	msg string
+	err error
+}
+
+// 送受信メッセージの終端文字
+const MsgEnd = "\n"
 
 // ホスト名がhost、ポート番号がportのservantへ接続し、ジョブ実行要求を送信する。
 // servantから返信されたジョブ実行結果を関数外へ返す。
@@ -35,36 +44,31 @@ func SendRequest(host string, port int, req string, stCh chan<- string) (string,
 	if err != nil {
 		return ``, err
 	}
-
 	defer conn.Close()
 
 	log.Debug(req)
-	_, err = conn.Write([]byte(req))
+	_, err = conn.Write([]byte(req + MsgEnd))
 	if err != nil {
 		return ``, err
 	}
 
-	buf := make([]byte, bufSize)
-	var res string
+	scanner := bufio.NewScanner(conn)
+	var res *response
 
 WAITRESPONSE:
 	for {
 		select {
-		case err = <-readResponse(conn, &buf):
-			if err != nil {
-				return ``, err
+		case res = <-readResponse(scanner):
+			if res.err != nil {
+				return ``, res.err
 			}
-			res = string(buf)
-			log.Debug(res)
-			if res == message.HEARTBEAT {
-				// ハートビートメッセージの場合はバッファサイズを初期化して再度read待ちをする。
-				//@todo 1度目の受信でジョブの起動ステータスを更新したい。
-				buf = buf[:bufSize]
+			log.Debug(res.msg)
+			if res.msg == message.HEARTBEAT {
+				// ハートビートメッセージの場合はバッファサイズを初期化する。
 				continue
-			} else if strings.HasPrefix(res, message.ST_HEADER) {
-				st := res[len(message.ST_HEADER):]
+			} else if strings.HasPrefix(res.msg, message.ST_HEADER) {
+				st := res.msg[len(message.ST_HEADER):]
 				stCh <- st
-				buf = buf[:bufSize]
 				continue
 			}
 
@@ -74,20 +78,22 @@ WAITRESPONSE:
 		}
 	}
 
-	return res, nil
+	return res.msg, nil
 }
 
-func readResponse(c net.Conn, b *[]byte) <-chan error {
-	ch := make(chan error, 10)
+func readResponse(scanner *bufio.Scanner) <-chan *response {
+	ch := make(chan *response, 10)
 	go func() {
-		l, err := c.Read(*b)
-		if err != nil {
-			ch <- err
+		res := new(response)
+		if scanner.Scan() {
+			res.msg = scanner.Text()
+		} else {
+			res.err = scanner.Err()
+		}
+		ch <- res
+		if res.err != nil {
 			return
 		}
-
-		*b = (*b)[:l]
-		ch <- nil
 	}()
 
 	return ch

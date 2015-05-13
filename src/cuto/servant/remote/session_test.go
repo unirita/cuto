@@ -60,6 +60,7 @@ func TestDo_ジョブを実行し結果を送信できる(t *testing.T) {
 	}
 
 	expected := `{"type":"response","version":"2.3.4","nid":1234,"jid":"001","rc":1,"stat":1,"detail":"detail","var":"","st":"20150331131524.123456789","et":"20150331131525.123456789"}`
+	expected += "\n"
 	if conn.WriteStr != expected {
 		t.Errorf("送信されたジョブ実行結果が間違っています。")
 		t.Logf("想定値: %s", expected)

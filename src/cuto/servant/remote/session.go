@@ -63,7 +63,7 @@ func (s *Session) Do(conf *config.ServantConfig) error {
 		return err
 	}
 
-	_, err = s.Conn.Write([]byte(resMsg))
+	_, err = s.Conn.Write([]byte(resMsg + MsgEnd))
 	if err != nil {
 		log.Error(err)
 		return err
@@ -98,7 +98,7 @@ func (s *Session) startHeartbeat() {
 				return
 			case <-time.After(t):
 				log.Debug("send heatbeat...")
-				s.Conn.Write([]byte(message.HEARTBEAT))
+				s.Conn.Write([]byte(message.HEARTBEAT + MsgEnd))
 			}
 		}
 	}()
@@ -118,7 +118,7 @@ func (s *Session) waitAndSendStartTime(stCh <-chan string) {
 		return
 	}
 
-	s.Conn.Write([]byte(message.ST_HEADER + st))
+	s.Conn.Write([]byte(message.ST_HEADER + st + MsgEnd))
 }
 
 // ジョブ実行結果が得られないようなエラーが発生した場合のレスポンスメッセージを生成する。

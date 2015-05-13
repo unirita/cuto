@@ -49,8 +49,9 @@ func TestReceiveLoopProcess_Acceptに失敗したらエラー(t *testing.T) {
 }
 
 func TestReceiveMessage_セッションキューにセッションを追加できる(t *testing.T) {
+	reqMsg := `{"type":"request","id":1234,"path":"C:\\work\\test.bat","param":"test","workspace": "C:\\work"}`
 	conn := testutil.NewConnStub()
-	conn.ReadStr = `{"type":"request","id":1234,"path":"C:\\work\\test.bat","param":"test","workspace": "C:\\work"}`
+	conn.ReadStr = reqMsg + "\n"
 	sq := make(chan *Session, 1)
 	err := receiveMessage(conn, sq)
 	close(sq)
@@ -68,9 +69,9 @@ func TestReceiveMessage_セッションキューにセッションを追加で�
 		t.Error("セッションにコネクションオブジェクトがセットされていない。")
 	}
 
-	if session.Body != conn.ReadStr {
+	if session.Body != reqMsg {
 		t.Error("セッションにセットされたメッセージが間違っている。")
-		t.Logf("想定値: %s", conn.ReadStr)
+		t.Logf("想定値: %s", reqMsg)
 		t.Logf("実績値: %s", session.Body)
 	}
 }
