@@ -11,7 +11,7 @@ import (
 
 func initForTest() {
 	config := `
-<seelog minlevel="trace">
+<seelog type="sync" minlevel="trace">
     <outputs formatid="common">
         <console />
     </outputs>

@@ -32,15 +32,23 @@ var locker *util.MutexHandle
 //
 // return : エラー情報を返す。
 func Init(dir string, name string, level string, maxSizeKB int, maxRolls int) error {
-	config := generateConfigString(dir, name, level, maxSizeKB, maxRolls)
-	logger, err := seelog.LoggerFromConfigAsString(config)
-	if err != nil {
+	var mutexErr error
+	mutexName := mutexHeader + name
+	locker, mutexErr = util.InitMutex(mutexName)
+	if mutexErr != nil {
+		return mutexErr
+	}
+
+	logfile := fmt.Sprintf("%s%c%s.log", dir, os.PathSeparator, name)
+	if err := makeFileIfNotExist(logfile); err != nil {
+		Term()
 		return err
 	}
 
-	mutexName := mutexHeader + name
-	locker, err = util.InitMutex(mutexName)
+	config := generateConfigString(logfile, level, maxSizeKB, maxRolls)
+	logger, err := seelog.LoggerFromConfigAsString(config)
 	if err != nil {
+		Term()
 		return err
 	}
 
@@ -63,8 +71,9 @@ func Trace(msg ...interface{}) {
 	if !valid {
 		return
 	}
+	locker.Lock(lockTimeout)
+	defer locker.Unlock()
 	seelog.Trace(msg...)
-	Flush()
 }
 
 // debugレベルでログメッセージを出力する。
@@ -74,8 +83,9 @@ func Debug(msg ...interface{}) {
 	if !valid {
 		return
 	}
+	locker.Lock(lockTimeout)
+	defer locker.Unlock()
 	seelog.Debug(msg...)
-	Flush()
 }
 
 // infoレベルでログメッセージを出力する。
@@ -85,8 +95,9 @@ func Info(msg ...interface{}) {
 	if !valid {
 		return
 	}
+	locker.Lock(lockTimeout)
+	defer locker.Unlock()
 	seelog.Info(msg...)
-	Flush()
 }
 
 // warnレベルでログメッセージを出力する。
@@ -96,8 +107,9 @@ func Warn(msg ...interface{}) {
 	if !valid {
 		return
 	}
+	locker.Lock(lockTimeout)
+	defer locker.Unlock()
 	seelog.Warn(msg...)
-	Flush()
 }
 
 // errorレベルでログメッセージを出力する。
@@ -107,8 +119,9 @@ func Error(msg ...interface{}) {
 	if !valid {
 		return
 	}
+	locker.Lock(lockTimeout)
+	defer locker.Unlock()
 	seelog.Error(msg...)
-	Flush()
 }
 
 // criticalレベルでログメッセージを出力する。
@@ -124,19 +137,27 @@ func Critical(msg ...interface{}) {
 	seelog.Critical(msg...)
 }
 
-// ログのフラッシュを行う。
-func Flush() {
-	if !valid {
-		return
-	}
+func makeFileIfNotExist(logfile string) error {
 	locker.Lock(lockTimeout)
 	defer locker.Unlock()
-	seelog.Flush()
+	if _, err := os.Stat(logfile); !os.IsNotExist(err) {
+		// ファイルが存在する場合は何もしない。
+		// os.IsExistはerr=nilのときfalseを返すため、os.IsNotExistで判定している。
+		return nil
+	}
+
+	file, err := os.OpenFile(logfile, os.O_WRONLY|os.O_CREATE, 0777)
+	if err != nil {
+		return err
+	}
+
+	file.Close()
+	return nil
 }
 
-func generateConfigString(dir string, name string, level string, maxSizeKB int, maxRolls int) string {
+func generateConfigString(logfile string, level string, maxSizeKB int, maxRolls int) string {
 	format := `
-<seelog minlevel="%s">
+<seelog type="sync" minlevel="%s">
     <outputs formatid="common">
         <rollingfile type="size" filename="%s" maxsize="%d" maxrolls="%d" />
     </outputs>
@@ -145,9 +166,7 @@ func generateConfigString(dir string, name string, level string, maxSizeKB int, 
     </formats>
 </seelog>`
 
-	filename := fmt.Sprintf("%s%c%s.log", dir, os.PathSeparator, name)
-
 	// rollingfileのmaxrollsの数字は、書き込み中のログファイルを含まずにカウントするため引数をデクリメントする。
 	maxRolls--
-	return fmt.Sprintf(format, level, filename, maxSizeKB*1024, maxRolls, os.Getpid())
+	return fmt.Sprintf(format, level, logfile, maxSizeKB*1024, maxRolls, os.Getpid())
 }
