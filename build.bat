@@ -2,9 +2,9 @@
 
 setlocal
 
-del "%GOPATH%\src\cuto\master\master.exe"
-del "%GOPATH%\src\cuto\servant\servant.exe"
-del "%GOPATH%\src\cuto\show\show.exe"
+del "%GOPATH%\bin\master.exe"
+del "%GOPATH%\bin\servant.exe"
+del "%GOPATH%\bin\show.exe"
 
 if "%1" neq "" goto BUILD
 :UNIT_TEST
@@ -20,18 +20,15 @@ rem *****************
 rem All build
 rem *****************
 echo master building...
-cd /d "%GOPATH%\src\cuto\master"
-go build
+go install cuto/master
 if %errorlevel% neq 0 goto err
 
 echo servant building...
-cd /d "%GOPATH%\src\cuto\servant"
-go build
+go install cuto/servant
 if %errorlevel% neq 0 goto err
 
 echo show utility building...
-cd /d "%GOPATH%\src\cuto\show"
-go build
+go install cuto/show
 if %errorlevel% neq 0 goto err
 
 exit /b 0
