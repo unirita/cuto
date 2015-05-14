@@ -26,7 +26,7 @@ func initForTest() {
 }
 
 func TestInit_ログレベルの指定が不正な場合にエラーが発生する(t *testing.T) {
-	err := Init("", "test", "invalid", 1000, 2, 1)
+	err := Init("", "test", "", "invalid", 1000, 2, 1)
 	if err == nil {
 		t.Error("エラーが発生していない。")
 	}

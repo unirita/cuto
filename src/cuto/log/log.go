@@ -33,9 +33,12 @@ var locker *util.MutexHandle
 // param : timeoutSec  ロックのタイムアウト秒
 //
 // return : エラー情報を返す。
-func Init(dir string, name string, level string, maxSizeKB int, maxRolls int, timeoutSec int) error {
+func Init(dir string, name string, identifer string, level string, maxSizeKB int, maxRolls int, timeoutSec int) error {
 	var mutexErr error
 	mutexName := mutexHeader + name
+	if identifer != "" {
+		mutexName = mutexName + "_" + identifer
+	}
 	locker, mutexErr = util.InitMutex(mutexName)
 	if mutexErr != nil {
 		return mutexErr

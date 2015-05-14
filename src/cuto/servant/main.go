@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strconv"
 
 	"cuto/console"
 	"cuto/log"
@@ -52,7 +53,8 @@ func realMain(args *arguments) int {
 
 	// ログ出力開始
 	if err := log.Init(config.Servant.Dir.LogDir,
-		fmt.Sprintf("servant_%d", config.Servant.Sys.BindPort),
+		"servant",
+		strconv.Itoa(config.Servant.Sys.BindPort),
 		config.Servant.Log.OutputLevel,
 		config.Servant.Log.MaxSizeKB,
 		config.Servant.Log.MaxGeneration,

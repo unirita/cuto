@@ -74,6 +74,7 @@ func realMain(args *arguments) int {
 
 	if err := log.Init(config.Dir.LogDir,
 		"master",
+		"",
 		config.Log.OutputLevel,
 		config.Log.MaxSizeKB,
 		config.Log.MaxGeneration,
