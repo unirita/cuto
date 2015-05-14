@@ -45,7 +45,7 @@ func (m *MutexHandle) Lock(timeout_milisec int) (bool, error) {
 		return true, nil
 	} else if int(r1) == wAIT_TIMEOUT {
 		msg := fmt.Sprintf("Lock Timeout. Detail( %v )", err)
-		fmt.Fprintf(os.Stderr, msg)
+		fmt.Fprintf(os.Stderr, "%v\n", msg)
 		return false, errors.New(msg)
 	}
 	return false, fmt.Errorf("Lock Unknown Error. Detail( %v )", err)
