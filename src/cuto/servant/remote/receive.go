@@ -35,12 +35,11 @@ const protocol = "tcp"
 func StartReceive(bindAddr string, port int, multi int) (<-chan *Session, error) {
 	addr := fmt.Sprintf("%s:%d", bindAddr, port)
 
-	log.Debug("addr = ", addr)
-
 	listener, err := net.Listen(protocol, addr)
 	if err != nil {
 		return nil, err
 	}
+	console.Display("CTM007I", bindAddr, port)
 
 	sq := make(chan *Session, multi)
 	go receiveLoop(listener, sq)
