@@ -43,6 +43,7 @@ type logSection struct {
 	OutputLevel   string `toml:"output_level"`
 	MaxSizeKB     int    `toml:"max_size_kb"`
 	MaxGeneration int    `toml:"max_generation"`
+	TimeoutSec    int    `toml:"timeout_sec"`
 }
 
 var Dir = new(dirSection)

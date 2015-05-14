@@ -55,7 +55,8 @@ func realMain(args *arguments) int {
 		fmt.Sprintf("servant_%d", config.Servant.Sys.BindPort),
 		config.Servant.Log.OutputLevel,
 		config.Servant.Log.MaxSizeKB,
-		config.Servant.Log.MaxGeneration); err != nil {
+		config.Servant.Log.MaxGeneration,
+		config.Servant.Log.TimeoutSec); err != nil {
 		console.Display("CTS023E", err)
 		return rc_error
 	}

@@ -12,9 +12,9 @@ import (
 	"cuto/util"
 )
 
-const lockTimeout = 1000
 const mutexHeader = "Unirita_CuteLog_"
 
+var lockTimeout = 1000
 var valid = false
 var locker *util.MutexHandle
 
@@ -30,13 +30,18 @@ var locker *util.MutexHandle
 //
 // param : maxRolls  ログファイルの最大世代数
 //
+// param : timeoutSec  ロックのタイムアウト秒
+//
 // return : エラー情報を返す。
-func Init(dir string, name string, level string, maxSizeKB int, maxRolls int) error {
+func Init(dir string, name string, level string, maxSizeKB int, maxRolls int, timeoutSec int) error {
 	var mutexErr error
 	mutexName := mutexHeader + name
 	locker, mutexErr = util.InitMutex(mutexName)
 	if mutexErr != nil {
 		return mutexErr
+	}
+	if timeoutSec > 0 {
+		lockTimeout = timeoutSec * 1000
 	}
 
 	logfile := fmt.Sprintf("%s%c%s.log", dir, os.PathSeparator, name)

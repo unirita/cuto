@@ -26,6 +26,7 @@ const (
 	defaultOutputLevel      = `info`
 	defaultMaxSizeKB        = 10240
 	defaultMaxGeneration    = 2
+	defaultTimeoutSec       = 1
 )
 
 const dirName = "bin"
@@ -44,6 +45,7 @@ func DefaultServantConfig() *ServantConfig {
 	cfg.Log.OutputLevel = defaultOutputLevel
 	cfg.Log.MaxSizeKB = defaultMaxSizeKB
 	cfg.Log.MaxGeneration = defaultMaxGeneration
+	cfg.Log.TimeoutSec = defaultTimeoutSec
 
 	return cfg
 
@@ -81,6 +83,7 @@ type logSection struct {
 	OutputLevel   string `toml:"output_level"`
 	MaxSizeKB     int    `toml:"max_size_kb"`
 	MaxGeneration int    `toml:"max_generation"`
+	TimeoutSec    int    `toml:"timeout_sec"`
 }
 
 var Servant *ServantConfig
