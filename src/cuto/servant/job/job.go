@@ -196,6 +196,7 @@ func (j *jobInstance) waitCmdTimeout(cmd *exec.Cmd) error {
 	go func() {
 		ch <- cmd.Wait()
 	}()
+	defer close(ch)
 
 	t := time.Duration(j.timeout) * time.Second
 	select {
