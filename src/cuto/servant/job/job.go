@@ -194,9 +194,9 @@ func (j *jobInstance) waitCmdTimeout(cmd *exec.Cmd) error {
 
 	ch := make(chan error, 1)
 	go func() {
+		defer close(ch)
 		ch <- cmd.Wait()
 	}()
-	defer close(ch)
 
 	t := time.Duration(j.timeout) * time.Second
 	select {
