@@ -28,11 +28,11 @@ var stack_msg = []string{"CTM019E", "CTS019E", "CTU003E"}
 
 // showユーティリティのUSAGE表示用の定義メッセージ
 const USAGE_SHOW = `Usage :
-    show.exe [-v] [-flow="bpmn file name"] [-From="From date"] [-to="To date"] [-status="normal" | "abnormal" | "running"] [-format="json" | "csv"]
+    show.exe [-v] [-jobnet="bpmn file name"] [-From="From date"] [-to="To date"] [-status="normal" | "abnormal" | "running"] [-format="json" | "csv"]
 
 Option :
     -v                 :   Print master version.
-    -flow=flow name    :   Designate a bpmn name.
+    -jobnet=jobnet     :   Designate a bpmn name.
     -from=yyyymmdd     :   From date is designated.
     -to=yyyymmdd       :   To date is designated.
     -status=normal     :   Status indicates only something of NORMAL-END.

@@ -12,11 +12,19 @@ import (
 	"cuto/util"
 )
 
-const mutexHeader = "Unirita_CuteLog_"
+//const mutexHeader = "Unirita_CuteLog_"
 
-var lockTimeout = 1000
-var valid = false
-var locker *util.MutexHandle
+var (
+	lockTimeout int64 = 1000
+	valid             = false
+
+	lockfile = getLockFile()
+	locker   util.FileLock
+)
+
+func getLockFile() string {
+	return fmt.Sprintf("%s%c%s", util.GetRootPath(), os.PathSeparator, "cuto.lock")
+}
 
 // ロガーの初期化処理を行う
 //
@@ -33,15 +41,11 @@ var locker *util.MutexHandle
 // param : timeoutSec  ロックのタイムアウト秒
 //
 // return : エラー情報を返す。
-func Init(dir string, name string, identifer string, level string, maxSizeKB int, maxRolls int, timeoutSec int) error {
-	var mutexErr error
-	mutexName := mutexHeader + name
-	if identifer != "" {
-		mutexName = mutexName + "_" + identifer
-	}
-	locker, mutexErr = util.InitMutex(mutexName)
-	if mutexErr != nil {
-		return mutexErr
+func Init(dir string, name string, identifer string, level string, maxSizeKB int, maxRolls int, timeoutSec int64) error {
+	var err error
+	locker, err = util.NewFileLock(lockfile)
+	if err != nil {
+		return err
 	}
 	if timeoutSec > 0 {
 		lockTimeout = timeoutSec * 1000
@@ -68,7 +72,6 @@ func Init(dir string, name string, identifer string, level string, maxSizeKB int
 
 // ロガーの終了処理を行う。
 func Term() {
-	locker.TermMutex()
 	valid = false
 }
 
