@@ -23,20 +23,26 @@ import (
 
 // ジョブネット全体を表す構造体
 type Network struct {
-	ID          int                // ジョブネットワークID。
-	Name        string             // ジョブネットワーク名。
-	Start       Element            // スタートイベントのノード。
-	End         Element            // エンドイベントのノード。
-	MasterPath  string             // ジョブネットワークファイルパス。
-	JobExPath   string             // 拡張ジョブ定義ファイルパス。
-	elements    map[string]Element // ジョブネットワークの構成要素Map。
-	Result      *tx.ResultMap      // 実行結果情報。
-	globalMutex *util.MutexHandle  // マスタ間ミューテックスハンドル
-	localMutex  sync.Mutex         // ゴルーチン間のミューテックス
+	ID         int                // ジョブネットワークID。
+	Name       string             // ジョブネットワーク名。
+	Start      Element            // スタートイベントのノード。
+	End        Element            // エンドイベントのノード。
+	MasterPath string             // ジョブネットワークファイルパス。
+	JobExPath  string             // 拡張ジョブ定義ファイルパス。
+	elements   map[string]Element // ジョブネットワークの構成要素Map。
+	Result     *tx.ResultMap      // 実行結果情報。
+	globalLock util.FileLock      // マスタ間ロックハンドル
+	localMutex sync.Mutex         // ゴルーチン間のミューテックス
 }
 
 // cuto masterが使用するミューテックス名。
 const mutex_name string = "Unirita_CutoMaster.mutex"
+
+var lockFile string = getLockFile()
+
+func getLockFile() string {
+	return fmt.Sprintf("%s%c%s", util.GetRootPath(), os.PathSeparator, "cuto_master.lock")
+}
 
 // Network構造体のコンストラクタ関数
 //
@@ -57,7 +63,7 @@ func NewNetwork(name string) (*Network, error) {
 		name)
 
 	var err error
-	nwk.globalMutex, err = util.InitMutex(mutex_name)
+	nwk.globalLock, err = util.NewFileLock(lockFile)
 	if err != nil {
 		return nil, err
 	}
@@ -339,14 +345,14 @@ func (n *Network) start() error {
 		timeout = 60000
 	}
 
-	var err error
-	ok, err := n.globalMutex.Lock(timeout)
+	err := n.globalLock.Lock(int64(timeout))
 	if err != nil {
-		return err
-	} else if !ok {
+		if err != util.ErrBusy {
+			return err
+		}
 		return fmt.Errorf("Lock Timeout.")
 	}
-	defer n.globalMutex.Unlock()
+	defer n.globalLock.Unlock()
 
 	n.Result, err = tx.StartJobNetwork(n.Name, config.DB.DBFile)
 	if err != nil {
@@ -371,7 +377,6 @@ func (n *Network) end(err error) error {
 }
 
 // 終了処理を行う。
-// 現在はミューテックスの破棄のみ。
+// 現在はなし
 func (n *Network) Terminate() {
-	n.globalMutex.TermMutex()
 }
