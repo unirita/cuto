@@ -1,6 +1,9 @@
 package log
 
 import (
+	"fmt"
+	"os"
+	"runtime"
 	"testing"
 
 	"github.com/cihub/seelog"
@@ -8,6 +11,16 @@ import (
 	"cuto/testutil"
 	"cuto/util"
 )
+
+var lockName = getLockName()
+
+func getLockName() string {
+	if runtime.GOOS == "windows" {
+		return "log_test"
+	} else {
+		return fmt.Sprintf("%s%c%s", util.GetRootPath(), os.PathSeparator, "test.lock")
+	}
+}
 
 func initForTest() {
 	config := `
@@ -20,7 +33,7 @@ func initForTest() {
     </formats>
 </seelog>`
 	logger, _ := seelog.LoggerFromConfigAsString(config)
-	locker, _ = util.InitMutex("log_test")
+	locker, _ = util.InitLock(lockName)
 	seelog.ReplaceLogger(logger)
 	valid = true
 }

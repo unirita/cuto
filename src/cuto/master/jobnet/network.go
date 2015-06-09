@@ -31,18 +31,12 @@ type Network struct {
 	JobExPath  string             // 拡張ジョブ定義ファイルパス。
 	elements   map[string]Element // ジョブネットワークの構成要素Map。
 	Result     *tx.ResultMap      // 実行結果情報。
-	globalLock util.FileLock      // マスタ間ロックハンドル
+	globalLock *util.LockHandle   // マスタ間ロックハンドル
 	localMutex sync.Mutex         // ゴルーチン間のミューテックス
 }
 
 // cuto masterが使用するミューテックス名。
-const mutex_name string = "Unirita_CutoMaster.mutex"
-
-var lockFile string = getLockFile()
-
-func getLockFile() string {
-	return fmt.Sprintf("%s%c%s", util.GetRootPath(), os.PathSeparator, "cuto_master.lock")
-}
+const lock_name string = "Unirita_CutoMaster.lock"
 
 // Network構造体のコンストラクタ関数
 //
@@ -63,7 +57,7 @@ func NewNetwork(name string) (*Network, error) {
 		name)
 
 	var err error
-	nwk.globalLock, err = util.NewFileLock(lockFile)
+	nwk.globalLock, err = util.InitLock(lock_name)
 	if err != nil {
 		return nil, err
 	}
@@ -345,7 +339,7 @@ func (n *Network) start() error {
 		timeout = 60000
 	}
 
-	err := n.globalLock.Lock(int64(timeout))
+	err := n.globalLock.Lock(timeout)
 	if err != nil {
 		if err != util.ErrBusy {
 			return err
@@ -379,4 +373,5 @@ func (n *Network) end(err error) error {
 // 終了処理を行う。
 // 現在はなし
 func (n *Network) Terminate() {
+	n.globalLock.TermLock()
 }

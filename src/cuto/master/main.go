@@ -78,7 +78,7 @@ func realMain(args *arguments) int {
 		config.Log.OutputLevel,
 		config.Log.MaxSizeKB,
 		config.Log.MaxGeneration,
-		int64(config.Log.TimeoutSec)); err != nil {
+		config.Log.TimeoutSec); err != nil {
 		console.Display("CTM021E", err)
 		return rc_ERROR
 	}

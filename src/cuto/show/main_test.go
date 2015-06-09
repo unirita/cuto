@@ -60,7 +60,7 @@ func vefiry_stdout(output_file, vefiry_file string) error {
 func TestRealMain_1日分のジョブネットを表示(t *testing.T) {
 	vefiry_file := "showtest_verify1.txt"
 	arg := &arguments{
-		flow:   "",
+		jobnet: "",
 		from:   "20150415",
 		to:     "20150415",
 		status: "",
@@ -96,7 +96,7 @@ func TestRealMain_1日分のジョブネットを表示(t *testing.T) {
 
 func TestRealMain_0件のジョブネットを表示(t *testing.T) {
 	arg := &arguments{
-		flow:   "JNET",
+		jobnet: "JNET",
 		from:   "",
 		to:     "",
 		status: "normal",
@@ -125,7 +125,7 @@ func TestRealMain_0件のジョブネットを表示(t *testing.T) {
 func TestRealMain_ヘルプを表示(t *testing.T) {
 	arg := &arguments{
 		help:   true,
-		flow:   "",
+		jobnet: "",
 		from:   "20150416",
 		to:     "20150416",
 		status: "",
@@ -155,7 +155,7 @@ func TestRealMain_ヘルプを表示(t *testing.T) {
 func TestRealMain_バージョン情報を表示(t *testing.T) {
 	arg := &arguments{
 		v:      true,
-		flow:   "",
+		jobnet: "",
 		from:   "20150416",
 		to:     "20150416",
 		status: "",
@@ -184,7 +184,7 @@ func TestRealMain_バージョン情報を表示(t *testing.T) {
 
 func TestRealMain_不正なFROM(t *testing.T) {
 	arg := &arguments{
-		flow:   "",
+		jobnet: "",
 		from:   "20150416X",
 		to:     "20150416",
 		status: "",
@@ -213,7 +213,7 @@ func TestRealMain_不正なFROM(t *testing.T) {
 
 func TestRealMain_不正なTO(t *testing.T) {
 	arg := &arguments{
-		flow:   "",
+		jobnet: "",
 		from:   "20150416",
 		to:     "20150416X",
 		status: "",
@@ -242,7 +242,7 @@ func TestRealMain_不正なTO(t *testing.T) {
 
 func TestRealMain_不正なStatus(t *testing.T) {
 	arg := &arguments{
-		flow:   "",
+		jobnet: "",
 		from:   "20150416",
 		to:     "20150416",
 		status: "abc",
@@ -271,7 +271,7 @@ func TestRealMain_不正なStatus(t *testing.T) {
 
 func TestRealMain_不正なFormat(t *testing.T) {
 	arg := &arguments{
-		flow:   "",
+		jobnet: "",
 		from:   "20150416",
 		to:     "20150416",
 		status: "",
@@ -300,7 +300,7 @@ func TestRealMain_不正なFormat(t *testing.T) {
 
 func TestRealMain_不正な設定ファイル(t *testing.T) {
 	arg := &arguments{
-		flow:   "",
+		jobnet: "",
 		from:   "20150416",
 		to:     "20150416",
 		status: "",
@@ -328,7 +328,7 @@ func TestRealMain_不正な設定ファイル(t *testing.T) {
 
 func TestRealMain_RuntimeErrorX(t *testing.T) {
 	arg := &arguments{
-		flow:   "",
+		jobnet: "",
 		from:   "20150414",
 		to:     "20150416",
 		status: "",
@@ -357,7 +357,7 @@ func TestRealMain_RuntimeErrorX(t *testing.T) {
 
 func TestRealMain_RuntimeErrorY(t *testing.T) {
 	arg := &arguments{
-		flow:   "",
+		jobnet: "",
 		from:   "20150414",
 		to:     "20150416",
 		status: "",

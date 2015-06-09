@@ -27,12 +27,6 @@ const (
 	rc_error = 1
 )
 
-var current = getCurrent()
-
-func getCurrent() string {
-	return fmt.Sprintf("%s%c%s", util.GetRootPath(), os.PathSeparator, "bin")
-}
-
 // エントリポイント
 func main() {
 	args := fetchArgs()
@@ -45,7 +39,7 @@ func realMain(args *arguments) int {
 		return rc_OK
 	}
 	// 作業フォルダは実行モジュールと同じ場所にする
-	os.Chdir(current)
+	os.Chdir(util.GetCurrentPath())
 	message.ServantVersion = Version
 
 	// システム変数のセット
@@ -64,7 +58,7 @@ func realMain(args *arguments) int {
 		config.Servant.Log.OutputLevel,
 		config.Servant.Log.MaxSizeKB,
 		config.Servant.Log.MaxGeneration,
-		int64(config.Servant.Log.TimeoutSec)); err != nil {
+		config.Servant.Log.TimeoutSec); err != nil {
 		console.Display("CTS023E", err)
 		return rc_error
 	}

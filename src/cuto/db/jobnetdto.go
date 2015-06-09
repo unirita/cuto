@@ -3,14 +3,6 @@
 
 package db
 
-// 実行結果のステータス
-const (
-	RUNNING = iota
-	NORMAL
-	WARN
-	ABNORMAL = 9
-)
-
 // ジョブネットワーク実行結果
 type JobNetworkResult struct {
 	ID         int    // ジョブネットワークのインシデントID

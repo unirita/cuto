@@ -4,10 +4,12 @@
 package util
 
 import (
+	"os"
 	"testing"
 )
 
 func TestGetRootPath_正常にRootPathが取得できる(t *testing.T) {
+	os.Setenv("CUTOROOT", "UNITTest")
 	s := GetRootPath()
 	if len(s) == 0 {
 		t.Error("取得失敗。")
