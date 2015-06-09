@@ -231,10 +231,19 @@ func (j *Job) end(res *message.Response) {
 	message.AddJobValue(j.Name, res)
 	tx.UpdateJob(j.Instance.Result.GetConnection(), jobres, &j.Instance.localMutex)
 
+	var st string
+	switch jobres.Status {
+	case db.NORMAL:
+		st = db.ST_NORMAL
+	case db.WARN:
+		st = db.ST_WARN
+	default:
+		st = db.ST_ABNORMAL
+	}
 	if jobres.Status != db.ABNORMAL {
-		console.Display("CTM024I", j.Name, j.Instance.ID, j.id, jobres.Status)
+		console.Display("CTM024I", j.Name, j.Instance.ID, j.id, st)
 	} else {
-		console.Display("CTM025W", j.Name, j.Instance.ID, j.id, jobres.Status, jobres.Detail)
+		console.Display("CTM025W", j.Name, j.Instance.ID, j.id, st, jobres.Detail)
 	}
 }
 
