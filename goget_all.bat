@@ -16,6 +16,8 @@ if %errorlevel% neq 0 goto err
 go get github.com/mattn/go-sqlite3
 if %errorlevel% neq 0 goto err
 
+go get golang.org/x/tools/cmd/cover
+
 endlocal
 exit /b 0
 
