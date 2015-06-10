@@ -6,6 +6,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"strings"
 	"syscall"
 
@@ -26,6 +27,15 @@ var (
 	confPath = setConfigPath()
 	confFile = setConfigFile()
 )
+var diffCommand = getDiff()
+
+func getDiff() string {
+	if runtime.GOOS == "windows" {
+		return "fc"
+	} else {
+		return "diff"
+	}
+}
 
 func setConfigPath() string {
 	return fmt.Sprintf("%v%c%v%c%v%c%v", os.Getenv("GOPATH"),
@@ -41,7 +51,7 @@ func init() {
 
 func vefiry_stdout(output_file, vefiry_file string) error {
 	params := []string{output_file, vefiry_file}
-	cmd := exec.Command("fc", params...)
+	cmd := exec.Command(diffCommand, params...)
 	err := cmd.Run()
 	if err != nil {
 		if e2, ok := err.(*exec.ExitError); ok {
