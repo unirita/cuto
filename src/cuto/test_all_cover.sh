@@ -1,7 +1,8 @@
 #/bin/sh
 
+OSNAME=`uname`
 TESTROOT=$GOPATH/src/cuto
-LOGFILE=$TESTROOT/cover_all.txt
+LOGFILE=$TESTROOT/cover_all_$OSNAME.txt
 RETCODE=0
 
 
