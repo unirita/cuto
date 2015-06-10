@@ -15,6 +15,7 @@ import (
 )
 
 var isTest bool = false
+var eventLoopFunc = eventLoop
 
 // サーバントメインルーチン
 func Run() (int, error) {
@@ -28,7 +29,7 @@ func Run() (int, error) {
 	signalCh := make(chan os.Signal)
 	signal.Notify(signalCh, os.Interrupt, syscall.SIGTERM, syscall.SIGHUP)
 
-	eventLoop(signalCh, sq)
+	eventLoopFunc(signalCh, sq)
 	return 0, nil
 }
 
