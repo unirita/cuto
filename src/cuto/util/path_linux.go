@@ -4,13 +4,18 @@
 package util
 
 import (
+	"fmt"
 	"os"
 )
 
 var rootPath = getCutoRoot()
 
 func getCutoRoot() string {
-	return os.Getenv("CUTOROOT")
+	d := os.Getenv("CUTOROOT")
+	if len(d) == 0 {
+		panic("Not setting environment argument $CUTOROOT")
+	}
+	return d
 }
 
 // Rootフォルダを取得する
@@ -20,6 +25,5 @@ func GetRootPath() string {
 
 // 現在のフォルダパスを返す。
 func GetCurrentPath() string {
-	dir, _ := os.Getwd()
-	return dir
+	return fmt.Sprintf("%s%c%s", rootPath, os.PathSeparator, "bin")
 }
