@@ -8,12 +8,12 @@ rm $GOPATH/bin/show
 # Unit test
 # *****************
 cd $GOPATH/src/cuto
-`./test_all_cover.sh`
+. ./test_all_cover.sh
 if [ "$?" -ne "0" ] ; then
     echo "unit test NG."
     exit 1
 fi
-:BUILD
+
 # *****************
 # All build
 # *****************
