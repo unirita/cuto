@@ -11,6 +11,10 @@ import (
 	"cuto/testutil"
 )
 
+func testEventLoop(signalCh <-chan os.Signal, sq <-chan *remote.Session) {
+
+}
+
 func waitEventLoopEnd(sigCh <-chan os.Signal, sq <-chan *remote.Session, endCh chan<- struct{}) {
 	eventLoop(sigCh, sq)
 	endCh <- struct{}{}
@@ -22,6 +26,19 @@ func TestRun_メッセージ受信開始に失敗したらエラー(t *testing.T
 	_, err := Run()
 	if err == nil {
 		t.Error("エラーが発生していない。")
+	}
+}
+
+func TestRun_メッセージ受信開始に成功(t *testing.T) {
+	eventLoopFunc = testEventLoop
+	config.Servant = config.DefaultServantConfig()
+	config.Servant.Sys.BindPort = 65531
+	r, err := Run()
+	if err != nil {
+		t.Error("エラーが発生した - %v", err)
+	}
+	if r != 0 {
+		t.Errorf("不正な戻り値　：　%v", r)
 	}
 }
 
