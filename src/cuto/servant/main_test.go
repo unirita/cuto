@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"runtime"
 	"strings"
 	"testing"
 
@@ -32,8 +33,14 @@ func TestRealMain_バージョン確認ができる(t *testing.T) {
 
 func TestRealMain_設定ファイルから設定がロードされた上で内容にエラーがあればリターンコードrc_errorを返す(t *testing.T) {
 	const s = os.PathSeparator
+	var configFile string
+	if runtime.GOOS == "windows" {
+		configFile = "error.ini"
+	} else {
+		configFile = "error_l.ini"
+	}
 	config.FilePath = fmt.Sprintf("%s%c%s",
-		getTestDataDir(), s, "error.ini")
+		getTestDataDir(), s, configFile)
 
 	args := new(arguments)
 	rc := realMain(args)
@@ -48,8 +55,14 @@ func TestRealMain_設定ファイルから設定がロードされた上で内�
 
 func TestRealMain_ロガー初期化でのエラー発生時にリターンコードrc_errorを返す(t *testing.T) {
 	const s = os.PathSeparator
+	var configFile string
+	if runtime.GOOS == "windows" {
+		configFile = "logerror.ini"
+	} else {
+		configFile = "logerror_l.ini"
+	}
 	config.FilePath = fmt.Sprintf("%s%c%s",
-		getTestDataDir(), s, "logerror.ini")
+		getTestDataDir(), s, configFile)
 
 	args := new(arguments)
 	rc := realMain(args)
@@ -60,9 +73,15 @@ func TestRealMain_ロガー初期化でのエラー発生時にリターンコ�
 }
 
 func TestRealMain_Run関数でのエラー発生時にリターンコードrc_errorを返す(t *testing.T) {
+	var configFile string
 	const s = os.PathSeparator
+	if runtime.GOOS == "windows" {
+		configFile = "binderror.ini"
+	} else {
+		configFile = "binderror_l.ini"
+	}
 	config.FilePath = fmt.Sprintf("%s%c%s",
-		getTestDataDir(), s, "binderror.ini")
+		getTestDataDir(), s, configFile)
 
 	args := new(arguments)
 	rc := realMain(args)

@@ -30,6 +30,9 @@ const (
 // エントリポイント
 func main() {
 	args := fetchArgs()
+	// 作業フォルダは実行モジュールと同じ場所にする
+	os.Chdir(util.GetCurrentPath())
+
 	os.Exit(realMain(args))
 }
 
@@ -38,8 +41,6 @@ func realMain(args *arguments) int {
 		showVersion()
 		return rc_OK
 	}
-	// 作業フォルダは実行モジュールと同じ場所にする
-	os.Chdir(util.GetCurrentPath())
 	message.ServantVersion = Version
 
 	// システム変数のセット
