@@ -16,6 +16,7 @@ OSNAME=`uname`
 OSNMAER=`uname -r`
 HOSTNAME=`hostname`
 CURRENT_DIR=`pwd`
+CURRENT_USER=`whoami`
 
 echo "\ncheack operating system..."
 if [ $OSNAME = "Linux" ] ; then
@@ -89,6 +90,7 @@ fi
 
 echo "\nInstall GoCUTO with the following setup information."
 echo "****************************************************"
+echo "  Install User                    = $CURRENT_USER"
 echo "  Install Directory of the GoCuto = $INSTALL_DIR"
 echo "  CUTO Servant bind-address       = $BIND_ADDRESS"
 echo "  CUTO Servant Port Number        = $LISTEN_PORT"
@@ -110,6 +112,9 @@ if [ "$SILENT_MODE" != "ON" ] ; then
     done
 fi
 
+USEC=s/@CUTOUSER/`echo $CURRENT_USER | sed 's/\//\\\\\//g'`/g
+echo $USEC >> .installsed
+
 DIRC=s/@ROOT/`echo $INSTALL_DIR | sed 's/\//\\\\\//g'`/g
 echo $DIRC >> .installsed
 
@@ -120,7 +125,7 @@ POTC=s/@LISTEN_PORT/$LISTEN_PORT/g
 echo $POTC >> .installsed
 
 cd $CURRENT_DIR/shell
-CUTO_SHELL="cutoenv.sh servant.sh"
+CUTO_SHELL="cutoenv.sh servant.sh servant_srv.sh"
 for z in $CUTO_SHELL ; do
     echo "changing $z ..."
     if [ -s $z ] ; then
@@ -131,6 +136,7 @@ for z in $CUTO_SHELL ; do
     fi
 done
 chmod 744 ./*
+chmod u-x cutoenv.sh
 
 cd $CURRENT_DIR/bin
 CUTO_PARMS="master.ini servant.ini"
