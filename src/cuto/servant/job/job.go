@@ -277,7 +277,7 @@ func (j *jobInstance) createJoblogFileName() string {
 	// 開始日フォルダの作成
 	joblogDir := fmt.Sprintf("%v%c%v", j.config.Dir.JoblogDir, os.PathSeparator, j.joblogTimestamp[:8])
 	if _, err := os.Stat(joblogDir); err != nil {
-		os.Mkdir(joblogDir, 0666)
+		os.Mkdir(joblogDir, 0777)
 	}
 	log.Debug("joblogDir = ", joblogDir)
 	return fmt.Sprintf("%v%c%v.%v.%v.log", joblogDir, os.PathSeparator, j.nID, job, j.joblogTimestamp)
