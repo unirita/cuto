@@ -1,10 +1,12 @@
 #!/bin/sh
 
+VERSION="V0.1.0L0"
+
 echo "\n"
 echo "***********************************************************"
 echo "*                                                         *"
 echo "*                                                         *"
-echo "*           GoCUTO V0.1.0 Instaler                        *"
+echo "*           GoCUTO $VERSION Instaler                      *"
 echo "*                         Last Update 2015/06/11          *"
 echo "*                                           UNIRITA.Inc   *"
 echo "*                                                         *"
@@ -49,7 +51,7 @@ fi
 if [ "$SILENT_MODE" != "ON" ] ; then
     YES_NO=
     while [ -z "$YES_NO" ] ; do
-        echo "Do you want to install GoCuto v0.1.0 [ y/n ] ?"
+        echo "Do you want to install GoCuto $VERSION [ y/n ] ?"
         read YES_NO
         if [ "$YES_NO" = "y" ] ; then
             echo "\nStarting to install..."
