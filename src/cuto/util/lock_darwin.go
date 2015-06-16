@@ -22,20 +22,20 @@ var (
 	errInvalidPid = errors.New("Lockfile contains invalid pid.")
 	errDeadOwner  = errors.New("Lockfile contains pid of process not existent on this system.")
 
-	lockFilePath = fmt.Sprintf("%s%c%s%c", GetRootPath(), os.PathSeparator, "temp", os.PathSeparator)
+	lockFilePath = filepath.Join(GetRootPath(), "temp")
 
-	onceLockFile = getOnceLock()
+	onlyLockFile = getOnlyLock()
 )
 
-func getOnceLock() string {
-	return filepath.Join(GetRootPath(), "temp", "once.lock")
+func getOnlyLock() string {
+	return filepath.Join(GetRootPath(), "temp", "cuto_only.lock")
 }
 
 // ファイルを利用した同期処理機能の初期化関数。
 // ファイル作成が可能なファイル名を指定します。
 func InitLock(name string) (*LockHandle, error) {
 	if len(name) > 0 {
-		lh := LockHandle(fmt.Sprintf("%s%s", lockFilePath, name))
+		lh := LockHandle(filepath.Join(lockFilePath, name))
 		return &lh, nil
 	} else {
 		lh := LockHandle("")
@@ -61,8 +61,7 @@ func (fl *LockHandle) Lock(timeout_millisec int) error {
 				} else if err != ErrBusy {
 					return err
 				}
-				d := time.Since(st)
-				if d.Nanoseconds() > (int64(timeout_millisec) * 1000000) {
+				if time.Since(st).Nanoseconds() > (int64(timeout_millisec) * 1000000) {
 					return ErrBusy
 				}
 			}
@@ -100,34 +99,28 @@ func (fl *LockHandle) TermLock() error {
 }
 
 // ロック処理を行う
-func (fl *LockHandle) tryLock(execOnceLock bool) error {
+func (fl *LockHandle) tryLock(execOnlyLock bool) error {
 
 	name := string(*fl)
 	if len(name) < 1 {
 		return errors.New("Not initialize.")
 	}
-	//@DEBUG start
-	if execOnceLock {
-		fmt.Fprintln(os.Stderr, "Before stat")
-		if _, err := os.Stat(onceLockFile); err != nil {
-			panic("Nothing " + onceLockFile)
+	if execOnlyLock {
+		if _, err := os.Stat(onlyLockFile); err != nil {
+			panic("Nothing " + onlyLockFile)
 		}
-		fmt.Fprintln(os.Stderr, "Before open")
-		fd, err := syscall.Open(onceLockFile, syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
+		fd, err := syscall.Open(onlyLockFile, syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
 		if err != nil {
-			panic(err)
+			return err
 		}
-		fmt.Fprintln(os.Stderr, "Before lock")
 		if err := syscall.Flock(fd, syscall.LOCK_EX); err != nil {
-			panic(err)
+			return err
 		}
 		defer func() {
-			fmt.Fprintln(os.Stderr, "Before unlock")
 			syscall.Flock(fd, syscall.LOCK_UN)
 			syscall.Close(fd)
 		}()
 	}
-	//@DEBUG end
 
 	tmpfile, err := ioutil.TempFile(filepath.Dir(name), "cuto_")
 	if err != nil {
@@ -194,10 +187,6 @@ func (fl *LockHandle) existOwnerProcess() (bool, error) {
 
 	p, err := os.FindProcess(pid)
 	if err != nil {
-		if isAccessDenied(err) {
-			// アクセスエラー時は、プロセスが存在する。
-			return true, nil
-		}
 		return false, errDeadOwner
 	}
 	// 取得したプロセスに、シグナルを送ってみて、成功すれば生きていると判断します。
@@ -220,9 +209,4 @@ func (fl *LockHandle) existOwnerProcess() (bool, error) {
 		return false, errors.New("Unknown error.")
 	}
 	panic("Not reached.")
-}
-
-// エラー情報が、権限エラーによる物か確認します。
-func isAccessDenied(err error) bool {
-	return false
 }
