@@ -114,7 +114,7 @@ func (fl *LockHandle) tryLock() error {
 		return err
 	}
 
-	os.Symlink(tmpfile.Name(), name)
+	os.Link(tmpfile.Name(), name)
 
 	fiTmp, err := os.Lstat(tmpfile.Name())
 	if err != nil {
