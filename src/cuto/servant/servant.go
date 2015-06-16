@@ -51,10 +51,11 @@ func eventLoop(signalCh <-chan os.Signal, sq <-chan *remote.Session) {
 
 func isEndSig(sig os.Signal) bool {
 	log.Info("Receive Signal : ", sig)
-	if sig == syscall.SIGTERM || sig == syscall.SIGHUP {
+	if sig == syscall.SIGHUP {
 		// ハングアップ？
 		config.ReloadConfig()
-	} else if sig == syscall.SIGINT {
+	} else if sig == syscall.SIGTERM || sig == syscall.SIGINT {
+		// 終了シグナル
 		return true
 	}
 	return false
