@@ -90,7 +90,7 @@ func TestDoJobRequest_ジョブが正常に実行できる(t *testing.T) {
 		t.Error("IDがリクエストとレスポンスで異なる.")
 	}
 	if res.RC != 0 {
-		t.Error("ジョブが正常終了するはずなのに異常終了した.")
+		t.Errorf("ジョブが正常終了するはずなのに異常終了した. - ", res.RC)
 	}
 	if len(res.Detail) > 0 {
 		t.Error("ジョブが正常終了するはずなのに、エラーメッセージがある.", res.Detail)

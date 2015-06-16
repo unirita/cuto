@@ -48,6 +48,13 @@ type jobInstance struct {
 	joblogTimestamp string                // ジョブログファイル名に使用するタイムスタンプ文字列
 }
 
+var (
+	detailWarnRC  = "JOB-RC exceeded MAX-WarnRC."
+	detailErrRC   = "JOB-RC exceeded MAX-ErrRC."
+	detailWarnPtn = "JOB-OUTPUT matched Warning Pattern."
+	detailErrPtn  = "JOB-OUTPUT matched Error Pattern."
+)
+
 // 実行ジョブ情報のコンストラクタ
 func newJobInstance(req *message.Request, conf *config.ServantConfig) *jobInstance {
 	job := new(jobInstance)
@@ -94,6 +101,7 @@ func DoJobRequest(req *message.Request, conf *config.ServantConfig, stCh chan<- 
 			job.stat = db.ABNORMAL
 			job.detail = err.Error()
 		} else {
+			// RCからの結果と、出力MSGの結果を比較し、大きい方（異常の方）を採用する
 			if rcSt > ptnSt {
 				job.stat = rcSt
 			} else {
@@ -101,9 +109,7 @@ func DoJobRequest(req *message.Request, conf *config.ServantConfig, stCh chan<- 
 			}
 		}
 		console.Display("CTS011I", job.path, job.nID, job.jID, job.stat, job.rc)
-		if job.stat != db.ABNORMAL {
-			job.setVariableValue()
-		}
+		job.setVariableValue()
 	}
 
 	return job.createResponse()
@@ -128,25 +134,7 @@ func (j *jobInstance) createShell() *exec.Cmd {
 	} else if strings.HasSuffix(j.path, ".ps1") { // PowerShell
 		shell = "powershell"
 		param = fmt.Sprintf("%s %s", script, j.param)
-	} else if strings.HasSuffix(j.path, "sh") {
-		shell = "sh"
-		param = fmt.Sprintf("%s %s", script, j.param)
-	} else if strings.HasSuffix(j.path, "bash") {
-		shell = "bash"
-		param = fmt.Sprintf("%s %s", script, j.param)
-	} else if strings.HasSuffix(j.path, "csh") {
-		shell = "csh"
-		param = fmt.Sprintf("%s %s", script, j.param)
-	} else if strings.HasSuffix(j.path, "tcsh") {
-		shell = "tcsh"
-		param = fmt.Sprintf("%s %s", script, j.param)
-	} else if strings.HasSuffix(j.path, "zsh") {
-		shell = "zsh"
-		param = fmt.Sprintf("%s %s", script, j.param)
-	} else if strings.HasSuffix(j.path, "ksh") {
-		shell = "ksh"
-		param = fmt.Sprintf("%s %s", script, j.param)
-	} else { // bat or exe
+	} else { // bat or exe or shell
 		shell = script
 		param = j.param
 	}
@@ -233,11 +221,13 @@ func (j *jobInstance) waitCmdTimeout(cmd *exec.Cmd) error {
 func (j *jobInstance) judgeRC() int {
 	if j.errRC > 0 {
 		if j.errRC <= j.rc {
+			j.detail = "JOB-RC exceeded MAX-ErrRC."
 			return db.ABNORMAL
 		}
 	}
 	if j.wrnRC > 0 {
 		if j.wrnRC <= j.rc {
+			j.detail = "JOB-RC exceeded MAX-WarnRC."
 			return db.WARN
 		}
 	}
@@ -265,11 +255,13 @@ func (j *jobInstance) writeFileAndJodgeJoblog() (int, error) {
 
 	if len(j.errPtn) > 0 {
 		if strings.Contains(j.joblog, j.errPtn) {
+			j.detail = detailErrPtn
 			return db.ABNORMAL, nil
 		}
 	}
 	if len(j.wrnPtn) > 0 {
 		if strings.Contains(j.joblog, j.wrnPtn) {
+			j.detail = detailWarnPtn
 			return db.WARN, nil
 		}
 	}

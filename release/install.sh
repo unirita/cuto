@@ -154,6 +154,10 @@ chmod 644 $CUTO_PARMS
 CUTO_BINARY="master servant sqlite3"
 chmod 755 $CUTO_BINARY
 
+cd $CURRENT_DIR/temp
+touch cuto_only.lock
+chmod 644 cuto_only.lock
+
 cd $CURRENT_DIR
 
 echo "...completed !"

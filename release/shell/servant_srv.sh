@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 # GoCuto        Starts syslogd/klogd.
 #

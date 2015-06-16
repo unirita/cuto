@@ -1,10 +1,7 @@
 #/bin/sh
 
 RC=1
-if [ -z "$CUTOROOT" ] ; then
-  echo Undefined \$CUTOROOT
-  exit $RC
-fi
+. ./cutoenv.sh
 
 ISALIVE=`ps -u $LOGNAME | grep 'master' | grep -v grep | wc -l`
 if [ $ISALIVE != 0 ] ; then
@@ -20,8 +17,8 @@ if [ -s bk_job.csv ] ; then
   rm bk_job.csv
 fi
 
-$CUTOROOT/bin/sqlite cuto.sqlite < dbinit.query
-if [ $? -eq ] ; then
+$CUTOROOT/bin/sqlite3 cuto.sqlite < dbinit.query
+if [ $? -eq 0 ] ; then
   echo Database initialize OK.
   RC=0
 else

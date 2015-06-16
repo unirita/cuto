@@ -4,10 +4,7 @@
 GENERAL_NUM=30
 # ################
 
-if [ -z "$CUTOROOT" ] ; then
-  echo Undefined \$CUTOROOT
-  exit $RC
-fi
+. ./cutoenv.sh
 
 files="$CUTOROOT/joblog/*"
 dirary=()
