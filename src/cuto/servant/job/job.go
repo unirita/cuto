@@ -128,6 +128,24 @@ func (j *jobInstance) createShell() *exec.Cmd {
 	} else if strings.HasSuffix(j.path, ".ps1") { // PowerShell
 		shell = "powershell"
 		param = fmt.Sprintf("%s %s", script, j.param)
+	} else if strings.HasSuffix(j.path, "sh") {
+		shell = "sh"
+		param = fmt.Sprintf("%s %s", script, j.param)
+	} else if strings.HasSuffix(j.path, "bash") {
+		shell = "bash"
+		param = fmt.Sprintf("%s %s", script, j.param)
+	} else if strings.HasSuffix(j.path, "csh") {
+		shell = "csh"
+		param = fmt.Sprintf("%s %s", script, j.param)
+	} else if strings.HasSuffix(j.path, "tcsh") {
+		shell = "tcsh"
+		param = fmt.Sprintf("%s %s", script, j.param)
+	} else if strings.HasSuffix(j.path, "zsh") {
+		shell = "zsh"
+		param = fmt.Sprintf("%s %s", script, j.param)
+	} else if strings.HasSuffix(j.path, "ksh") {
+		shell = "ksh"
+		param = fmt.Sprintf("%s %s", script, j.param)
 	} else { // bat or exe
 		shell = script
 		param = j.param
