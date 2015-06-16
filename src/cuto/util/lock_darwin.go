@@ -23,7 +23,13 @@ var (
 	errDeadOwner  = errors.New("Lockfile contains pid of process not existent on this system.")
 
 	lockFilePath = fmt.Sprintf("%s%c%s%c", GetRootPath(), os.PathSeparator, "temp", os.PathSeparator)
+
+	onceLockFile = getOnceLock()
 )
+
+func getOnceLock() string {
+	return filepath.Join(GetRootPath(), "temp", "once.lock")
+}
 
 // ファイルを利用した同期処理機能の初期化関数。
 // ファイル作成が可能なファイル名を指定します。
@@ -41,7 +47,7 @@ func InitLock(name string) (*LockHandle, error) {
 // 引数で指定したミリ秒まで待機します。0以下を指定した場合は、1度だけロックに挑戦します。
 // 他プロセスのロックが指定時間内に解けなかった場合は、ErrBusy を返します。
 func (fl *LockHandle) Lock(timeout_millisec int) error {
-	err := fl.tryLock()
+	err := fl.tryLock(true)
 
 	if err == ErrBusy { // Locked by other process.
 		if timeout_millisec > 0 {
@@ -49,7 +55,7 @@ func (fl *LockHandle) Lock(timeout_millisec int) error {
 			st := time.Now()
 			for {
 				time.Sleep(1 * time.Millisecond)
-				err = fl.tryLock()
+				err = fl.tryLock(true)
 				if err == nil {
 					return nil
 				} else if err != ErrBusy {
@@ -94,11 +100,34 @@ func (fl *LockHandle) TermLock() error {
 }
 
 // ロック処理を行う
-func (fl *LockHandle) tryLock() error {
+func (fl *LockHandle) tryLock(execOnceLock bool) error {
+
 	name := string(*fl)
 	if len(name) < 1 {
 		return errors.New("Not initialize.")
 	}
+	//@DEBUG start
+	if execOnceLock {
+		fmt.Println("Before stat")
+		if _, err := os.Stat(onceLockFile); err != nil {
+			panic("Nothing " + onceLockFile)
+		}
+		fmt.Println("Before open")
+		fd, err := syscall.Open(onceLockFile, syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println("Before lock")
+		if err := syscall.Flock(fd, syscall.LOCK_EX); err != nil {
+			panic(err)
+		}
+		defer func() {
+			fmt.Println("Before unlock")
+			syscall.Flock(fd, syscall.LOCK_UN)
+			syscall.Close(fd)
+		}()
+	}
+	//@DEBUG end
 
 	tmpfile, err := ioutil.TempFile(filepath.Dir(name), "cuto_")
 	if err != nil {
@@ -140,7 +169,7 @@ func (fl *LockHandle) tryLock() error {
 		if err != nil {
 			return err
 		}
-		return fl.tryLock()
+		return fl.tryLock(false)
 	default:
 		return err
 	}
