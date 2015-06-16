@@ -108,21 +108,21 @@ func (fl *LockHandle) tryLock(execOnceLock bool) error {
 	}
 	//@DEBUG start
 	if execOnceLock {
-		fmt.Println("Before stat")
+		fmt.Fprintln(os.Stderr, "Before stat")
 		if _, err := os.Stat(onceLockFile); err != nil {
 			panic("Nothing " + onceLockFile)
 		}
-		fmt.Println("Before open")
+		fmt.Fprintln(os.Stderr, "Before open")
 		fd, err := syscall.Open(onceLockFile, syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println("Before lock")
+		fmt.Fprintln(os.Stderr, "Before lock")
 		if err := syscall.Flock(fd, syscall.LOCK_EX); err != nil {
 			panic(err)
 		}
 		defer func() {
-			fmt.Println("Before unlock")
+			fmt.Fprintln(os.Stderr, "Before unlock")
 			syscall.Flock(fd, syscall.LOCK_UN)
 			syscall.Close(fd)
 		}()
