@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 
 # ################
 GENERAL_NUM=30

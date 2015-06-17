@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 
 RC=1
 . ./cutoenv.sh
