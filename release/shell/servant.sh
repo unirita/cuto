@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. ./cutoenv.sh
+CUTOROOT=@ROOT;export CUTOROOT
 
 cd $CUTOROOT/bin
-./servant -c servant.ini > $CUTOROOT/log/servant_console.log 2>&1 &
+./servant -c servant.ini
