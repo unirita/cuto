@@ -39,7 +39,7 @@ func StartReceive(bindAddr string, port int, multi int) (<-chan *Session, error)
 	if err != nil {
 		return nil, err
 	}
-	console.Display("CTM007I", bindAddr, port)
+	console.Display("CTS007I", bindAddr, port)
 
 	sq := make(chan *Session, multi)
 	go receiveLoop(listener, sq)
