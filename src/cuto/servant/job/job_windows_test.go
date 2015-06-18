@@ -232,8 +232,10 @@ func TestDoJobRequest_RCで警告終了するジョブ_閾値と同じ(t *testin
 	if res.RC != 4 {
 		t.Error("RCは4のはず.")
 	}
-	if len(res.Detail) != 0 {
+	if len(res.Detail) == 0 {
 		t.Error("異常終了メッセージが存在しない.")
+	} else if res.Detail != detailWarnRC {
+		t.Errorf("想定外のメッセージ - %s", res.Detail)
 	}
 	if len(res.Var) == 0 {
 		t.Error("変数なし.")
@@ -365,8 +367,10 @@ func TestDoJobRequest_標準出力で警告終了するジョブ_RC確認なし(
 	if res.RC != 0 {
 		t.Error("RCは0のはず.")
 	}
-	if len(res.Detail) != 0 {
+	if len(res.Detail) == 0 {
 		t.Error("異常終了メッセージが存在しない.")
+	} else if res.Detail != detailWarnPtn {
+		t.Errorf("想定外のメッセージ - %v", res.Detail)
 	}
 	if len(res.Var) == 0 {
 		t.Error("変数なし.")
@@ -500,8 +504,10 @@ func TestDoJobRequest_標準エラー出力で警告終了するVBSジョブ_RC�
 	if res.RC != 0 {
 		t.Error("RCは0のはず.")
 	}
-	if len(res.Detail) != 0 {
+	if len(res.Detail) == 0 {
 		t.Error("異常終了メッセージが存在しない.")
+	} else if res.Detail != detailWarnPtn {
+		t.Errorf("想定外のメッセージ - %v", res.Detail)
 	}
 	if len(res.Var) == 0 {
 		t.Error("変数なし.")
@@ -545,11 +551,13 @@ func TestDoJobRequest_RCで異常終了するジョブ_閾値と同じ(t *testin
 	if res.RC != 12 {
 		t.Error("RCは12のはず.")
 	}
-	if len(res.Detail) != 0 {
+	if len(res.Detail) == 0 {
 		t.Error("異常終了メッセージが存在しない.")
+	} else if res.Detail != detailErrRC {
+		t.Errorf("想定外のメッセージ - %v", res.Detail)
 	}
-	if len(res.Var) > 0 {
-		t.Error("テストコード側の変数機能が未実装.")
+	if len(res.Var) == 0 {
+		t.Error("変数が格納されていない.")
 	}
 	if len(res.St) == 0 {
 		t.Error("ジョブ開始時間がない.")
@@ -633,11 +641,13 @@ func TestDoJobRequest_RCで異常終了して標準出力で警告終了する�
 	if res.RC != 12 {
 		t.Error("RCは12のはず.")
 	}
-	if len(res.Detail) != 0 {
+	if len(res.Detail) == 0 {
 		t.Error("異常終了メッセージが存在しない.")
+	} else if res.Detail != detailErrRC {
+		t.Errorf("想定外のメッセージ - %v", res.Detail)
 	}
-	if len(res.Var) > 0 {
-		t.Error("テストコード側の変数機能が未実装.")
+	if len(res.Var) == 0 {
+		t.Error("変数が格納されていない.")
 	}
 	if len(res.St) == 0 {
 		t.Error("ジョブ開始時間がない.")
@@ -676,11 +686,13 @@ func TestDoJobRequest_RCで警告終了して標準出力で異常終了する�
 	if res.RC != 11 {
 		t.Error("RCは11のはず.")
 	}
-	if len(res.Detail) != 0 {
+	if len(res.Detail) == 0 {
 		t.Error("異常終了メッセージが存在する.")
+	} else if res.Detail != detailErrPtn {
+		t.Errorf("想定外のメッセージ - %v", res.Detail)
 	}
-	if len(res.Var) > 0 {
-		t.Error("テストコード側の変数機能が未実装.")
+	if len(res.Var) == 0 {
+		t.Error("変数が格納されていない.")
 	}
 	if len(res.St) == 0 {
 		t.Error("ジョブ開始時間がない.")

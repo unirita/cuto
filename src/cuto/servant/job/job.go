@@ -94,8 +94,8 @@ func DoJobRequest(req *message.Request, conf *config.ServantConfig, stCh chan<- 
 		job.stat = db.ABNORMAL
 		job.detail = err.Error()
 	} else {
-		rcSt := job.judgeRC()
-		ptnSt, err := job.writeFileAndJodgeJoblog()
+		rcSt, rcMsg := job.judgeRC()
+		ptnSt, ptnMsg, err := job.writeFileAndJodgeJoblog()
 		if err != nil {
 			console.DisplayError("CTS019E", err)
 			job.stat = db.ABNORMAL
@@ -104,8 +104,10 @@ func DoJobRequest(req *message.Request, conf *config.ServantConfig, stCh chan<- 
 			// RCからの結果と、出力MSGの結果を比較し、大きい方（異常の方）を採用する
 			if rcSt > ptnSt {
 				job.stat = rcSt
+				job.detail = rcMsg
 			} else {
 				job.stat = ptnSt
+				job.detail = ptnMsg
 			}
 		}
 		console.Display("CTS011I", job.path, job.nID, job.jID, job.stat, job.rc)
@@ -218,25 +220,23 @@ func (j *jobInstance) waitCmdTimeout(cmd *exec.Cmd) error {
 
 // ジョブのRCを確認し、statを返す。
 // ジョブのRCが指定されたRC以上の場合は、それぞれのステータスを返します。
-func (j *jobInstance) judgeRC() int {
+func (j *jobInstance) judgeRC() (int, string) {
 	if j.errRC > 0 {
 		if j.errRC <= j.rc {
-			j.detail = "JOB-RC exceeded MAX-ErrRC."
-			return db.ABNORMAL
+			return db.ABNORMAL, detailErrRC
 		}
 	}
 	if j.wrnRC > 0 {
 		if j.wrnRC <= j.rc {
-			j.detail = "JOB-RC exceeded MAX-WarnRC."
-			return db.WARN
+			return db.WARN, detailWarnRC
 		}
 	}
-	return db.NORMAL
+	return db.NORMAL, ""
 }
 
 // ジョブログ結果を確認し、ステータスを返す。
 // joblog内に指定された文字列が存在する場合は、それぞれのステータスを返します。
-func (j *jobInstance) writeFileAndJodgeJoblog() (int, error) {
+func (j *jobInstance) writeFileAndJodgeJoblog() (int, string, error) {
 	// ジョブログファイル名の作成
 	j.joblogFile = j.createJoblogFileName()
 	log.Debug("joblogFile = ", j.joblogFile)
@@ -244,28 +244,26 @@ func (j *jobInstance) writeFileAndJodgeJoblog() (int, error) {
 	// ファイルは存在しない場合の新規作成モード。
 	file, err := os.OpenFile(j.joblogFile, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0666)
 	if err != nil {
-		return 0, err
+		return 0, "", err
 	}
 	defer file.Close()
 
 	_, err = file.WriteString(j.joblog)
 	if err != nil {
-		return 0, err
+		return 0, "", err
 	}
 
 	if len(j.errPtn) > 0 {
 		if strings.Contains(j.joblog, j.errPtn) {
-			j.detail = detailErrPtn
-			return db.ABNORMAL, nil
+			return db.ABNORMAL, detailErrPtn, nil
 		}
 	}
 	if len(j.wrnPtn) > 0 {
 		if strings.Contains(j.joblog, j.wrnPtn) {
-			j.detail = detailWarnPtn
-			return db.WARN, nil
+			return db.WARN, detailWarnPtn, nil
 		}
 	}
-	return db.NORMAL, nil
+	return db.NORMAL, "", nil
 }
 
 // ジョブログファイル名をフルパスで作成する。

@@ -310,11 +310,11 @@ func (n *Network) Run() error {
 	}
 
 	err := n.start()
-	console.Display("CTM012I", n.Name, n.ID)
-
 	if err != nil {
+		console.Display("CTM019E", err)
 		return err
 	}
+	console.Display("CTM012I", n.Name, n.ID)
 
 	for {
 		next, err := current.Execute()
@@ -327,9 +327,9 @@ func (n *Network) Run() error {
 			err := fmt.Errorf("Element[id = %s] cannot terminate network because it is not a endEvent.", current.ID())
 			return n.end(err)
 		}
-
 		current = next
 	}
+	panic("Not reached.")
 }
 
 // ジョブネットワークの開始処理
