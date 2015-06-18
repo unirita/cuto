@@ -315,6 +315,7 @@ func TestRealMain_不正な設定ファイル(t *testing.T) {
 		to:     "20150416",
 		status: "",
 		format: "",
+		config: "error.ini",
 	}
 	ce := testutil.NewStderrCapturer()
 	ce.Start()
@@ -331,7 +332,7 @@ func TestRealMain_不正な設定ファイル(t *testing.T) {
 	if len(cout) > 0 {
 		t.Errorf("不正な標準出力です。 - %v", cout)
 	}
-	if !strings.Contains(cerr, defaultConfig) {
+	if !strings.Contains(cerr, "error.ini") {
 		t.Errorf("不正な標準エラー出力です。 - %v", cerr)
 	}
 }

@@ -7,7 +7,10 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime"
 	"time"
+
+	"path/filepath"
 
 	"cuto/console"
 	"cuto/db"
@@ -37,7 +40,14 @@ const (
 )
 
 // デフォルトの設定ファイル名
-const defaultConfig = "master.ini"
+var defaultConfig string = getDefaultConfig()
+
+func getDefaultConfig() string {
+	if runtime.GOOS == "windows" {
+		return "master.ini"
+	}
+	return filepath.Join(os.Getenv("CUTOROOT"), "bin", "master.ini")
+}
 
 // ステータス指定
 const status_normal = "normal"
