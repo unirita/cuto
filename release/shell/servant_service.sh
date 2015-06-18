@@ -11,12 +11,14 @@
 # Source function library.
 . /etc/init.d/functions
 
-
+NAME=servant
+LOCKFILE=/var/lock/subsys/${NAME}
 CUTOUSER=@CUTOUSER
 CUTOROOT=@ROOT
 
 start() {
 
+        touch $LOCKFILE
 #servant start
         ISALIVE=`ps -u $CUTOUSER | grep 'servant' | grep -v grep | wc -l`
         if [ $ISALIVE != 0 ] ; then
@@ -43,6 +45,7 @@ start() {
 
 stop() {
 
+        rm -f $LOCKFILE
 #servant stop
         echo "servant Process Stopped ..."
 
@@ -54,25 +57,15 @@ stop() {
                 export killid=`ps -ef | grep $CUTOUSER | grep 'servant' | grep -v grep |awk '{print $2}'`
                 kill -15 $killid
 
-                echo "$nowtime Servant process terminated." >> $CUTOROOT/log/servant_chklog.log
+                echo "$nowtime Servant process stopped." >> $CUTOROOT/log/servant_chklog.log
         else
-                echo "### servant already terminated ###"
+                echo "### servant already stopped ###"
         fi
 
         exit 0
 
         return 0
 }
-rhstatus() {
-        return 0
-}
-restart() {
-        return 0
-}
-reload()  {
-    return 1
-}
-
 
 case "$1" in
   start)
@@ -81,8 +74,13 @@ case "$1" in
   stop)
         stop
         ;;
+  restart)
+        stop
+        sleep 1
+        start
+        ;;
   *)
-        echo $"Usage: $0 {start|stop}"
+        echo $"Usage: $0 {start|stop|restart}"
         exit 2
 esac
 

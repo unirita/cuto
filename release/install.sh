@@ -125,7 +125,7 @@ POTC=s/@LISTEN_PORT/$LISTEN_PORT/g
 echo $POTC >> .installsed
 
 cd $CURRENT_DIR/shell
-CUTO_SHELL="cutoenv.sh servant.sh servant_srv.sh"
+CUTO_SHELL="cutoenv.sh servant.sh servant_service.sh"
 for z in $CUTO_SHELL ; do
     echo "changing $z ..."
     if [ -s $z ] ; then
