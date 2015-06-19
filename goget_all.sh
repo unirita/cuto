@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 
 go get github.com/coopernurse/gorp
 if [ "$?" -ne "0" ] ; then

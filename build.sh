@@ -1,4 +1,4 @@
-#/bin/sh
+#!/bin/sh
 
 rm $GOPATH/bin/master
 rm $GOPATH/bin/servant
