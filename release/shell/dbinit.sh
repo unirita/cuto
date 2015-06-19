@@ -3,6 +3,12 @@
 RC=1
 . ./cutoenv.sh
 
+which sqlite3
+if [ $? -ne 0 ] ; then
+  echo Not found sqlite3
+  exit $RC
+fi
+
 ISALIVE=`ps -u $LOGNAME | grep 'master' | grep -v grep | wc -l`
 if [ $ISALIVE != 0 ] ; then
   echo Cuto master running now.
@@ -17,7 +23,7 @@ if [ -s bk_job.csv ] ; then
   rm bk_job.csv
 fi
 
-$CUTOROOT/bin/sqlite3 cuto.sqlite < dbinit.query
+sqlite3 cuto.sqlite < dbinit.query
 if [ $? -eq 0 ] ; then
   echo Database initialize OK.
   RC=0
