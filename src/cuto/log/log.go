@@ -24,6 +24,8 @@ var locker *util.LockHandle
 //
 // param : name      ログファイルの種別（例：master、servant）。
 //
+// param : identifer ロック用ファイルに（付与する識別ID（例：servantはListePort）。
+//
 // param : level     出力ログレベル（trace,debug,info,warn,error,criticalのいずれかを指定）
 //
 // param : maxSizeKB ログファイルの最大サイズ。この値を超えるとログローテーションが発生する。
@@ -39,6 +41,7 @@ func Init(dir string, name string, identifer string, level string, maxSizeKB int
 	if identifer != "" {
 		lockName = lockName + "_" + identifer
 	}
+	lockName = lockName + ".lock"
 	locker, lockErr = util.InitLock(lockName)
 	if lockErr != nil {
 		return lockErr
