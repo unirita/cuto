@@ -153,14 +153,11 @@ for z in $CUTO_PARMS ; do
 done
 chmod 644 $CUTO_PARMS
 
-CUTO_BINARY="master servant sqlite3"
+CUTO_BINARY="master servant show"
 chmod 755 $CUTO_BINARY
 
-cd $CURRENT_DIR/temp
-touch cuto_only.lock
-chmod 644 cuto_only.lock
-
 cd $CURRENT_DIR
+mkdir joblog log temp
 
 echo "...completed !"
 echo "Thank you for installing GoCUTO !"
