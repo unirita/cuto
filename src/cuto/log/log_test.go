@@ -1,15 +1,13 @@
 package log
 
 import (
-	"fmt"
-	"os"
 	"runtime"
 	"testing"
 
-	"github.com/cihub/seelog"
-
 	"cuto/testutil"
 	"cuto/util"
+
+	"github.com/cihub/seelog"
 )
 
 var lockName = getLockName()
@@ -18,7 +16,7 @@ func getLockName() string {
 	if runtime.GOOS == "windows" {
 		return "log_test"
 	} else {
-		return fmt.Sprintf("%s%c%s", util.GetRootPath(), os.PathSeparator, "test.lock")
+		return "test.lock"
 	}
 }
 
