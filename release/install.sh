@@ -153,7 +153,7 @@ for z in $CUTO_PARMS ; do
 done
 chmod 644 $CUTO_PARMS
 
-cd $CURRENT_DIR/bin
+cd $CURRENT_DIR/bpmn
 CUTO_BPMN="inst_test.csv"
 for z in $CUTO_BPMN ; do
     echo "changing $z ..."
