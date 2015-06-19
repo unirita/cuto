@@ -126,6 +126,7 @@ echo $ADDC >> .installsed
 POTC=s/@LISTEN_PORT/$LISTEN_PORT/g
 echo $POTC >> .installsed
 
+
 cd $CURRENT_DIR/shell
 CUTO_SHELL="cutoenv.sh servant.sh servant_service.sh"
 for z in $CUTO_SHELL ; do
@@ -140,18 +141,6 @@ done
 chmod 744 ./*
 chmod u-x cutoenv.sh
 
-cd $CURRENT_DIR/bin
-CUTO_PARMS="master.ini servant.ini"
-for z in $CUTO_PARMS ; do
-    echo "changing $z ..."
-    if [ -s $z ] ; then
-        sed -f ../.installsed $z > $z.temp
-        mv $z.temp $z
-    else
-        echo "<error> $z didn't exists"
-    fi
-done
-chmod 644 $CUTO_PARMS
 
 cd $CURRENT_DIR/bpmn
 CUTO_BPMN="inst_test.csv"
@@ -166,6 +155,19 @@ for z in $CUTO_BPMN ; do
 done
 chmod 644 $CUTO_BPMN
 
+
+cd $CURRENT_DIR/bin
+CUTO_PARMS="master.ini servant.ini"
+for z in $CUTO_PARMS ; do
+    echo "changing $z ..."
+    if [ -s $z ] ; then
+        sed -f ../.installsed $z > $z.temp
+        mv $z.temp $z
+    else
+        echo "<error> $z didn't exists"
+    fi
+done
+chmod 644 $CUTO_PARMS
 
 CUTO_BINARY="master servant show"
 chmod 755 $CUTO_BINARY
