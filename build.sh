@@ -38,7 +38,7 @@ if [ "$?" -ne "0" ] ; then
     exit 1
 fi
 
-chnod a+x $GOPATH/bin/*
+chmod a+x $GOPATH/bin/*
 
 rm $GOPATH/cutoroot/bin/master
 rm $GOPATH/cutoroot/bin/servant
