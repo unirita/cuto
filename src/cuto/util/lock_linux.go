@@ -5,7 +5,6 @@ package util
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"syscall"
 	"time"
@@ -13,12 +12,13 @@ import (
 	"path/filepath"
 )
 
-type LockHandle string
+type LockHandle struct {
+	name string //lock ファイル名
+	fd   int    //lockファイルディスクリプタ
+}
 
 var (
-	ErrBusy       = errors.New("Locked by other process.")
-	errInvalidPid = errors.New("Lockfile contains invalid pid.")
-	errDeadOwner  = errors.New("Lockfile contains pid of process not existent on this system.")
+	ErrBusy = errors.New("Locked by other process.")
 
 	lockFilePath = filepath.Join(GetRootPath(), "temp")
 )
@@ -27,11 +27,9 @@ var (
 // ファイル作成が可能なファイル名を指定します。
 func InitLock(name string) (*LockHandle, error) {
 	if len(name) > 0 {
-		lh := LockHandle(filepath.Join(lockFilePath, name))
-		return &lh, nil
+		return &LockHandle{filepath.Join(lockFilePath, name), 0}, nil
 	} else {
-		lh := LockHandle("")
-		return &lh, errors.New("Invalid lockfile name.")
+		return &LockHandle{"", 0}, errors.New("Invalid lockfile name.")
 	}
 }
 
@@ -67,13 +65,11 @@ func (fl *LockHandle) Lock(timeout_millisec int) error {
 
 // ロック解除。
 func (fl *LockHandle) Unlock() error {
-	name := string(*fl)
-	fd, err := syscall.Open(name, syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
-	if err != nil {
-		return err
+	if fl.fd == 0 {
+		return errors.New("It has not been locked yet.")
 	}
-	defer syscall.Close(fd)
-	if err := syscall.Flock(fd, syscall.LOCK_UN); err != nil {
+	defer syscall.Close(fl.fd)
+	if err := syscall.Flock(fl.fd, syscall.LOCK_UN); err != nil {
 		return err
 	}
 	return nil
@@ -81,30 +77,25 @@ func (fl *LockHandle) Unlock() error {
 
 // ロックファイルの終了処理。（現在は何も行わない）
 func (fl *LockHandle) TermLock() error {
-	*fl = LockHandle("")
+	fl.Unlock()
 	return nil
 }
 
 // ロック処理を行う
 func (fl *LockHandle) tryLock() error {
-	name := string(*fl)
-	if len(name) < 1 {
+	if len(fl.name) < 1 {
 		return errors.New("Not initialize.")
 	}
-	var fd int
 	var err error
-	if _, err := os.Stat(name); err != nil {
-		fd, err = syscall.Open(name, syscall.O_CREAT|syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
+	if _, err := os.Stat(fl.name); err != nil {
+		fl.fd, err = syscall.Open(fl.name, syscall.O_CREAT|syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
 	} else {
-		fd, err = syscall.Open(name, syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
+		fl.fd, err = syscall.Open(fl.name, syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
 	}
 	if err != nil {
-		fmt.Printf("open error : %v\n", err)
 		return err
 	}
-	defer syscall.Close(fd)
-	if err := syscall.Flock(fd, syscall.LOCK_EX); err != nil {
-		fmt.Printf("Flock error : %v\n", err)
+	if err := syscall.Flock(fl.fd, syscall.LOCK_EX); err != nil {
 		return ErrBusy
 	}
 	return nil
