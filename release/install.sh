@@ -153,6 +153,20 @@ for z in $CUTO_PARMS ; do
 done
 chmod 644 $CUTO_PARMS
 
+cd $CURRENT_DIR/bin
+CUTO_BPMN="inst_test.csv"
+for z in $CUTO_BPMN ; do
+    echo "changing $z ..."
+    if [ -s $z ] ; then
+        sed -f ../.installsed $z > $z.temp
+        mv $z.temp $z
+    else
+        echo "<error> $z didn't exists"
+    fi
+done
+chmod 644 $CUTO_BPMN
+
+
 CUTO_BINARY="master servant show"
 chmod 755 $CUTO_BINARY
 
