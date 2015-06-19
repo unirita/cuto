@@ -36,66 +36,71 @@ func InitLock(name string) (*LockHandle, error) {
 // ファイルを利用して、ロックを行います。
 // 引数で指定したミリ秒まで待機します。0以下を指定した場合は、1度だけロックに挑戦します。
 // 他プロセスのロックが指定時間内に解けなかった場合は、ErrBusy を返します。
-func (fl *LockHandle) Lock(timeout_millisec int) error {
-	err := fl.tryLock()
+func (l *LockHandle) Lock(timeout_millisec int) error {
+	err := l.tryLock()
 
-	if err == ErrBusy { // Locked by other process.
+	if err == nil {
+		return nil
+
+	} else if err == ErrBusy { // Locked by other process.
 		if timeout_millisec > 0 {
-			// 既に他プロセスがロックしているので、指定時間リトライする。
 			st := time.Now()
 			for {
 				time.Sleep(1 * time.Millisecond)
-				err = fl.tryLock()
+				err = l.tryLock()
 				if err == nil {
-					return nil
-				} else if err != ErrBusy {
-					return err
+					return nil // ロック成功
 				}
 				if time.Since(st).Nanoseconds() > (int64(timeout_millisec) * 1000000) {
-					return ErrBusy
+					break
 				}
 			}
 		}
+		syscall.Close(l.fd)
+		l.fd = 0
 		return ErrBusy
-	} else {
-		return err
 	}
-	panic("Not reached.")
+	return err
 }
 
 // ロック解除。
-func (fl *LockHandle) Unlock() error {
-	if fl.fd == 0 {
+func (l *LockHandle) Unlock() error {
+	if l.fd == 0 {
 		return errors.New("It has not been locked yet.")
 	}
-	defer syscall.Close(fl.fd)
-	if err := syscall.Flock(fl.fd, syscall.LOCK_UN); err != nil {
+	defer func() {
+		syscall.Close(l.fd)
+		l.fd = 0
+	}()
+	if err := syscall.Flock(l.fd, syscall.LOCK_UN); err != nil {
 		return err
 	}
 	return nil
 }
 
 // ロックファイルの終了処理。（現在は何も行わない）
-func (fl *LockHandle) TermLock() error {
-	fl.Unlock()
+func (l *LockHandle) TermLock() error {
 	return nil
 }
 
-// ロック処理を行う
-func (fl *LockHandle) tryLock() error {
-	if len(fl.name) < 1 {
+// 実際にロック処理を行う。
+// 現在は、nilまたはErrBusyを返すと、ファイルを開いている状態という目印にもなっている。
+func (l *LockHandle) tryLock() error {
+	if len(l.name) == 0 {
 		return errors.New("Not initialize.")
 	}
-	var err error
-	if _, err := os.Stat(fl.name); err != nil {
-		fl.fd, err = syscall.Open(fl.name, syscall.O_CREAT|syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
-	} else {
-		fl.fd, err = syscall.Open(fl.name, syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
+	if l.fd == 0 {
+		var err error
+		if _, err = os.Stat(l.name); err != nil {
+			l.fd, err = syscall.Open(l.name, syscall.O_CREAT|syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
+		} else {
+			l.fd, err = syscall.Open(l.name, syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
+		}
+		if err != nil {
+			return err
+		}
 	}
-	if err != nil {
-		return err
-	}
-	if err := syscall.Flock(fl.fd, syscall.LOCK_EX); err != nil {
+	if err := syscall.Flock(l.fd, syscall.LOCK_EX); err != nil {
 		return ErrBusy
 	}
 	return nil
