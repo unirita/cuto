@@ -44,7 +44,7 @@ func stToTimestamp(st string) string {
 
 // ジョブログファイル名をフルパスで作成する。
 // ”開始日(YYYYMMDD)\インスタンスID.ジョブ名（拡張子なし）.開始日時（yyyyMMddHHmmss.sss).log
-func createJoblogFileName(req *message.Request, st string, nID int) string {
+func createJoblogFileName(req *message.Request, st string, nID int, jID string) string {
 	var job string
 	if strings.LastIndex(req.Path, "\\") != -1 {
 		tokens := strings.Split(req.Path, "\\")
@@ -59,7 +59,7 @@ func createJoblogFileName(req *message.Request, st string, nID int) string {
 		job = job[:extpos]
 	}
 	joblogDir := filepath.Join(conf.Dir.JoblogDir, st[:8])
-	return fmt.Sprintf("%v%c%v.%v.%v.log", joblogDir, os.PathSeparator, nID, job, st)
+	return fmt.Sprintf("%v%c%v.%v.%v.%v.log", joblogDir, os.PathSeparator, nID, job, jID, st)
 }
 
 func TestDoJobRequest_拡張子無しSHジョブが正常に実行できる(t *testing.T) {
@@ -107,7 +107,7 @@ func TestDoJobRequest_拡張子無しSHジョブが正常に実行できる(t *t
 		t.Error("ジョブ終了時間が無い.")
 	}
 
-	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID))
+	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID, res.JID))
 	if err != nil {
 		t.Error("ジョブログがない。", err.Error())
 	}
@@ -165,7 +165,7 @@ func TestDoJobRequest_パス指定ありCSHジョブが正常に実行できる(
 	if len(res.Et) == 0 {
 		t.Error("ジョブ終了時間が無い.")
 	}
-	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID))
+	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID, res.JID))
 	if err != nil {
 		t.Error("ジョブログがない。", err.Error())
 	}
@@ -244,7 +244,7 @@ func TestDoJobRequest_RCで警告終了するジョブ_閾値と同じ(t *testin
 	if res.Detail != detailWarnRC {
 		t.Errorf("想定外のメッセージ - %v", res.Detail)
 	}
-	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID))
+	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID, res.JID))
 	if err != nil {
 		t.Error("ジョブログが存在しない.")
 	}
@@ -288,7 +288,7 @@ func TestDoJobRequest_RCで異常終了するジョブ_閾値と同じ(t *testin
 	if res.Detail != detailErrRC {
 		t.Errorf("想定外のメッセージ - %v", res.Detail)
 	}
-	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID))
+	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID, res.JID))
 	if err != nil {
 		t.Error("ジョブログが存在しない.")
 	}
@@ -333,7 +333,7 @@ func TestDoJobRequest_標準出力で警告終了するジョブ_RC確認なし(
 	if res.Detail != detailWarnPtn {
 		t.Errorf("想定外のメッセージ - %v", res.Detail)
 	}
-	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID))
+	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID, res.JID))
 	if err != nil {
 		t.Error("ジョブログが存在しない.")
 	}
@@ -377,7 +377,7 @@ func TestDoJobRequest_標準エラー出力で異常終了するzshジョブ_RC�
 	if res.Detail != detailErrPtn {
 		t.Errorf("想定外のメッセージ - %v", res.Detail)
 	}
-	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID))
+	file, err := os.Open(createJoblogFileName(req, stToTimestamp(res.St), res.NID, res.JID))
 	if err != nil {
 		t.Error("ジョブログが存在しない.")
 	}

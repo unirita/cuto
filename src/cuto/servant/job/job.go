@@ -288,7 +288,7 @@ func (j *jobInstance) createJoblogFileName() string {
 		os.Mkdir(joblogDir, 0777)
 	}
 	log.Debug("joblogDir = ", joblogDir)
-	return fmt.Sprintf("%v%c%v.%v.%v.log", joblogDir, os.PathSeparator, j.nID, job, j.joblogTimestamp)
+	return fmt.Sprintf("%v%c%v.%v.%v.%v.log", joblogDir, os.PathSeparator, j.nID, job, j.jID, j.joblogTimestamp)
 }
 
 // レスポンスメッセージの作成
