@@ -33,6 +33,7 @@ type variable struct {
 
 // ジョブネットワーク変数の値を格納する構造体
 type jobValue struct {
+	ID  string
 	RC  string
 	SD  string
 	ED  string
@@ -56,6 +57,7 @@ func AddSysValue(name, tag, value string) {
 // ジョブネットワーク変数の値を追加する。
 func AddJobValue(name string, res *Response) {
 	j := new(jobValue)
+	j.ID = res.JID
 	j.RC = strconv.Itoa(res.RC)
 	j.SD = res.St
 	j.ED = res.Et
@@ -171,6 +173,8 @@ func (v *variable) expandJob() (string, error) {
 	}
 
 	switch v.Tag {
+	case `ID`:
+		return j.ID, nil
 	case `RC`:
 		return j.RC, nil
 	case `SD`:

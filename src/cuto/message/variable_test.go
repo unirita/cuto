@@ -116,14 +116,24 @@ func TestExpand_環境変数の値を取得できる(t *testing.T) {
 
 func TestExpand_ジョブネットワーク変数の値を取得できる(t *testing.T) {
 	res := new(Response)
+	res.JID = "JOB1"
 	res.RC = 1
 	res.St = "2015-01-01 12:34:56.789"
 	res.Et = "2015-01-01 13:00:00.000"
 	res.Var = "testout"
 	AddJobValue("test", res)
 
-	v := NewVariable("$MJtest:RC$")
+	v := NewVariable("$MJtest:ID$")
 	val, err := v.Expand()
+	if err != nil {
+		t.Fatalf("想定外のエラーが発生[%s]", err)
+	}
+	if val != "JOB1" {
+		t.Errorf("取得したRCの値[%s]が想定と違っている。", val)
+	}
+
+	v = NewVariable("$MJtest:RC$")
+	val, err = v.Expand()
 	if err != nil {
 		t.Fatalf("想定外のエラーが発生[%s]", err)
 	}
