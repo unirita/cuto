@@ -73,6 +73,7 @@ var msgs = map[string]string{
 	"CTM023I": "JOB [%s] STARTED. INSTANCE [%d] JOBID [%s].",
 	"CTM024I": "JOB [%s] ENDED. INSTANCE [%d] JOBID [%s] STATUS [%v].",
 	"CTM025W": "JOB [%s] ABNORMAL ENDED. INSTANCE [%d] JOBID [%s] STATUS [%v] DETAIL [%s].",
+	"CTM026I": "SEE JOBLOG FILE [%s] ON NODE [%s].",
 	"1":       "",
 	"CTS001I": "CUTO SERVANT STARTED. PID [%v] VERSION [%s]",
 	"CTS002I": "CUTO SERVANT ENDED. RC [%d].",

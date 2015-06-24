@@ -5,6 +5,7 @@ package jobnet
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"cuto/console"
@@ -163,7 +164,7 @@ func (j *Job) Execute() (Element, error) {
 	defer j.end(res)
 
 	if isAbnormalEnd(res) {
-		//return nil, fmt.Errorf("Job[id = %s] ended abnormally.", j.ID())
+		console.Display("CTM026I", j.createJoblogFileName(res), j.Node)
 		return nil, fmt.Errorf("")
 	}
 
@@ -278,4 +279,26 @@ func (j *Job) startTimer(endCh chan struct{}) {
 			return
 		}
 	}
+}
+
+func (j *Job) createJoblogFileName(r *message.Response) string {
+	// ジョブ名（拡張子なし）の取得
+	job := j.FilePath
+	if strings.LastIndex(job, "\\") != -1 {
+		tokens := strings.Split(job, "\\")
+		job = tokens[len(tokens)-1]
+	} else if strings.LastIndex(job, "/") != -1 {
+		tokens := strings.Split(job, "/")
+		job = tokens[len(tokens)-1]
+	}
+	if extpos := strings.LastIndex(job, "."); extpos != -1 {
+		job = job[:extpos]
+	}
+
+	timestamp := r.St
+	timestamp = strings.Replace(timestamp, "-", "", -1)
+	timestamp = strings.Replace(timestamp, " ", "", -1)
+	timestamp = strings.Replace(timestamp, ":", "", -1)
+
+	return fmt.Sprintf("%v.%v.%v.%v.log", j.Instance.ID, job, j.ID(), timestamp)
 }

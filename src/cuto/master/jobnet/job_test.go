@@ -2,6 +2,7 @@ package jobnet
 
 import (
 	"fmt"
+	"strconv"
 	"testing"
 	"time"
 
@@ -450,5 +451,27 @@ func TestJobExecute_レスポンスがJSON形式でないケース(t *testing.T)
 	}
 	if jobres.Port != 1234 {
 		t.Errorf("ジョブ実行結果のPort[%d]は想定と違っている。", jobres.Port)
+	}
+}
+
+func TestCreateJoblogFileName(t *testing.T) {
+	n := newTestNetwork()
+	j, _ := NewJob("jobid1", "job1", n)
+	j.FilePath = `C:\test\testjob.bat`
+
+	res := new(message.Response)
+	res.NID = n.ID
+	res.JID = j.ID()
+	res.RC = 1
+	res.Stat = 9
+	res.Detail = "testerror"
+	res.Var = "testvar"
+	res.St = "2015-04-01 12:34:56.789"
+	res.Et = "2015-04-01 12:35:46.123"
+
+	actual := j.createJoblogFileName(res)
+	expected := strconv.Itoa(n.ID) + `.testjob.jobid1.20150401123456.789.log`
+	if actual != expected {
+		t.Errorf("ジョブログファイル名[%s]は想定値[%s]と違っている。", actual, expected)
 	}
 }
