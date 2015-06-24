@@ -5,6 +5,7 @@ package util
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"syscall"
 	"time"
@@ -27,13 +28,16 @@ var (
 // ファイル作成が可能なファイル名を指定します。
 func InitLock(name string) (*LockHandle, error) {
 	if len(name) > 0 {
+		fullname := filepath.Join(lockFilePath, name)
 		// open処理移動
 		var fd int
 		var err error
-		if _, err = os.Stat(name); err != nil {
-			fd, err = syscall.Open(name, syscall.O_CREAT|syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
+		if _, err = os.Stat(fullname); err != nil {
+			fmt.Printf("Create File %v\n", fullname)
+			fd, err = syscall.Open(fullname, syscall.O_CREAT|syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
 		} else {
-			fd, err = syscall.Open(name, syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
+			fmt.Printf("Open File %v\n", fullname)
+			fd, err = syscall.Open(fullname, syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
 		}
 		if err != nil {
 			return nil, err
