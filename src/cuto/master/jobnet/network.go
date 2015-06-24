@@ -371,7 +371,6 @@ func (n *Network) end(err error) error {
 }
 
 // 終了処理を行う。
-// 現在はなし
 func (n *Network) Terminate() {
 	n.globalLock.TermLock()
 }

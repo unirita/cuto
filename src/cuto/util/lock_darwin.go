@@ -27,7 +27,19 @@ var (
 // ファイル作成が可能なファイル名を指定します。
 func InitLock(name string) (*LockHandle, error) {
 	if len(name) > 0 {
-		return &LockHandle{filepath.Join(lockFilePath, name), 0}, nil
+		// open処理移動
+		var fd int
+		var err error
+		if _, err = os.Stat(name); err != nil {
+			fd, err = syscall.Open(name, syscall.O_CREAT|syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
+		} else {
+			fd, err = syscall.Open(name, syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
+		}
+		if err != nil {
+			return nil, err
+		}
+		return &LockHandle{filepath.Join(lockFilePath, name), fd}, nil
+		//		return &LockHandle{filepath.Join(lockFilePath, name), 0}, nil
 	} else {
 		return &LockHandle{"", 0}, errors.New("Invalid lockfile name.")
 	}
@@ -69,8 +81,8 @@ func (l *LockHandle) Unlock() error {
 		return errors.New("It has not been locked yet.")
 	}
 	defer func() {
-		syscall.Close(l.fd)
-		l.fd = 0
+		//		syscall.Close(l.fd)
+		//		l.fd = 0
 	}()
 	if err := syscall.Flock(l.fd, syscall.LOCK_UN); err != nil {
 		return err
@@ -80,6 +92,8 @@ func (l *LockHandle) Unlock() error {
 
 // ロックファイルの終了処理。（現在は何も行わない）
 func (l *LockHandle) TermLock() error {
+	syscall.Close(l.fd)
+	l.fd = 0
 	return nil
 }
 
@@ -89,17 +103,17 @@ func (l *LockHandle) tryLock() error {
 	if len(l.name) == 0 {
 		return errors.New("Not initialize.")
 	}
-	if l.fd == 0 {
-		var err error
-		if _, err = os.Stat(l.name); err != nil {
-			l.fd, err = syscall.Open(l.name, syscall.O_CREAT|syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
-		} else {
-			l.fd, err = syscall.Open(l.name, syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
-		}
-		if err != nil {
-			return err
-		}
-	}
+	//	if l.fd == 0 {
+	//		var err error
+	//		if _, err = os.Stat(l.name); err != nil {
+	//			l.fd, err = syscall.Open(l.name, syscall.O_CREAT|syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
+	//		} else {
+	//			l.fd, err = syscall.Open(l.name, syscall.O_RDONLY|syscall.O_CLOEXEC, 0644)
+	//		}
+	//		if err != nil {
+	//			return err
+	//		}
+	//	}
 	if err := syscall.Flock(l.fd, syscall.LOCK_EX); err != nil {
 		return ErrBusy
 	}
