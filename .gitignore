@@ -25,3 +25,13 @@ _testmain.go
 
 # Log files
 *.log
+
+# Test coverage reports
+cover.out
+src/cuto/cover_all.txt
+
+# Integration test directory
+cutoroot/
+
+# External packages
+src/github.com/
