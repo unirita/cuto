@@ -54,6 +54,6 @@ func NewParallel() *Parallel {
 }
 
 // Add path to Parallel.
-func (p *Parallel) addPathHead(head *Job) {
+func (p *Parallel) AddPathHead(head *Job) {
 	p.PathHeads = append(p.PathHeads, head)
 }
