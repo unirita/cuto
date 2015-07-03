@@ -1,7 +1,10 @@
 package converter
 
+import "encoding/xml"
+
 // Definitions element in BPMN.
 type Definitions struct {
+	XMLName xml.Name `xml:"definitions"`
 	Process *Process `xml:"process"`
 }
 
