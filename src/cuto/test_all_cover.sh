@@ -157,4 +157,14 @@ if [ "$?" -ne "0" ] ; then
 fi
 
 
+
+cd $TESTROOT/flowgen/converter
+echo "flowgen/converter package tested..."
+go test -coverprofile cover.out>> $LOGFILE
+if [ "$?" -ne "0" ] ; then
+  echo "NG."
+  RETCODE=1
+fi
+
+
 exit $RETCODE
