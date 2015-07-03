@@ -74,11 +74,15 @@ func extractGateways(str string) (string, []*Gateway, error) {
 }
 
 func parseJob(str string) (*Job, error) {
-	ptn := regexp.MustCompile(`[\[\]\\/:*?<>$&,\-]`)
-	if ptn.MatchString(str) {
+	if isIrregalJobName(str) {
 		return nil, errors.New("Irregal character found in job name")
 	}
 	return NewJob(str), nil
+}
+
+func isIrregalJobName(str string) bool {
+	ptn := regexp.MustCompile(`[\[\]\\/:*?<>$&,\-]`)
+	return ptn.MatchString(str)
 }
 
 func parseGateway(str string) (*Gateway, error) {
