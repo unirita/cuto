@@ -2,6 +2,7 @@ package converter
 
 import (
 	"errors"
+	"io/ioutil"
 	"regexp"
 	"strings"
 )
@@ -13,6 +14,16 @@ const (
 	gDelim = ","
 	tmpGW  = ":gw"
 )
+
+// Parse parses flow description from file.
+func ParseFile(filepath string) (Element, error) {
+	buf, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		return nil, err
+	}
+
+	return ParseString(string(buf))
+}
 
 // ParseString parses flow description from string.
 // If it successed, returns head element of flow.
