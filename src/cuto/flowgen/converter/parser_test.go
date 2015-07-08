@@ -81,6 +81,22 @@ func TestParseString_OnlyOneJob(t *testing.T) {
 	}
 }
 
+func TestParseString_EmptyGateway(t *testing.T) {
+	s := "test1->[]->test2"
+	_, err := ParseString(s)
+	if err == nil {
+		t.Error("Error was not detected.")
+	}
+}
+
+func TestExtractGateways_EmptyPath(t *testing.T) {
+	s := "test1->[test2,,test3]->test4"
+	_, err := ParseString(s)
+	if err == nil {
+		t.Error("Error was not detected.")
+	}
+}
+
 func TestExtractGateways(t *testing.T) {
 	s := "test1->[test2,test3]->[test4,test5->test6]->test7"
 	afterStr, gws, err := extractGateways(s)

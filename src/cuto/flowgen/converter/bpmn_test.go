@@ -95,14 +95,14 @@ func TestNewProcess(t *testing.T) {
 
 func TestNewStartEvent(t *testing.T) {
 	s := NewStartEvent()
-	if !isIrregalJobName(s.ID) {
+	if validateJobName(s.ID) == nil {
 		t.Error("StartEvent ID[%s] has possibility of using for job ID or Name.", s.ID)
 	}
 }
 
 func TestNewEndEvent(t *testing.T) {
 	e := NewEndEvent()
-	if !isIrregalJobName(e.ID) {
+	if validateJobName(e.ID) == nil {
 		t.Error("EndEvent ID[%s] has possibility of using for job ID or Name.", e.ID)
 	}
 }
