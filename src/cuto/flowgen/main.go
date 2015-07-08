@@ -15,6 +15,13 @@ const usage = `Usage :
 Copyright 2015 unirita Inc.
 `
 
+const (
+	rc_OK           = 0
+	rc_PARAM_ERROR  = 1
+	rc_SYNTAX_ERROR = 2
+	rc_OUTPUT_ERROR = 4
+)
+
 func main() {
 	os.Exit(realMain())
 }
@@ -22,24 +29,24 @@ func main() {
 func realMain() int {
 	if len(os.Args) != 2 {
 		fmt.Println(usage)
-		return 1
+		return rc_PARAM_ERROR
 	}
 
 	path := os.Args[1]
 	elm, err := converter.ParseFile(path)
 	if err != nil {
 		fmt.Println(err)
-		return 1
+		return rc_SYNTAX_ERROR
 	}
 
 	definitions := converter.GenerateDefinitions(elm)
 	err = converter.ExportFile(convertExtension(path, ".bpmn"), definitions)
 	if err != nil {
 		fmt.Println(err)
-		return 1
+		return rc_OUTPUT_ERROR
 	}
 
-	return 0
+	return rc_OK
 }
 
 func convertExtension(path string, afterExt string) string {
