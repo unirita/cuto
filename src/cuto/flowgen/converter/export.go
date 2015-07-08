@@ -21,7 +21,8 @@ func Export(w io.Writer, d *Definitions) error {
 
 // ExportFile writes xml to file.
 func ExportFile(filepath string, d *Definitions) error {
-	f, err := os.OpenFile(filepath, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0644)
+	backupFileIfExists(filepath)
+	f, err := os.OpenFile(filepath, os.O_WRONLY|os.O_CREATE, 0644)
 	if err != nil {
 		return fmt.Errorf("Output file open error: %s", err)
 	}
@@ -48,4 +49,12 @@ func GenerateDefinitions(head Element) *Definitions {
 	d.AppendSequenceFlow(NewSequenceFlow(pre, d.Process.End.ID))
 
 	return d
+}
+
+func backupFileIfExists(path string) {
+	_, err := os.Stat(path)
+	if !os.IsNotExist(err) {
+		bkupPath := path + ".bk"
+		os.Rename(path, bkupPath)
+	}
 }
