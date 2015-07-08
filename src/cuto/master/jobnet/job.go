@@ -192,7 +192,7 @@ func (j *Job) start(req *message.Request) {
 	j.Instance.Result.Jobresults[j.ID()] = jobres
 	tx.InsertJob(j.Instance.Result.GetConnection(), jobres, &j.Instance.localMutex)
 
-	console.Display("CTM023I", j.Name, j.Instance.ID, j.id)
+	console.Display("CTM023I", j.Name, j.Node, j.Instance.ID, j.id)
 }
 
 // ジョブ実行結果にジョブの開始時刻をセットする。
@@ -242,9 +242,9 @@ func (j *Job) end(res *message.Response) {
 		st = db.ST_ABNORMAL
 	}
 	if jobres.Status != db.ABNORMAL {
-		console.Display("CTM024I", j.Name, j.Instance.ID, j.id, st)
+		console.Display("CTM024I", j.Name, j.Node, j.Instance.ID, j.id, st)
 	} else {
-		console.Display("CTM025W", j.Name, j.Instance.ID, j.id, st, jobres.Detail)
+		console.Display("CTM025W", j.Name, j.Node, j.Instance.ID, j.id, st, jobres.Detail)
 	}
 }
 
@@ -258,7 +258,7 @@ func (j *Job) abnormalEnd(err error) error {
 	jobres.Detail = err.Error()
 	tx.UpdateJob(j.Instance.Result.GetConnection(), jobres, &j.Instance.localMutex)
 
-	console.Display("CTM025W", j.Name, j.Instance.ID, j.id, jobres.Status, jobres.Detail)
+	console.Display("CTM025W", j.Name, j.Node, j.Instance.ID, j.id, jobres.Status, jobres.Detail)
 	return err
 }
 
