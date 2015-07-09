@@ -55,6 +55,12 @@ func backupFileIfExists(path string) {
 	_, err := os.Stat(path)
 	if !os.IsNotExist(err) {
 		bkupPath := path + ".bk"
+		_, err := os.Stat(bkupPath)
+		if !os.IsNotExist(err) {
+			tmpPath := path + ".tmp"
+			os.Rename(bkupPath, tmpPath)
+			defer os.Remove(tmpPath)
+		}
 		os.Rename(path, bkupPath)
 	}
 }
