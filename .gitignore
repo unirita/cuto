@@ -32,6 +32,7 @@ src/cuto/cover_all.txt
 
 # Integration test directory
 cutoroot/
+evidence/
 
 # External packages
 src/github.com/
