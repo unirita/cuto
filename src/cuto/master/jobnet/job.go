@@ -22,22 +22,24 @@ type sendFunc func(string, int, string, chan<- string) (string, error)
 
 // ジョブを表す構造体
 type Job struct {
-	id          string   // ジョブID
-	Name        string   // ジョブ名
-	Node        string   // ノード
-	Port        int      // ポート番号
-	FilePath    string   // ジョブファイル
-	Param       string   // ジョブ引き渡しパラメータ
-	Env         string   // ジョブ実行に渡す環境変数
-	Workspace   string   // ジョブ実行時の作業フォルダ
-	WrnRC       int      // 警告終了と判断する戻り値の下限値
-	WrnPtn      string   // 警告終了と判断するジョブの出力メッセージ
-	ErrRC       int      // 異常終了と判断する戻り値の下限値
-	ErrPtn      string   // 異常終了と判断するジョブの出力メッセージ
-	Timeout     int      // ジョブ実行時間のタイムアウト
-	Next        Element  // 次ノード
-	Instance    *Network // ネットワーク情報構造体のポインタ
-	sendRequest sendFunc // リクエスト送信メソッド
+	id            string   // ジョブID
+	Name          string   // ジョブ名
+	Node          string   // ノード
+	Port          int      // ポート番号
+	FilePath      string   // ジョブファイル
+	Param         string   // ジョブ引き渡しパラメータ
+	Env           string   // ジョブ実行に渡す環境変数
+	Workspace     string   // ジョブ実行時の作業フォルダ
+	WrnRC         int      // 警告終了と判断する戻り値の下限値
+	WrnPtn        string   // 警告終了と判断するジョブの出力メッセージ
+	ErrRC         int      // 異常終了と判断する戻り値の下限値
+	ErrPtn        string   // 異常終了と判断するジョブの出力メッセージ
+	Timeout       int      // ジョブ実行時間のタイムアウト
+	SecondaryNode string   // セカンダリサーバントのノード
+	SecondaryPort int      // セカンダリサーバントのポート番号
+	Next          Element  // 次ノード
+	Instance      *Network // ネットワーク情報構造体のポインタ
+	sendRequest   sendFunc // リクエスト送信メソッド
 }
 
 // Job構造体のコンストラクタ関数。
