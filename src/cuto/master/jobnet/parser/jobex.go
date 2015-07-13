@@ -14,21 +14,26 @@ import (
 
 // 拡張ジョブ情報
 type JobEx struct {
-	Node       string // ノード名
-	Port       int    // ポート番号
-	FilePath   string // ジョブファイルパス
-	Param      string // 実行時引数
-	Env        string // 実行時環境変数
-	Workspace  string // 作業フォルダ
-	WrnRC      int    // 警告終了判断に使用するリターンコードの下限値
-	WrnPtn     string // 警告終了と判断する出力文字列
-	ErrRC      int    // 異常終了判断に使用するリターンコードの下限値
-	ErrPtn     string // 異常終了と判断する出力文字列
-	TimeoutMin int    // タイムアウト（分）
+	Node          string // ノード名
+	Port          int    // ポート番号
+	FilePath      string // ジョブファイルパス
+	Param         string // 実行時引数
+	Env           string // 実行時環境変数
+	Workspace     string // 作業フォルダ
+	WrnRC         int    // 警告終了判断に使用するリターンコードの下限値
+	WrnPtn        string // 警告終了と判断する出力文字列
+	ErrRC         int    // 異常終了判断に使用するリターンコードの下限値
+	ErrPtn        string // 異常終了と判断する出力文字列
+	TimeoutMin    int    // タイムアウト（分）
+	SecondaryNode string // ノード名
+	SecondaryPort int    // ポート番号
 }
 
 // CSVファイルの項目数
-const columnCount = 12
+const (
+	noSecondary   = 12
+	withSecondary = 14
+)
 
 // 項目のインデックス
 const (
@@ -44,6 +49,8 @@ const (
 	ercIdx
 	eptIdx
 	tmoutIdx
+	secNodeIdx
+	secPortIdx
 )
 
 // JobEx構造体のオブジェクトを生成しする。
@@ -102,14 +109,14 @@ func ParseJobEx(reader io.Reader) (map[string]*JobEx, error) {
 			continue
 		}
 
-		if len(record) != columnCount {
-			log.Info("Line %d of jobex is ignored because of invalid column count.", i)
+		if len(record) != noSecondary && len(record) != withSecondary {
+			log.Info("Jobex line[%d] was ignored: Irregal column count[%d].", i, len(record))
 			continue
 		}
 
 		name := record[nameIdx]
 		if len(name) == 0 {
-			log.Info("Line %d of jobex is ignored because job name is empty.", i)
+			log.Info("Jobex line[%d] was ignored: Empty job name.", i)
 			continue
 		}
 
@@ -132,6 +139,13 @@ func ParseJobEx(reader io.Reader) (map[string]*JobEx, error) {
 		je.ErrPtn = record[eptIdx]
 		if tmout, err := strconv.Atoi(record[tmoutIdx]); err == nil {
 			je.TimeoutMin = tmout
+		}
+
+		if len(record) >= withSecondary {
+			je.SecondaryNode = record[secNodeIdx]
+			if port, err := strconv.Atoi(record[secPortIdx]); err == nil {
+				je.SecondaryPort = port
+			}
 		}
 
 		jobExMap[name] = je

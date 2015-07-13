@@ -125,6 +125,12 @@ testjob1,,,,,,,,,,,`
 	if j1.TimeoutMin != -1 {
 		t.Errorf("testjob1の実行タイムアウト時間のパース結果[%d]が間違っています。", j1.TimeoutMin)
 	}
+	if j1.SecondaryNode != `` {
+		t.Errorf("testjob1のセカンダリノード名のパース結果[%s]が間違っています。", j1.SecondaryNode)
+	}
+	if j1.SecondaryPort != 0 {
+		t.Errorf("testjob1のセカンダリポート番号のパース結果[%d]が間違っています。", j1.SecondaryPort)
+	}
 }
 
 func TestParseJobEx_ジョブ名が無い行はエラーとして無視する(t *testing.T) {
@@ -145,5 +151,46 @@ testjob2,12.345.67.89,5678,C:\work\test2.bat,testparam2,testenv2,C:\work2,20,war
 
 	if _, ok := jeMap["testjob2"]; !ok {
 		t.Fatalf("パース結果にtestjob2がセットされていない。")
+	}
+}
+
+func TestParseJobEx_セカンダリサーバント情報をパースできる(t *testing.T) {
+	csv := `
+ジョブ名,ノード名,ポート番号,実行ファイル,パラメータ,環境変数,作業フォルダ,警告コード,警告出力,異常コード,異常出力,タイムアウト,セカンダリ実行ノード,セカンダリポート番号
+testjob1,123.45.67.89,1234,C:\work\test1.bat,testparam1,testenv1,C:\work1,10,warn1,11,err1,3600,secondary,12345
+testjob2,12.345.67.89,5678,C:\work\test2.bat,testparam2,testenv2,C:\work2,20,warn2,21,err2,3600,,`
+
+	r := strings.NewReader(csv)
+	jeMap, err := ParseJobEx(r)
+	if err != nil {
+		t.Fatalf("想定外のエラーが発生した: %s", err)
+	}
+
+	if len(jeMap) != 2 {
+		t.Fatalf("パース結果が2件になるはずが、%d件になった。", len(jeMap))
+	}
+
+	j1, ok := jeMap["testjob1"]
+	if !ok {
+		t.Fatalf("パース結果にtestjob1がセットされていない。")
+	}
+
+	if j1.SecondaryNode != `secondary` {
+		t.Errorf("testjob1のセカンダリノード名のパース結果[%s]が間違っています。", j1.SecondaryNode)
+	}
+	if j1.SecondaryPort != 12345 {
+		t.Errorf("testjob1のセカンダリポート番号のパース結果[%d]が間違っています。", j1.SecondaryPort)
+	}
+
+	j2, ok := jeMap["testjob2"]
+	if !ok {
+		t.Fatalf("パース結果にtestjob2がセットされていない。")
+	}
+
+	if j2.SecondaryNode != `` {
+		t.Errorf("testjob2のセカンダリノード名のパース結果[%s]が間違っています。", j2.SecondaryNode)
+	}
+	if j2.SecondaryPort != 0 {
+		t.Errorf("testjob2のセカンダリポート番号のパース結果[%d]が間違っています。", j2.SecondaryPort)
 	}
 }
