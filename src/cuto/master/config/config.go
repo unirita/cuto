@@ -25,6 +25,7 @@ type jobSection struct {
 	DefaultTimeoutMin    int    `toml:"default_timeout_min"`
 	ConnectionTimeoutSec int    `toml:"connection_timeout_sec"`
 	TimeTrackingSpanMin  int    `toml:"time_tracking_span_min"`
+	AttemptLimit         int    `toml:"attempt_limit"`
 }
 
 // 設定ファイルのdirセクション
@@ -66,6 +67,7 @@ func Load(filePath string) error {
 
 func loadReader(reader io.Reader) error {
 	c := new(config)
+	c.Job.AttemptLimit = 1
 	if _, err := toml.DecodeReader(reader, c); err != nil {
 		return err
 	}
@@ -92,6 +94,9 @@ func DetectError() error {
 	}
 	if Job.TimeTrackingSpanMin < 0 {
 		return fmt.Errorf("job.time_tracking_span_min(%d) must not be minus value.", Job.TimeTrackingSpanMin)
+	}
+	if Job.AttemptLimit <= 0 {
+		return fmt.Errorf("job.attempt_limit(%d) must not be 0 or less.", Job.AttemptLimit)
 	}
 	if Log.MaxSizeKB <= 0 {
 		return fmt.Errorf("log.max_size_kb(%d) must not be 0 or less.", Log.MaxSizeKB)
