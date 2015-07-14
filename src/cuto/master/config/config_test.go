@@ -93,6 +93,42 @@ max_generation=2
 	}
 }
 
+func TestLoadByReader_CUTOROOTタグを展開できる(t *testing.T) {
+	conf := `
+[job]
+default_node='localhost'
+default_port=2015
+default_timeout_min=30
+connection_timeout_sec=60
+time_tracking_span_min=10
+attempt_limit=5
+
+[dir]
+jobnet_dir='<CUTOROOT>/jobnet'
+log_dir='<CUTOROOT>/log'
+
+[db]
+db_file='cute.db'
+
+[log]
+output_level='info'
+max_size_kb=10240
+max_generation=2
+`
+
+	r := strings.NewReader(conf)
+	err := loadReader(r)
+	if err != nil {
+		t.Fatalf("想定外のエラーが発生した[%s]", err)
+	}
+	if Dir.JobnetDir == `<CUTOROOT>/jobnet` {
+		t.Errorf("jobnet_dir内の<CUTOROOT>が置換されていない")
+	}
+	if Dir.LogDir == `<CUTOROOT>/log` {
+		t.Errorf("log_dir内の<CUTOROOT>が置換されていない")
+	}
+}
+
 func TestLoadByReader_AttemptLimitが指定されない場合のデフォルト値(t *testing.T) {
 	conf := `
 [job]

@@ -7,8 +7,11 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/BurntSushi/toml"
+
+	"cuto/util"
 )
 
 type config struct {
@@ -47,6 +50,8 @@ type logSection struct {
 	TimeoutSec    int    `toml:"timeout_sec"`
 }
 
+const tag_CUTOROOT = "<CUTOROOT>"
+
 var Dir = new(dirSection)
 var Job = new(jobSection)
 var DB = new(dbSection)
@@ -72,11 +77,18 @@ func loadReader(reader io.Reader) error {
 		return err
 	}
 
+	replaceCutoroot(c)
+
 	Dir = &c.Dir
 	Job = &c.Job
 	DB = &c.DB
 	Log = &c.Log
 	return nil
+}
+
+func replaceCutoroot(c *config) {
+	c.Dir.JobnetDir = strings.Replace(c.Dir.JobnetDir, tag_CUTOROOT, util.GetRootPath(), -1)
+	c.Dir.LogDir = strings.Replace(c.Dir.LogDir, tag_CUTOROOT, util.GetRootPath(), -1)
 }
 
 // 設定値のエラー検出を行う。
