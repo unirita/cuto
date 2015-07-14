@@ -152,7 +152,12 @@ func (j *Job) Execute() (Element, error) {
 	go j.startTimer(timerEndCh)
 	defer close(timerEndCh)
 
-	resMsg, err := j.sendRequest(j.Node, j.Port, reqMsg, stCh)
+	resMsg, err := j.sendRequestWithRetry(reqMsg, stCh)
+	if j.isNecessaryToRetry(err) && j.SecondaryNode != "" {
+		console.Display("CTM028W", j.Name, j.SecondaryNode)
+		resMsg, err = j.sendSecondaryRequestWithRetry(reqMsg, stCh)
+	}
+
 	close(stCh)
 	if err != nil {
 		return nil, j.abnormalEnd(err)
@@ -171,6 +176,61 @@ func (j *Job) Execute() (Element, error) {
 	}
 
 	return j.Next, nil
+}
+
+// ジョブ実行リクエストを送信する。
+// 送信失敗時には必要な回数だけリトライを行う。
+func (j *Job) sendRequestWithRetry(reqMsg string, stCh chan<- string) (string, error) {
+	limit := config.Job.AttemptLimit
+	var resMsg string
+	var err error
+	for i := 0; i < limit; i++ {
+		if i != 0 {
+			console.Display("CTM027W", j.Name, i, limit-1)
+		}
+
+		resMsg, err = j.sendRequest(j.Node, j.Port, reqMsg, stCh)
+		if !j.isNecessaryToRetry(err) {
+			break
+		}
+	}
+
+	return resMsg, err
+}
+
+// セカンダリサーバントへのジョブ実行リクエストを送信する。
+// 送信失敗時には必要な回数だけリトライを行う。
+func (j *Job) sendSecondaryRequestWithRetry(reqMsg string, stCh chan<- string) (string, error) {
+	limit := config.Job.AttemptLimit
+	var resMsg string
+	var err error
+	for i := 0; i < limit; i++ {
+		if i != 0 {
+			console.Display("CTM027W", j.Name, i, limit-1)
+		}
+
+		resMsg, err = j.sendRequest(j.SecondaryNode, j.SecondaryPort, reqMsg, stCh)
+		if !j.isNecessaryToRetry(err) {
+			break
+		}
+	}
+
+	return resMsg, err
+}
+
+// リトライの必要があるかを判定する。
+// 判定条件：リクエスト送信でエラーが発生しており、スタート時刻がセットされていないこと
+func (j *Job) isNecessaryToRetry(err error) bool {
+	if err != nil {
+		jobres, exist := j.Instance.Result.Jobresults[j.id]
+		if !exist {
+			return true
+		} else if jobres.StartDate == "" {
+			return true
+		}
+	}
+
+	return false
 }
 
 // responseメッセージrのステータスを参照し、ジョブが異常終了している場合はtrueを返す。

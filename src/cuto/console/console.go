@@ -74,6 +74,8 @@ var msgs = map[string]string{
 	"CTM024I": "JOB [%s] ENDED AT NODE [%s]. INSTANCE [%d] JOBID [%s] STATUS [%v].",
 	"CTM025W": "JOB [%s] ABNORMAL ENDED AT NODE [%s]. INSTANCE [%d] JOBID [%s] STATUS [%v] DETAIL [%s].",
 	"CTM026I": "SEE JOBLOG FILE [%s] ON NODE [%s].",
+	"CTM027W": "JOB [%s] REQUEST FAILED. RETRYING...(%d of %d)",
+	"CTM028W": "JOB [%s] REQUEST FAILED. TRYING TO REQUEST SECONDARY SERVANT[%s].",
 	"1":       "",
 	"CTS001I": "GOCUTO SERVANT STARTED. PID [%v] VERSION [%s]",
 	"CTS002I": "GOCUTO SERVANT ENDED. RC [%d].",

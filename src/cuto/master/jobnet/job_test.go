@@ -8,6 +8,7 @@ import (
 
 	"cuto/db"
 	"cuto/db/tx"
+	"cuto/master/config"
 	"cuto/message"
 )
 
@@ -163,6 +164,7 @@ func TestJobHasNext_ジョブ構造体の後続エレメントの有無をチェ
 }
 
 func TestJobExecute_レスポンスにエラーが無いケース(t *testing.T) {
+	config.Job.AttemptLimit = 1
 	n := newTestNetwork()
 	j1, _ := NewJob("jobid1", "job1", n)
 	j2, _ := NewJob("jobid1", "job1", n)
@@ -219,6 +221,7 @@ func TestJobExecute_レスポンスにエラーが無いケース(t *testing.T) 
 }
 
 func TestJobExecute_使用できない変数を使用したケース(t *testing.T) {
+	config.Job.AttemptLimit = 1
 	n := newTestNetwork()
 	j1, _ := NewJob("jobid1", "job1", n)
 	j2, _ := NewJob("jobid1", "job1", n)
@@ -264,6 +267,7 @@ func TestJobExecute_使用できない変数を使用したケース(t *testing.
 }
 
 func TestJobExecute_ジョブが異常終了したケース(t *testing.T) {
+	config.Job.AttemptLimit = 1
 	n := newTestNetwork()
 	j1, _ := NewJob("jobid1", "job1", n)
 	j2, _ := NewJob("jobid1", "job1", n)
@@ -320,6 +324,7 @@ func TestJobExecute_ジョブが異常終了したケース(t *testing.T) {
 }
 
 func TestJobExecute_リクエスト送信に失敗したケース(t *testing.T) {
+	config.Job.AttemptLimit = 1
 	n := newTestNetwork()
 	j1, _ := NewJob("jobid1", "job1", n)
 	j2, _ := NewJob("jobid1", "job1", n)
@@ -364,6 +369,7 @@ func TestJobExecute_リクエスト送信に失敗したケース(t *testing.T) 
 }
 
 func TestJobExecute_リクエスト送信に失敗したケース_失敗前にスタート時刻を受け取った場合(t *testing.T) {
+	config.Job.AttemptLimit = 1
 	n := newTestNetwork()
 	j1, _ := NewJob("jobid1", "job1", n)
 	j2, _ := NewJob("jobid1", "job1", n)
@@ -411,6 +417,7 @@ func TestJobExecute_リクエスト送信に失敗したケース_失敗前に�
 }
 
 func TestJobExecute_レスポンスがJSON形式でないケース(t *testing.T) {
+	config.Job.AttemptLimit = 1
 	n := newTestNetwork()
 	j1, _ := NewJob("jobid1", "job1", n)
 	j2, _ := NewJob("jobid1", "job1", n)
