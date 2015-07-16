@@ -89,6 +89,7 @@ func loadReader(reader io.Reader) error {
 func replaceCutoroot(c *config) {
 	c.Dir.JobnetDir = strings.Replace(c.Dir.JobnetDir, tag_CUTOROOT, util.GetRootPath(), -1)
 	c.Dir.LogDir = strings.Replace(c.Dir.LogDir, tag_CUTOROOT, util.GetRootPath(), -1)
+	c.DB.DBFile = strings.Replace(c.DB.DBFile, tag_CUTOROOT, util.GetRootPath(), -1)
 }
 
 // 設定値のエラー検出を行う。

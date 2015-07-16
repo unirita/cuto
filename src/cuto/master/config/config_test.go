@@ -108,7 +108,7 @@ jobnet_dir='<CUTOROOT>/jobnet'
 log_dir='<CUTOROOT>/log'
 
 [db]
-db_file='cute.db'
+db_file='<CUTOROOT>/cuto.db'
 
 [log]
 output_level='info'
@@ -126,6 +126,9 @@ max_generation=2
 	}
 	if Dir.LogDir == `<CUTOROOT>/log` {
 		t.Errorf("log_dir内の<CUTOROOT>が置換されていない")
+	}
+	if DB.DBFile == `<CUTOROOT>/cuto.db` {
+		t.Errorf("db_file内の<CUTOROOT>が置換されていない")
 	}
 }
 
