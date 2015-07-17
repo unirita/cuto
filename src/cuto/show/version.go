@@ -4,4 +4,4 @@
 package main
 
 // showユーティリティのバージョン情報
-const Version = "1.0.1.0"
+const Version = "1.0.2.0"
