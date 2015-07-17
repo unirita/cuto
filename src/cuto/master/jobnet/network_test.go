@@ -547,6 +547,8 @@ func TestSetJobEx_拡張ジョブ情報をセットできる(t *testing.T) {
 	je1.ErrRC = 21
 	je1.ErrPtn = "err1"
 	je1.TimeoutMin = 60
+	je1.SecondaryNode = "secondary"
+	je1.SecondaryPort = 2
 
 	je2 := new(parser.JobEx)
 	je2.Node = "node2"
@@ -597,6 +599,12 @@ func TestSetJobEx_拡張ジョブ情報をセットできる(t *testing.T) {
 	}
 	if task1.Timeout != 3600 {
 		t.Errorf("実行タイムアウト時間[%d]は想定と違っている", task1.Timeout)
+	}
+	if task1.SecondaryNode != "secondary" {
+		t.Errorf("ノード名[%s]は想定と違っている", task1.SecondaryNode)
+	}
+	if task1.SecondaryPort != 2 {
+		t.Errorf("ポート番号[%d]は想定と違っている", task1.SecondaryPort)
 	}
 
 	task2 := nwk.elements["task2"].(*Job)
@@ -662,6 +670,12 @@ func TestSetJobEx_ゼロ値が挿入されたカラムにデフォルト値を�
 	if task1.Timeout != 1800 {
 		t.Errorf("実行タイムアウト時間[%d]は想定と違っている", task1.Timeout)
 	}
+	if task1.SecondaryNode != "" {
+		t.Errorf("ノード名[%s]は想定と違っている", task1.SecondaryNode)
+	}
+	if task1.SecondaryPort != 0 {
+		t.Errorf("ポート番号[%d]は想定と違っている", task1.SecondaryPort)
+	}
 }
 
 func TestSetJobEx_ゲートウェイには影響を与えない(t *testing.T) {
@@ -677,6 +691,8 @@ func TestSetJobEx_ゲートウェイには影響を与えない(t *testing.T) {
 	je1.ErrRC = 21
 	je1.ErrPtn = "err1"
 	je1.TimeoutMin = 60
+	je1.SecondaryNode = "secondary"
+	je1.SecondaryPort = 2
 
 	jeMap := make(map[string]*parser.JobEx)
 	jeMap["job1"] = je1

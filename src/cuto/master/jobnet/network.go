@@ -206,6 +206,8 @@ func (n *Network) setJobEx(m map[string]*parser.JobEx) {
 				j.ErrRC = je.ErrRC
 				j.ErrPtn = je.ErrPtn
 				j.Timeout = je.TimeoutMin * 60
+				j.SecondaryNode = je.SecondaryNode
+				j.SecondaryPort = je.SecondaryPort
 			}
 			j.SetDefaultEx()
 		default:

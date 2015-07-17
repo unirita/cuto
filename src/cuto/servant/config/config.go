@@ -31,6 +31,7 @@ const (
 
 const dirName = "bin"
 const fileName = "servant.ini"
+const tag_CUTOROOT = "<CUTOROOT>"
 
 // 設定情報のデフォルト値を設定する。
 func DefaultServantConfig() *ServantConfig {
@@ -161,7 +162,15 @@ func loadReader(reader io.Reader) (*ServantConfig, error) {
 		return nil, err
 	}
 
+	sc.replaceCutoroot()
+
 	return sc, nil
+}
+
+func (s *ServantConfig) replaceCutoroot() {
+	s.Dir.JoblogDir = strings.Replace(s.Dir.JoblogDir, tag_CUTOROOT, util.GetRootPath(), -1)
+	s.Dir.JobDir = strings.Replace(s.Dir.JobDir, tag_CUTOROOT, util.GetRootPath(), -1)
+	s.Dir.LogDir = strings.Replace(s.Dir.LogDir, tag_CUTOROOT, util.GetRootPath(), -1)
 }
 
 // 設定値の相対パスを絶対パスへ変換する。

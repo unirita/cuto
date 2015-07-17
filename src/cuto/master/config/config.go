@@ -7,8 +7,11 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/BurntSushi/toml"
+
+	"cuto/util"
 )
 
 type config struct {
@@ -25,6 +28,7 @@ type jobSection struct {
 	DefaultTimeoutMin    int    `toml:"default_timeout_min"`
 	ConnectionTimeoutSec int    `toml:"connection_timeout_sec"`
 	TimeTrackingSpanMin  int    `toml:"time_tracking_span_min"`
+	AttemptLimit         int    `toml:"attempt_limit"`
 }
 
 // 設定ファイルのdirセクション
@@ -46,6 +50,8 @@ type logSection struct {
 	TimeoutSec    int    `toml:"timeout_sec"`
 }
 
+const tag_CUTOROOT = "<CUTOROOT>"
+
 var Dir = new(dirSection)
 var Job = new(jobSection)
 var DB = new(dbSection)
@@ -66,15 +72,24 @@ func Load(filePath string) error {
 
 func loadReader(reader io.Reader) error {
 	c := new(config)
+	c.Job.AttemptLimit = 1
 	if _, err := toml.DecodeReader(reader, c); err != nil {
 		return err
 	}
+
+	replaceCutoroot(c)
 
 	Dir = &c.Dir
 	Job = &c.Job
 	DB = &c.DB
 	Log = &c.Log
 	return nil
+}
+
+func replaceCutoroot(c *config) {
+	c.Dir.JobnetDir = strings.Replace(c.Dir.JobnetDir, tag_CUTOROOT, util.GetRootPath(), -1)
+	c.Dir.LogDir = strings.Replace(c.Dir.LogDir, tag_CUTOROOT, util.GetRootPath(), -1)
+	c.DB.DBFile = strings.Replace(c.DB.DBFile, tag_CUTOROOT, util.GetRootPath(), -1)
 }
 
 // 設定値のエラー検出を行う。
@@ -92,6 +107,9 @@ func DetectError() error {
 	}
 	if Job.TimeTrackingSpanMin < 0 {
 		return fmt.Errorf("job.time_tracking_span_min(%d) must not be minus value.", Job.TimeTrackingSpanMin)
+	}
+	if Job.AttemptLimit <= 0 {
+		return fmt.Errorf("job.attempt_limit(%d) must not be 0 or less.", Job.AttemptLimit)
 	}
 	if Log.MaxSizeKB <= 0 {
 		return fmt.Errorf("log.max_size_kb(%d) must not be 0 or less.", Log.MaxSizeKB)

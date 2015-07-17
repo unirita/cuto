@@ -116,6 +116,44 @@ max_generation=2
 	}
 }
 
+func TestLoadReader_CUTOROOTタグを展開できる(t *testing.T) {
+	conf := `
+[sys]
+bind_address='0.0.0.0'
+bind_port=2015
+
+[job]
+multi_proc=20
+heartbeat_span_sec=30
+
+[dir]
+joblog_dir='<CUTOROOT>\joblog'
+job_dir='<CUTOROOT>\jobscript'
+log_dir='<CUTOROOT>\log'
+
+[log]
+output_level='info'
+max_size_kb=10240
+max_generation=2
+`
+
+	r := strings.NewReader(conf)
+	cfg, err := loadReader(r)
+	if err != nil {
+		t.Fatalf("想定外のエラーが発生した[%s]", err)
+	}
+
+	if cfg.Dir.JoblogDir == `<CUTOROOT>\joblog` {
+		t.Errorf("joblog_dir内のCUTOROOTタグが展開されていない。")
+	}
+	if cfg.Dir.JobDir == `<CUTOROOT>\jobscript` {
+		t.Errorf("job_dir内のCUTOROOTタグが展開されていない。")
+	}
+	if cfg.Dir.LogDir == `<CUTOROOT>\log` {
+		t.Errorf("log_dir内のCUTOROOTタグが展開されていない。")
+	}
+}
+
 func TestLoadReader_tomlの書式に沿っていない場合はエラーが発生する(t *testing.T) {
 	conf := `
 [sys]

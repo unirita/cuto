@@ -11,6 +11,7 @@ func generateTestConfig() {
 	Job.DefaultTimeoutMin = 0
 	Job.ConnectionTimeoutSec = 1
 	Job.TimeTrackingSpanMin = 10
+	Job.AttemptLimit = 5
 	Dir.JobnetDir = `.\jobnet`
 	Dir.LogDir = `.\log`
 	DB.DBFile = `.\data\cuto.sqlite`
@@ -33,6 +34,7 @@ default_port=2015
 default_timeout_min=30
 connection_timeout_sec=60
 time_tracking_span_min=10
+attempt_limit=5
 
 [dir]
 jobnet_dir='jobnet'
@@ -68,6 +70,9 @@ max_generation=2
 	if Job.TimeTrackingSpanMin != 10 {
 		t.Errorf("time_tracking_span_minの値[%d]は想定と違っている。", Job.TimeTrackingSpanMin)
 	}
+	if Job.AttemptLimit != 5 {
+		t.Errorf("attempt_limitの値[%d]は想定と違っている。", Job.AttemptLimit)
+	}
 	if Dir.JobnetDir != `jobnet` {
 		t.Errorf("jobnet_dirの値[%s]は想定と違っている。", Dir.JobnetDir)
 	}
@@ -88,6 +93,78 @@ max_generation=2
 	}
 }
 
+func TestLoadByReader_CUTOROOTタグを展開できる(t *testing.T) {
+	conf := `
+[job]
+default_node='localhost'
+default_port=2015
+default_timeout_min=30
+connection_timeout_sec=60
+time_tracking_span_min=10
+attempt_limit=5
+
+[dir]
+jobnet_dir='<CUTOROOT>/jobnet'
+log_dir='<CUTOROOT>/log'
+
+[db]
+db_file='<CUTOROOT>/cuto.db'
+
+[log]
+output_level='info'
+max_size_kb=10240
+max_generation=2
+`
+
+	r := strings.NewReader(conf)
+	err := loadReader(r)
+	if err != nil {
+		t.Fatalf("想定外のエラーが発生した[%s]", err)
+	}
+	if Dir.JobnetDir == `<CUTOROOT>/jobnet` {
+		t.Errorf("jobnet_dir内の<CUTOROOT>が置換されていない")
+	}
+	if Dir.LogDir == `<CUTOROOT>/log` {
+		t.Errorf("log_dir内の<CUTOROOT>が置換されていない")
+	}
+	if DB.DBFile == `<CUTOROOT>/cuto.db` {
+		t.Errorf("db_file内の<CUTOROOT>が置換されていない")
+	}
+}
+
+func TestLoadByReader_AttemptLimitが指定されない場合のデフォルト値(t *testing.T) {
+	conf := `
+[job]
+default_node='localhost'
+default_port=2015
+default_timeout_min=30
+connection_timeout_sec=60
+time_tracking_span_min=10
+
+[dir]
+jobnet_dir='jobnet'
+log_dir='log'
+
+[db]
+db_file='cute.db'
+
+[log]
+output_level='info'
+max_size_kb=10240
+max_generation=2
+`
+
+	r := strings.NewReader(conf)
+	err := loadReader(r)
+	if err != nil {
+		t.Fatalf("想定外のエラーが発生した[%s]", err)
+	}
+
+	if Job.AttemptLimit != 1 {
+		t.Errorf("attempt_limitの値[%d]は想定と違っている。", Job.AttemptLimit)
+	}
+}
+
 func TestLoadByReader_tomlの書式に沿っていない場合はエラーが発生する(t *testing.T) {
 	conf := `
 [job]
@@ -96,6 +173,7 @@ default_port=2015
 default_timeout_min=30
 connection_timeout_sec=60
 time_tracking_span_min=10
+attempt_limit=5
 
 [dir]
 jobnet_dir='jobnet'
@@ -167,6 +245,14 @@ func TestDetectError_接続タイムアウト時間が0以下の場合はエラ�
 func TestDetectError_経過時間表示間隔が負の値の場合はエラー(t *testing.T) {
 	generateTestConfig()
 	Job.TimeTrackingSpanMin = -1
+	if err := DetectError(); err == nil {
+		t.Error("エラーが発生しなかった。")
+	}
+}
+
+func TestDetectError_最大試行回数が0以下の場合はエラー(t *testing.T) {
+	generateTestConfig()
+	Job.AttemptLimit = 0
 	if err := DetectError(); err == nil {
 		t.Error("エラーが発生しなかった。")
 	}
