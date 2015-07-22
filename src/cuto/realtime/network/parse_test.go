@@ -1,7 +1,6 @@
 package network
 
 import (
-	"strings"
 	"testing"
 )
 
@@ -33,7 +32,7 @@ func TestParse(t *testing.T) {
 	]
 }
 `
-	network, err := Parse(strings.NewReader(jsonStr))
+	network, err := Parse(jsonStr)
 	if err != nil {
 		t.Fatalf("Unexpected error occurd: %s", err)
 	}
@@ -163,7 +162,7 @@ func TestParse_WithJSONError(t *testing.T) {
 	]
 }
 `
-	_, err := Parse(strings.NewReader(jsonStr))
+	_, err := Parse(jsonStr)
 	if err == nil {
 		t.Fatalf("No error occured.")
 	}
@@ -196,7 +195,7 @@ func TestParse_WithAnonymousJob(t *testing.T) {
 	]
 }
 `
-	_, err := Parse(strings.NewReader(jsonStr))
+	_, err := Parse(jsonStr)
 	if err == nil {
 		t.Fatalf("No error occured.")
 	}

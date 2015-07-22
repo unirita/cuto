@@ -3,7 +3,7 @@ package network
 import (
 	"encoding/json"
 	"errors"
-	"io"
+	"strings"
 )
 
 type Network struct {
@@ -28,9 +28,9 @@ type Job struct {
 	SPort   *int    `json:"sport"`
 }
 
-// Parse reads json string from reader, and unmarshal it.
-func Parse(reader io.Reader) (*Network, error) {
-	decorder := json.NewDecoder(reader)
+// Parse parses str as json format, and create Network object.
+func Parse(str string) (*Network, error) {
+	decorder := json.NewDecoder(strings.NewReader(str))
 
 	network := new(Network)
 	if err := decorder.Decode(network); err != nil {
