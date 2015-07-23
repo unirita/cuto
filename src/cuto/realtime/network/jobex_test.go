@@ -13,7 +13,7 @@ func TestLoadJobexFromReader(t *testing.T) {
 job1,123.45.67.89,1234,/scripts/job1.sh,param1,env1,/work,10,warn1,20,err1,3600,secondary,12345
 job2,12.345.67.89,5678,/scripts/job2.sh,param2,env2,/work2,11,warn2,21,err2,3600,,`
 
-	jobex, err := LoadJobexFromReader(strings.NewReader(csv))
+	jobex, err := loadJobexFromReader(strings.NewReader(csv))
 	if err != nil {
 		t.Fatalf("Unexpected error occured: %s", err)
 	}
