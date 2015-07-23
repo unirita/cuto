@@ -1,4 +1,4 @@
-package jobex
+package network
 
 import (
 	"encoding/csv"
@@ -7,8 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-
-	"cuto/realtime/network"
 )
 
 // Number of columns
@@ -32,10 +30,10 @@ const (
 	sportIdx
 )
 
-// LoadRealtimeCsv loads jobex csv which corresponds to name.
-// LoadRealtimeCsv returns empty jobex array if csv is not exists.
-func LoadRealtimeCsv(name string, nwkDir string) ([][]string, error) {
-	csvPath := searchCsvFile(name, nwkDir)
+// LoadJobex loads jobex csv which corresponds to name.
+// LoadJobex returns empty jobex array if csv is not exists.
+func LoadJobex(name string, nwkDir string) ([][]string, error) {
+	csvPath := searchJobexCsvFile(name, nwkDir)
 	if csvPath == "" {
 		return createEmptyJobex(), nil
 	}
@@ -46,10 +44,10 @@ func LoadRealtimeCsv(name string, nwkDir string) ([][]string, error) {
 	}
 	defer file.Close()
 
-	return Load(file)
+	return LoadJobexFromReader(file)
 }
 
-func searchCsvFile(name string, nwkDir string) string {
+func searchJobexCsvFile(name string, nwkDir string) string {
 	individualPath := filepath.Join(nwkDir, "realtime", name+".csv")
 	defaultPath := filepath.Join(nwkDir, "realtime", "default.csv")
 
@@ -71,8 +69,8 @@ func createEmptyJobex() [][]string {
 	return jobex
 }
 
-// Load reads reader as csv format, and create jobex data array.
-func Load(reader io.Reader) ([][]string, error) {
+// LoadJobexFromReader reads reader as csv format, and create jobex data array.
+func LoadJobexFromReader(reader io.Reader) ([][]string, error) {
 	r := csv.NewReader(reader)
 	jobex, err := r.ReadAll()
 	if err != nil {
@@ -85,8 +83,8 @@ func Load(reader io.Reader) ([][]string, error) {
 	return jobex, nil
 }
 
-// MergeRealtimeParam merge jobex data from jobs to base.
-func MergeRealtimeParam(base [][]string, jobs []network.Job) [][]string {
+// MergeParamIntoJobex merge jobex data from jobs to base.
+func MergeParamIntoJobex(base [][]string, jobs []Job) [][]string {
 	result := make([][]string, len(base))
 	copy(result, base)
 
@@ -95,7 +93,7 @@ func MergeRealtimeParam(base [][]string, jobs []network.Job) [][]string {
 		for idx, baseRecord := range base {
 			if baseRecord[nameIdx] == *job.Name {
 				isExistsInBase = true
-				result[idx] = mergeRecord(baseRecord, job)
+				result[idx] = mergeJobexRecord(baseRecord, job)
 				break
 			}
 		}
@@ -103,13 +101,13 @@ func MergeRealtimeParam(base [][]string, jobs []network.Job) [][]string {
 		if !isExistsInBase {
 			newRecord := make([]string, columns)
 			newRecord[nameIdx] = *job.Name
-			result = append(result, mergeRecord(newRecord, job))
+			result = append(result, mergeJobexRecord(newRecord, job))
 		}
 	}
 	return result
 }
 
-func mergeRecord(record []string, job network.Job) []string {
+func mergeJobexRecord(record []string, job Job) []string {
 	result := make([]string, columns)
 	for idx, col := range record {
 		switch idx {

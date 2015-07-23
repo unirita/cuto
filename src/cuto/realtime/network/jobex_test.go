@@ -1,21 +1,19 @@
-package jobex
+package network
 
 import (
 	"reflect"
 	"strconv"
 	"strings"
 	"testing"
-
-	"cuto/realtime/network"
 )
 
-func TestLoad(t *testing.T) {
+func TestLoadJobexFromReader(t *testing.T) {
 	csv := `
 ジョブ名,ノード名,ポート番号,実行ファイル,パラメータ,環境変数,作業フォルダ,警告コード,警告出力,異常コード,異常出力,タイムアウト,セカンダリ実行ノード,セカンダリポート番号
 job1,123.45.67.89,1234,/scripts/job1.sh,param1,env1,/work,10,warn1,20,err1,3600,secondary,12345
 job2,12.345.67.89,5678,/scripts/job2.sh,param2,env2,/work2,11,warn2,21,err2,3600,,`
 
-	jobex, err := Load(strings.NewReader(csv))
+	jobex, err := LoadJobexFromReader(strings.NewReader(csv))
 	if err != nil {
 		t.Fatalf("Unexpected error occured: %s", err)
 	}
@@ -24,13 +22,13 @@ job2,12.345.67.89,5678,/scripts/job2.sh,param2,env2,/work2,11,warn2,21,err2,3600
 	}
 }
 
-func TestMergeRealtimeParam(t *testing.T) {
+func TestMergeParamIntoJobex(t *testing.T) {
 	base := [][]string{
 		[]string{"job1", "node1", "1234", "/scripts/job1.sh", "param1", "env1", "/work", "10", "warn1", "20", "err1", "3600", "secondary", "12345"},
 		[]string{"job2", "node2", "2345", "/scripts/job2.sh", "param2", "env2", "/work2", "11", "warn2", "21", "err2", "3600", "secondary2", "23456"},
 	}
 
-	job1 := network.Job{}
+	job1 := Job{}
 	job1.Name = new(string)
 	*job1.Name = "job1"
 	job1.Node = new(string)
@@ -59,12 +57,12 @@ func TestMergeRealtimeParam(t *testing.T) {
 	*job1.SNode = "realsnode"
 	job1.SPort = new(int)
 	*job1.SPort = 2000
-	job2 := network.Job{}
+	job2 := Job{}
 	job2.Name = new(string)
 	*job2.Name = "job2"
 	job2.Node = new(string)
 	*job2.Node = "realnode2"
-	job3 := network.Job{}
+	job3 := Job{}
 	job3.Name = new(string)
 	*job3.Name = "job3"
 	job3.Node = new(string)
@@ -93,11 +91,11 @@ func TestMergeRealtimeParam(t *testing.T) {
 	*job3.SNode = "realsnode3"
 	job3.SPort = new(int)
 	*job3.SPort = 2002
-	jobs := []network.Job{job1, job2, job3}
+	jobs := []Job{job1, job2, job3}
 
 	baseJob2 := make([]string, 14)
 	copy(baseJob2, base[1])
-	result := MergeRealtimeParam(base, jobs)
+	result := MergeParamIntoJobex(base, jobs)
 	if len(result) != 3 {
 		t.Fatalf("len(result) => %d, want %d", len(result), 3)
 	}
