@@ -1,6 +1,7 @@
 package network
 
 import (
+	"bytes"
 	"strings"
 	"testing"
 )
@@ -15,8 +16,66 @@ job2,12.345.67.89,5678,/scripts/job2.sh,param2,env2,/work2,11,warn2,21,err2,3600
 	if err != nil {
 		t.Fatalf("Unexpected error occured: %s", err)
 	}
-	if len(jobex) != 3 {
-		t.Fatalf("len(jobex) => %d, want %d", len(jobex), 3)
+	if len(jobex) != 2 {
+		t.Fatalf("len(jobex) => %d, want %d", len(jobex), 2)
+	}
+}
+
+func TestExportJob(t *testing.T) {
+	expected := `,,,,,,,,,,,,,
+job1,node1,1234,/scripts/job1.sh,param1,env1,/work1,11,warn1,21,err1,100,snode1,1000
+job2,node2,2345,/scripts/job2.sh,param2,env2,/work2,12,warn2,22,err2,200,snode2,2000
+`
+
+	n := new(Network)
+	n.Jobs = []Job{
+		Job{
+			Name:    "job1",
+			Node:    "node1",
+			Port:    1234,
+			Path:    "/scripts/job1.sh",
+			Param:   "param1",
+			Env:     "env1",
+			Work:    "/work1",
+			WRC:     11,
+			WPtn:    "warn1",
+			ERC:     21,
+			EPtn:    "err1",
+			Timeout: 100,
+			SNode:   "snode1",
+			SPort:   1000,
+		},
+		Job{
+			Name:    "job2",
+			Node:    "node2",
+			Port:    2345,
+			Path:    "/scripts/job2.sh",
+			Param:   "param2",
+			Env:     "env2",
+			Work:    "/work2",
+			WRC:     12,
+			WPtn:    "warn2",
+			ERC:     22,
+			EPtn:    "err2",
+			Timeout: 200,
+			SNode:   "snode2",
+			SPort:   2000,
+		},
+	}
+
+	w := new(bytes.Buffer)
+	err := n.exportJob(w)
+	if err != nil {
+		t.Fatalf("Unexpected error occured: %s", err)
+	}
+	result := w.String()
+	if result != expected {
+		t.Log("Exported csv is not expected.")
+		t.Log("Expected:")
+		t.Log(expected)
+		t.Log("Actual:")
+		t.Log(result)
+		t.Fail()
 	}
 }
 

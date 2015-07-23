@@ -12,6 +12,8 @@ import (
 	"strings"
 
 	scan "github.com/mattn/go-scan"
+
+	"cuto/flowgen/converter"
 )
 
 // Number of columns
@@ -36,12 +38,6 @@ const (
 )
 
 var jobex = make([][]string, 0)
-
-func init() {
-	// Create empty jobex with title record.
-	jobex := make([][]string, 1)
-	jobex[0] = make([]string, columns)
-}
 
 // LoadJobex loads jobex csv which corresponds to name.
 // LoadJobex returns empty jobex array if csv is not exists.
@@ -78,15 +74,25 @@ func searchJobexCsvFile(name string, nwkDir string) string {
 // loadJobexFromReader reads reader as csv format, and create jobex data array.
 func loadJobexFromReader(reader io.Reader) ([][]string, error) {
 	r := csv.NewReader(reader)
-	jobex, err := r.ReadAll()
-	if err != nil {
-		return nil, err
+	result := make([][]string, 0)
+	isTitleRow := true
+	for {
+		record, err := r.Read()
+		if err == io.EOF {
+			break
+		} else if err != nil {
+			return nil, err
+		}
+		if !isTitleRow {
+			result = append(result, record)
+		}
+		isTitleRow = false
 	}
-	if len(jobex) > 0 && len(jobex[0]) != columns {
-		return nil, fmt.Errorf("Number of jobex csv columns[%d] must be %d.", len(jobex[0]), columns)
+	if len(result) > 0 && len(result[0]) != columns {
+		return nil, fmt.Errorf("Number of jobex csv columns[%d] must be %d.", len(result[0]), columns)
 	}
 
-	return jobex, nil
+	return result, nil
 }
 
 func getJobexRecordByName(jobname string) []string {
@@ -146,6 +152,61 @@ func (n *Network) DetectError() error {
 			return errors.New("Anonymous job detected.")
 		}
 	}
+	return nil
+}
+
+func (n *Network) Export(name, nwkDir string) error {
+	flowPath := filepath.Join(nwkDir, name+".bpmn")
+	jobexPath := filepath.Join(nwkDir, name+".csv")
+
+	flowHead, err := converter.ParseString(n.Flow)
+	if err != nil {
+		return err
+	}
+	definition := converter.GenerateDefinitions(flowHead)
+	if err := converter.ExportFile(flowPath, definition); err != nil {
+		return err
+	}
+
+	file, err := os.Create(jobexPath)
+	if err != nil {
+		return err
+	}
+	if err := n.exportJob(file); err != nil {
+		return nil
+	}
+
+	return nil
+}
+
+func (n *Network) exportJob(writer io.Writer) error {
+	w := csv.NewWriter(writer)
+	// Add title record.
+	if err := w.Write(make([]string, columns)); err != nil {
+		return err
+	}
+
+	for _, job := range n.Jobs {
+		record := make([]string, columns)
+		record[nameIdx] = job.Name
+		record[nodeIdx] = job.Node
+		record[portIdx] = strconv.Itoa(job.Port)
+		record[pathIdx] = job.Path
+		record[paramIdx] = job.Param
+		record[envIdx] = job.Env
+		record[workIdx] = job.Work
+		record[wrcIdx] = strconv.Itoa(job.WRC)
+		record[wptnIdx] = job.WPtn
+		record[ercIdx] = strconv.Itoa(job.ERC)
+		record[eptnIdx] = job.EPtn
+		record[timeoutIdx] = strconv.Itoa(job.Timeout)
+		record[snodeIdx] = job.SNode
+		record[sportIdx] = strconv.Itoa(job.SPort)
+		if err := w.Write(record); err != nil {
+			return err
+		}
+	}
+	w.Flush()
 	return nil
 }
 
