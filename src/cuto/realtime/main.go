@@ -1,16 +1,10 @@
 package main
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
-	"io"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"regexp"
-	"strings"
-	"time"
 
 	"cuto/master/config"
 	"cuto/realtime/network"
@@ -60,17 +54,15 @@ func realMain() int {
 		return 1
 	}
 
-	networkName := generateNetworkName(args.realtimeName)
-	nwk.Export(networkName, networkDir)
+	cmd := network.NewCommand(args.realtimeName)
+	nwk.Export(cmd.GetNetworkName(), networkDir)
 
-	masterCommand := filepath.Join(util.GetRootPath(), "bin", "master")
-	cmd := exec.Command(masterCommand, "-n", networkName, "-s")
-	pipe, _ := cmd.StdoutPipe()
-	cmd.Start()
-
-	ch := make(chan string)
-	go waitID(ch, pipe)
-	fmt.Println(<-ch)
+	id, err := cmd.Run()
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(id)
+	}
 
 	return 0
 }
@@ -89,26 +81,4 @@ func fetchArgs() *arguments {
 
 func showUsage() {
 	fmt.Println(usage)
-}
-
-func generateNetworkName(realtimeName string) string {
-	timestamp := time.Now().Format("20060102150405")
-	if realtimeName == "" {
-		return fmt.Sprintf("realtime_%s", timestamp)
-	} else {
-		return fmt.Sprintf("realtime_%s_%s", realtimeName, timestamp)
-	}
-}
-
-func waitID(waitCh chan<- string, reader io.Reader) {
-	matcher := regexp.MustCompile(`INSTANCE \[\d+`)
-	scanner := bufio.NewScanner(reader)
-	for scanner.Scan() {
-		id := matcher.FindString(scanner.Text())
-		if id != "" {
-			id = strings.Replace(id, "INSTANCE [", "", 1)
-			waitCh <- id
-			return
-		}
-	}
 }
