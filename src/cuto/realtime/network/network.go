@@ -9,7 +9,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 
 	scan "github.com/mattn/go-scan"
 
@@ -110,8 +109,8 @@ type Network struct {
 }
 
 // Parse parses str as json format, and create Network object.
-func Parse(str string) (*Network, error) {
-	decorder := json.NewDecoder(strings.NewReader(str))
+func Parse(reader io.Reader) (*Network, error) {
+	decorder := json.NewDecoder(reader)
 
 	network := new(Network)
 	if err := decorder.Decode(network); err != nil {

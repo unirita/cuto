@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"net/http"
 	"os"
 	"path/filepath"
 
@@ -14,11 +15,11 @@ import (
 // Runtime arguments
 type arguments struct {
 	realtimeName string
-	jsonMessage  string
+	jsonURL      string
 }
 
 const usage = `Usage :
-    realtime [-n name] json-message
+    realtime [-n name] url
 
 Option :
     -n name : Use realtime network name.
@@ -48,9 +49,23 @@ func realMain() int {
 	if err := network.LoadJobex(args.realtimeName, networkDir); err != nil {
 		msg := fmt.Sprintf("Jobex csv load error: %s", err)
 		fmt.Println(network.RealtimeErrorResult(msg))
+		return 1
 	}
 
-	nwk, err := network.Parse(args.jsonMessage)
+	res, err := http.Get(args.jsonURL)
+	if err != nil {
+		msg := fmt.Sprintf("HTTP request error: %s", err)
+		fmt.Println(network.RealtimeErrorResult(msg))
+		return 1
+	}
+	defer res.Body.Close()
+	if res.StatusCode != http.StatusOK {
+		msg := fmt.Sprintf("HTTP response error. Status code[%d]", res.StatusCode)
+		fmt.Println(network.RealtimeErrorResult(msg))
+		return 1
+	}
+
+	nwk, err := network.Parse(res.Body)
 	if err != nil {
 		msg := fmt.Sprintf("Parse error: %s", err)
 		fmt.Println(network.RealtimeErrorResult(msg))
@@ -86,7 +101,7 @@ func fetchArgs() *arguments {
 	if flag.NArg() != 1 {
 		return nil
 	}
-	args.jsonMessage = flag.Arg(0)
+	args.jsonURL = flag.Arg(0)
 	return args
 }
 
