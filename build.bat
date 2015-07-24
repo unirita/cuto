@@ -6,6 +6,7 @@ del "%GOPATH%\bin\master.exe"
 del "%GOPATH%\bin\servant.exe"
 del "%GOPATH%\bin\show.exe"
 del "%GOPATH%\bin\flowgen.exe"
+del "%GOPATH%\bin\realtime.exe"
 
 if "%1" neq "" goto BUILD
 :UNIT_TEST
@@ -34,6 +35,10 @@ if %errorlevel% neq 0 goto err
 
 echo flowgen utility building...
 go install cuto/flowgen
+if %errorlevel% neq 0 goto err
+
+echo realtime utility building...
+go install cuto/realtime
 if %errorlevel% neq 0 goto err
 
 exit /b 0
