@@ -23,6 +23,7 @@ func Export(w io.Writer, d *Definitions) error {
 func ExportFile(filepath string, d *Definitions) error {
 	backupFileIfExists(filepath)
 	f, err := os.OpenFile(filepath, os.O_WRONLY|os.O_CREATE, 0644)
+	defer f.Close()
 	if err != nil {
 		return fmt.Errorf("Output file open error: %s", err)
 	}

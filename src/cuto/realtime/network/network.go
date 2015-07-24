@@ -172,6 +172,7 @@ func (n *Network) Export(name, nwkDir string) error {
 	if err != nil {
 		return err
 	}
+	defer file.Close()
 	if err := n.exportJob(file); err != nil {
 		return nil
 	}
