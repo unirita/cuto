@@ -58,7 +58,12 @@ func realMain() int {
 	}
 
 	cmd := network.NewCommand(args.realtimeName)
-	nwk.Export(cmd.GetNetworkName(), networkDir)
+	if err := nwk.Export(cmd.GetNetworkName(), networkDir); err != nil {
+		msg := fmt.Sprintf("Network temporary file create error: %s", err)
+		fmt.Println(network.RealtimeErrorResult(msg))
+		return 1
+	}
+	defer nwk.Clean(cmd.GetNetworkName(), networkDir)
 
 	id, err := cmd.Run()
 	if err != nil {

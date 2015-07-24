@@ -180,6 +180,13 @@ func (n *Network) Export(name, nwkDir string) error {
 	return nil
 }
 
+func (n *Network) Clean(name, nwkDir string) {
+	flowPath := filepath.Join(nwkDir, name+".bpmn")
+	jobexPath := filepath.Join(nwkDir, name+".csv")
+	os.Remove(flowPath)
+	os.Remove(jobexPath)
+}
+
 func (n *Network) exportJob(writer io.Writer) error {
 	w := csv.NewWriter(writer)
 	// Add title record.
