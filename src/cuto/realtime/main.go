@@ -39,18 +39,21 @@ func realMain() int {
 
 	configPath := filepath.Join(util.GetRootPath(), "bin", "master.ini")
 	if err := config.Load(configPath); err != nil {
-		fmt.Println("master.ini not found or cannot read it.")
+		msg := fmt.Sprintf("master.ini not found or cannot read it.")
+		fmt.Println(network.RealtimeErrorResult(msg))
 		return 1
 	}
 	networkDir := config.Dir.JobnetDir
 
 	if err := network.LoadJobex(args.realtimeName, networkDir); err != nil {
-		fmt.Printf("Jobex csv load error: %s\n", err)
+		msg := fmt.Sprintf("Jobex csv load error: %s", err)
+		fmt.Println(network.RealtimeErrorResult(msg))
 	}
 
 	nwk, err := network.Parse(args.jsonMessage)
 	if err != nil {
-		fmt.Printf("Parse error: %s\n", err)
+		msg := fmt.Sprintf("Parse error: %s", err)
+		fmt.Println(network.RealtimeErrorResult(msg))
 		return 1
 	}
 
@@ -59,10 +62,13 @@ func realMain() int {
 
 	id, err := cmd.Run()
 	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println(id)
+		network.MasterErrorResult(err.Error(), cmd.GetPID())
+		return 1
 	}
+
+	result := network.SuccessResult(cmd.GetPID(), id, cmd.GetNetworkName())
+	fmt.Println(result)
+	cmd.Release()
 
 	return 0
 }

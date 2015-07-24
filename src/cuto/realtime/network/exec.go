@@ -17,6 +17,7 @@ import (
 // Command represents a master command which executes realtime network.
 type Command struct {
 	cmd         *exec.Cmd
+	pid         int
 	networkName string
 }
 
@@ -42,6 +43,12 @@ func (c *Command) GetNetworkName() string {
 	return c.networkName
 }
 
+// GetPID returns master process ID.
+// If Run is not called, returns 0.
+func (c *Command) GetPID() int {
+	return c.pid
+}
+
 // Run runs the master command and gets its instance id.
 func (c *Command) Run() (int, error) {
 	stdoutReader, err := c.cmd.StdoutPipe()
@@ -51,6 +58,7 @@ func (c *Command) Run() (int, error) {
 	if err := c.cmd.Start(); err != nil {
 		return 0, err
 	}
+	c.pid = c.cmd.Process.Pid
 
 	lineCh := make(chan string, 1)
 	waitCh := make(chan struct{}, 1)
