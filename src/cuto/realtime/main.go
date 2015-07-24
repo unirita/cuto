@@ -106,5 +106,5 @@ func fetchArgs() *arguments {
 }
 
 func showUsage() {
-	fmt.Println(usage)
+	fmt.Fprintln(os.Stderr, usage)
 }
