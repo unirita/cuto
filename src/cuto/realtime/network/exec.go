@@ -7,6 +7,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -42,13 +43,13 @@ func (c *Command) GetNetworkName() string {
 }
 
 // Run runs the master command and gets its instance id.
-func (c *Command) Run() (string, error) {
+func (c *Command) Run() (int, error) {
 	stdoutReader, err := c.cmd.StdoutPipe()
 	if err != nil {
-		return "", err
+		return 0, err
 	}
 	if err := c.cmd.Start(); err != nil {
-		return "", err
+		return 0, err
 	}
 
 	lineCh := make(chan string, 1)
@@ -61,10 +62,14 @@ func (c *Command) Run() (string, error) {
 	go c.waitID(idCh, errCh, lineCh, waitCh)
 
 	select {
-	case id := <-idCh:
+	case idStr := <-idCh:
+		id, err := strconv.Atoi(idStr)
+		if err != nil {
+			return 0, fmt.Errorf("Invalid instance ID[%s] received.", idStr)
+		}
 		return id, nil
 	case errMsg := <-errCh:
-		return "", fmt.Errorf("Master error: %s", errMsg)
+		return 0, fmt.Errorf("Master error: %s", errMsg)
 	}
 }
 
