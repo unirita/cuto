@@ -14,8 +14,11 @@ func TestNewShowParam_ShowParamの初期化(t *testing.T) {
 	var g gen.Generator
 	var c gen.CsvGenerator
 	g = c
-	s := NewShowParam("jobnet1", "2015-04-27 14:15:24.999", "2015-04-27 15:15:24.999", 9, &g)
+	s := NewShowParam(123, "jobnet1", "2015-04-27 14:15:24.999", "2015-04-27 15:15:24.999", 9, &g)
 
+	if s.nid != 123 {
+		t.Errorf("不正なインスタンスID[%v]が返りました。", s.nid)
+	}
 	if s.jobnetName != "jobnet1" {
 		t.Errorf("不正なジョブネット名[%v]が返りました。", s.jobnetName)
 	}
