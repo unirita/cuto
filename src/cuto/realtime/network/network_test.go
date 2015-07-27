@@ -103,7 +103,7 @@ func TestParse(t *testing.T) {
 	]
 }
 `
-	network, err := Parse(jsonStr)
+	network, err := Parse(strings.NewReader(jsonStr))
 	if err != nil {
 		t.Fatalf("Unexpected error occurd: %s", err)
 	}
@@ -218,7 +218,7 @@ func TestParse_WithNullValue(t *testing.T) {
 		jobex[0] = make([]string, columns)
 	}()
 
-	network, err := Parse(jsonStr)
+	network, err := Parse(strings.NewReader(jsonStr))
 	if err != nil {
 		t.Fatalf("Unexpected error occurd: %s", err)
 	}
@@ -389,7 +389,7 @@ func TestParse_NonParameterJobex(t *testing.T) {
 		jobex[0] = make([]string, columns)
 	}()
 
-	network, err := Parse(jsonStr)
+	network, err := Parse(strings.NewReader(jsonStr))
 	if err != nil {
 		t.Fatalf("Unexpected error occurd: %s", err)
 	}
@@ -470,7 +470,7 @@ func TestParse_WithJSONError(t *testing.T) {
 	]
 }
 `
-	_, err := Parse(jsonStr)
+	_, err := Parse(strings.NewReader(jsonStr))
 	if err == nil {
 		t.Fatalf("No error occured.")
 	}
@@ -503,7 +503,7 @@ func TestParse_WithAnonymousJob(t *testing.T) {
 	]
 }
 `
-	_, err := Parse(jsonStr)
+	_, err := Parse(strings.NewReader(jsonStr))
 	if err == nil {
 		t.Fatalf("No error occured.")
 	}
