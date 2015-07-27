@@ -167,6 +167,17 @@ if %errorlevel% neq 0 (
 popd
 popd
 
+pushd realtime
+pushd network
+echo realtime/network package tested...
+go test -coverprofile cover.out>> %LOGFILE%
+if %errorlevel% neq 0 (
+  echo NG.
+  set RETCODE=1
+)
+popd
+popd
+
 if "%1" neq "" type %LOGFILE%
 if "%1" equ "" pause
 
