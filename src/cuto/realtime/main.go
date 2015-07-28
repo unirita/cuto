@@ -82,7 +82,7 @@ func realMain() int {
 
 	id, err := cmd.Run()
 	if err != nil {
-		network.MasterErrorResult(err.Error(), cmd.GetPID())
+		fmt.Println(network.MasterErrorResult(err.Error(), cmd.GetPID()))
 		return 1
 	}
 
