@@ -264,14 +264,14 @@ func (j *Job) UnmarshalJSON(data []byte) error {
 	return nil
 }
 
-func (j *Job) importJobex() error {
+func (j *Job) importJobex() {
 	for _, record := range jobex {
 		if record[nameIdx] == j.Name {
 			var err error
 			j.Node = record[nodeIdx]
 			j.Port, err = strconv.Atoi(record[portIdx])
 			if err != nil {
-				return err
+				j.Port = 0
 			}
 			j.Path = record[pathIdx]
 			j.Param = record[paramIdx]
@@ -279,24 +279,23 @@ func (j *Job) importJobex() error {
 			j.Work = record[workIdx]
 			j.WRC, err = strconv.Atoi(record[wrcIdx])
 			if err != nil {
-				return err
+				j.WRC = 0
 			}
 			j.WPtn = record[wptnIdx]
 			j.ERC, err = strconv.Atoi(record[ercIdx])
 			if err != nil {
-				return err
+				j.ERC = 0
 			}
 			j.EPtn = record[eptnIdx]
 			j.Timeout, err = strconv.Atoi(record[timeoutIdx])
 			if err != nil {
-				return err
+				j.Timeout = 0
 			}
 			j.SNode = record[snodeIdx]
 			j.SPort, err = strconv.Atoi(record[sportIdx])
 			if err != nil {
-				return err
+				j.SPort = 0
 			}
 		}
 	}
-	return nil
 }
