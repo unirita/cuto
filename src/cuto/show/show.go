@@ -15,6 +15,7 @@ import (
 
 // 表示に使用する構造体。
 type ShowParam struct {
+	nid        int            // インスタンスID
 	jobnetName string         // ジョブネットワーク名
 	from       string         // FROM日付
 	to         string         // TO日付
@@ -30,8 +31,9 @@ type oneJobnetwork struct {
 }
 
 // ShowParam構造体のコンストラクタ。
-func NewShowParam(jobnetName string, from string, to string, status int, gen *gen.Generator) *ShowParam {
+func NewShowParam(nid int, jobnetName string, from string, to string, status int, gen *gen.Generator) *ShowParam {
 	return &ShowParam{
+		nid:        nid,
 		jobnetName: jobnetName,
 		from:       from,
 		to:         to,
@@ -79,6 +81,9 @@ func (s *ShowParam) Run(db_name string) (int, error) {
 // ジョブネットワーク一覧の取得
 func (s *ShowParam) getJobnetworkList() ([]*db.JobNetworkResult, error) {
 	jnQ := query.CreateJobnetworkQuery(s.conn)
+	if s.nid > 0 {
+		jnQ.AddAndWhereID(s.nid)
+	}
 	if len(s.jobnetName) > 0 {
 		jnQ.AddAndWhereJobnetwork(s.jobnetName)
 	}

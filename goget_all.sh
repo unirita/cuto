@@ -24,5 +24,11 @@ if [ "$?" -ne "0" ] ; then
   exit 1
 fi
 
+go get github.com/mattn/go-scan
+if [ "$?" -ne "0" ] ; then
+  echo "go get error."
+  exit 1
+fi
+
 exit 0
 
