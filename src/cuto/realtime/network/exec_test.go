@@ -57,8 +57,8 @@ func TestWaitID_ProcessEnd(t *testing.T) {
 	case id := <-idCh:
 		t.Errorf("Unexpected id received: %s", id)
 	case errMsg := <-errCh:
-		if errMsg != "testline3" {
-			t.Errorf("errMsg => %s, want %s", errMsg, "testline3")
+		if errMsg != "testline1\ntestline2\ntestline3\n" {
+			t.Errorf("errMsg => %s, want %s", errMsg, "testline1\ntestline2\ntestline3\n")
 		}
 	case <-timer.C:
 		t.Errorf("Test timeout.")

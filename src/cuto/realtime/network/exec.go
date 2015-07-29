@@ -104,18 +104,19 @@ func (c *Command) waitProcess(waitCh chan<- struct{}) {
 
 func (c *Command) waitID(idCh, errCh chan<- string, lineCh <-chan string, waitCh <-chan struct{}) {
 	matcher := regexp.MustCompile(`INSTANCE \[\d+`)
-	var lastLine string
+	output := ""
 	for {
 		select {
-		case lastLine = <-lineCh:
-			id := matcher.FindString(lastLine)
+		case line := <-lineCh:
+			id := matcher.FindString(line)
 			if id != "" {
 				id = strings.Replace(id, "INSTANCE [", "", 1)
 				idCh <- id
 				return
 			}
+			output += line + "\n"
 		case <-waitCh:
-			errCh <- lastLine
+			errCh <- output
 			return
 		}
 	}
