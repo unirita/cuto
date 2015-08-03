@@ -5,11 +5,10 @@ package tx
 
 import (
 	"fmt"
-	"time"
 
 	"cuto/db"
 	"cuto/log"
-	"cuto/util"
+	"cuto/utctime"
 )
 
 // ジョブIDをキーに持つ
@@ -32,7 +31,7 @@ type ResultMap struct {
 //
 // return : error
 func StartJobNetwork(jobnetName string, dbname string) (*ResultMap, error) {
-	jn := db.NewJobNetworkResult(jobnetName, util.DateFormat(time.Now()), db.RUNNING)
+	jn := db.NewJobNetworkResult(jobnetName, utctime.Now().String(), db.RUNNING)
 
 	conn, err := db.Open(dbname)
 	if err != nil {
@@ -62,7 +61,7 @@ func (r *ResultMap) EndJobNetwork(status int, detail string) error {
 	if r.JobnetResult == nil {
 		return fmt.Errorf("Invalid Jobnetwork info.")
 	}
-	r.JobnetResult.EndDate = util.DateFormat(time.Now())
+	r.JobnetResult.EndDate = utctime.Now().String()
 	r.JobnetResult.Status = status
 	r.JobnetResult.Detail = detail
 
@@ -96,7 +95,7 @@ func (r *ResultMap) insertJobNetwork() error {
 		}
 	}()
 
-	now := util.DateFormat(time.Now())
+	now := utctime.Now().String()
 	r.JobnetResult.CreateDate = now
 	r.JobnetResult.UpdateDate = now
 
@@ -124,7 +123,7 @@ func (r *ResultMap) updateJobNetwork() error {
 			tx.Rollback()
 		}
 	}()
-	r.JobnetResult.UpdateDate = util.DateFormat(time.Now())
+	r.JobnetResult.UpdateDate = utctime.Now().String()
 
 	if _, err = tx.Update(r.JobnetResult); err != nil {
 		return err

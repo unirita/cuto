@@ -13,8 +13,10 @@ type UTCTime struct {
 }
 
 // Now creates UTCTime object with current UTC time.
-func Now() UTCTime {
-	return UTCTime{tm: time.Now().UTC()}
+func Now() *UTCTime {
+	u := new(UTCTime)
+	u.tm = time.Now().UTC()
+	return u
 }
 
 // Parse parses value as UTC.

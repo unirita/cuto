@@ -6,10 +6,9 @@ package tx
 import (
 	"sync"
 	"testing"
-	"time"
 
 	"cuto/db"
-	"cuto/util"
+	"cuto/utctime"
 )
 
 var mutex sync.Mutex
@@ -26,7 +25,7 @@ func TestInsertJob_ジョブの新規登録処理(t *testing.T) {
 			ID:        121,
 			JobId:     "JOB001",
 			JobName:   "abcjob.bat",
-			StartDate: util.DateFormat(time.Now()),
+			StartDate: utctime.Now().String(),
 			Status:    db.RUNNING,
 			Node:      "TestNode01",
 			Port:      9999,
@@ -48,7 +47,7 @@ func TestInsertJob_ジョブの新規登録失敗(t *testing.T) {
 			ID:        131,
 			JobId:     "JOB001",
 			JobName:   "abcjob.bat",
-			StartDate: util.DateFormat(time.Now()),
+			StartDate: utctime.Now().String(),
 			Status:    db.RUNNING,
 			Node:      "TestNode01",
 			Port:      9999,
@@ -69,7 +68,7 @@ func TestUpdateJob_ジョブの更新処理(t *testing.T) {
 		ID:        122,
 		JobId:     "JOB002",
 		JobName:   "XYZ.vbs",
-		StartDate: util.DateFormat(time.Now()),
+		StartDate: utctime.Now().String(),
 		Status:    db.RUNNING,
 		Node:      "TestNode02",
 		Port:      9999,
@@ -80,7 +79,7 @@ func TestUpdateJob_ジョブの更新処理(t *testing.T) {
 	}
 	jobres.Status = db.ABNORMAL
 	jobres.Variable = "VAR"
-	jobres.EndDate = util.DateFormat(time.Now())
+	jobres.EndDate = utctime.Now().String()
 	jobres.Detail = "Attention!!"
 	jobres.Rc = 4
 
@@ -101,7 +100,7 @@ func TestUpdateJob_ジョブの登録前に更新(t *testing.T) {
 		ID:        132,
 		JobId:     "JOB002",
 		JobName:   "XYZ.vbs",
-		StartDate: util.DateFormat(time.Now()),
+		StartDate: utctime.Now().String(),
 		Status:    db.RUNNING,
 		Node:      "TestNode02",
 		Port:      9999,
@@ -123,7 +122,7 @@ func TestUpdateJob_ジョブの更新失敗(t *testing.T) {
 		ID:        122,
 		JobId:     "JOB002",
 		JobName:   "XYZ.vbs",
-		StartDate: util.DateFormat(time.Now()),
+		StartDate: utctime.Now().String(),
 		Status:    db.RUNNING,
 		Node:      "TestNode02",
 		Port:      9999,

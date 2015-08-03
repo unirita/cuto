@@ -5,10 +5,9 @@ package tx
 
 import (
 	"sync"
-	"time"
 
 	"cuto/db"
-	"cuto/util"
+	"cuto/utctime"
 )
 
 // JOBテーブルへINSERTする。
@@ -32,7 +31,7 @@ func InsertJob(conn db.IConnection, job *db.JobResult, mutex *sync.Mutex) error 
 		}
 	}()
 
-	now := util.DateFormat(time.Now())
+	now := utctime.Now().String()
 	job.CreateDate = now
 	job.UpdateDate = now
 
@@ -67,7 +66,7 @@ func UpdateJob(conn db.IConnection, job *db.JobResult, mutex *sync.Mutex) error 
 		}
 	}()
 
-	job.UpdateDate = util.DateFormat(time.Now())
+	job.UpdateDate = utctime.Now().String()
 
 	if _, err = tx.Update(job); err != nil {
 		return err
