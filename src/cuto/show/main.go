@@ -30,6 +30,7 @@ type arguments struct {
 	status string // ジョブネットワークのステータス
 	format string // 表示フォーマット
 	config string // 設定ファイルのパス
+	isUTC  bool   // 時刻を標準時として扱うかどうか
 }
 
 // 戻り値
@@ -142,6 +143,7 @@ func fetchArgs() *arguments {
 	flag.StringVar(&args.status, "status", "", "Jobnetwork status.")
 	flag.StringVar(&args.format, "format", "", "Output format.")
 	flag.StringVar(&args.config, "c", "", "Input config-file.")
+	flag.BoolVar(&args.isUTC, "utc", false, "UTC option.")
 	flag.Parse()
 	return args
 }
