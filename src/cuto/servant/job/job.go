@@ -20,7 +20,7 @@ import (
 	"cuto/log"
 	"cuto/message"
 	"cuto/servant/config"
-	"cuto/util"
+	"cuto/utctime"
 )
 
 // 実行ジョブ情報
@@ -168,15 +168,15 @@ func (j *jobInstance) run(cmd *exec.Cmd, stCh chan<- string) error {
 	if err := cmd.Start(); err != nil {
 		return err
 	}
-	startTime := time.Now()
-	j.st = util.DateFormat(startTime) // ジョブ開始日時の取得
-	j.joblogTimestamp = util.DateJoblogFormat(startTime)
+	startTime := utctime.Now()
+	j.st = startTime.String() // ジョブ開始日時の取得
+	j.joblogTimestamp = startTime.FormatLocaltime(utctime.NoDelimiter)
 	stCh <- j.st
 
 	console.Display("CTS010I", j.path, j.nID, j.jID, cmd.Process.Pid)
 
 	err := j.waitCmdTimeout(cmd)
-	j.et = util.DateFormat(time.Now()) // ジョブ終了日時の取得
+	j.et = utctime.Now().String() // ジョブ終了日時の取得
 
 	if err != nil {
 		if e2, ok := err.(*exec.ExitError); ok {
