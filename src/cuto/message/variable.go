@@ -9,6 +9,8 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"cuto/utctime"
 )
 
 const (
@@ -17,6 +19,7 @@ const (
 	kndSys     = 'S'
 	kndEnv     = 'E'
 	kndJob     = 'J'
+	kndTime    = 'T'
 )
 
 const minKeyLength = len(`$MEx$`)
@@ -111,7 +114,7 @@ func NewVariable(key string) *variable {
 		return nil
 	}
 
-	if v.Kind != kndSys && v.Kind != kndEnv && v.Kind != kndJob {
+	if v.Kind != kndSys && v.Kind != kndEnv && v.Kind != kndJob && v.Kind != kndTime {
 		return nil
 	}
 
@@ -144,6 +147,8 @@ func (v *variable) Expand() (string, error) {
 		return v.expandEnv()
 	case kndJob:
 		return v.expandJob()
+	case kndTime:
+		return v.expandTime()
 	}
 
 	return ``, fmt.Errorf("Undefined variable[%s].", v)
@@ -178,12 +183,33 @@ func (v *variable) expandJob() (string, error) {
 	case `RC`:
 		return j.RC, nil
 	case `SD`:
-		return j.SD, nil
+		t, err := utctime.Parse(utctime.Default, j.SD)
+		if err != nil {
+			return ``, fmt.Errorf("Cannot parse time string[%s].", j.SD)
+		}
+		return t.Format("$ST" + utctime.NoDelimiter + "$"), nil
 	case `ED`:
-		return j.ED, nil
+		t, err := utctime.Parse(utctime.Default, j.ED)
+		if err != nil {
+			return ``, fmt.Errorf("Cannot parse time string[%s].", j.ED)
+		}
+		return t.Format("$ST" + utctime.NoDelimiter + "$"), nil
 	case `OUT`:
 		return j.OUT, nil
 	}
 
 	return ``, fmt.Errorf("Undefined variable[%s].", v)
+}
+
+func (v *variable) expandTime() (string, error) {
+	if v.Place == plcMaster {
+		return ``, fmt.Errorf("Cannot use time variable in master.")
+	}
+
+	t, err := utctime.Parse(utctime.NoDelimiter, v.Name)
+	if err != nil {
+		return ``, fmt.Errorf("Cannot parse time variable[%s]. Reason[%s]", v.Name, err)
+	}
+
+	return t.FormatLocaltime(utctime.Default), nil
 }

@@ -3,7 +3,17 @@ package message
 import (
 	"os"
 	"testing"
+	"time"
 )
+
+func TestMain(m *testing.M) {
+	var err error
+	time.Local, err = time.LoadLocation("Asia/Tokyo")
+	if err != nil {
+		panic(err)
+	}
+	os.Exit(m.Run())
+}
 
 func TestNewVariable_変数オブジェクトを生成できる(t *testing.T) {
 	v := NewVariable(`$METEST$`)
@@ -146,7 +156,7 @@ func TestExpand_ジョブネットワーク変数の値を取得できる(t *tes
 	if err != nil {
 		t.Fatalf("想定外のエラーが発生[%s]", err)
 	}
-	if val != "2015-01-01 12:34:56.789" {
+	if val != "$ST20150101123456.789$" {
 		t.Errorf("取得したSDの値[%s]が想定と違っている。", val)
 	}
 
@@ -155,8 +165,8 @@ func TestExpand_ジョブネットワーク変数の値を取得できる(t *tes
 	if err != nil {
 		t.Fatalf("想定外のエラーが発生[%s]", err)
 	}
-	if val != "2015-01-01 13:00:00.000" {
-		t.Errorf("取得したSDの値[%s]が想定と違っている。", val)
+	if val != "$ST20150101130000.000$" {
+		t.Errorf("取得したEDの値[%s]が想定と違っている。", val)
 	}
 
 	v = NewVariable("$MJtest:OUT$")
@@ -258,5 +268,18 @@ func TestExpandStringVars_場所識別子が異なる変数を無視する(t *te
 		t.Errorf("変数展開後の文字列が想定と一致しない。")
 		t.Logf("想定値：%s", expect)
 		t.Logf("実績値：%s", after)
+	}
+}
+
+func TestExpandTime(t *testing.T) {
+	v := NewVariable("$ST20150730123456.789$")
+	result, err := v.expandTime()
+	if err != nil {
+		t.Fatalf("想定外のエラーが発生した[%s]", err)
+	}
+	if result != "2015-07-30 21:34:56.789" {
+		t.Errorf("変数展開後の文字列が想定と一致しない。")
+		t.Logf("想定値：%s", "2015-07-30 21:34:56.789")
+		t.Logf("実績値：%s", result)
 	}
 }

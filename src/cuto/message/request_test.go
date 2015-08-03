@@ -267,6 +267,48 @@ func TestExpandServantVars_メッセージ内の変数を展開出来る(t *test
 	}
 }
 
+func TestExpandServantVars_メッセージ内の時刻変数を展開出来る(t *testing.T) {
+	AddSysValue("ROOT", "", `C:\cute`)
+	os.Setenv("TEST", "testenv")
+	res := new(Response)
+	res.RC = 1
+	AddJobValue("test", res)
+
+	req := new(Request)
+	req.Path = `$ST20150730123456.789$`
+	req.Param = `$ST20150730123456.789$`
+	req.Env = `$ST20150730123456.789$`
+	req.Workspace = `$ST20150730123456.789$`
+
+	err := req.ExpandServantVars()
+	if err != nil {
+		t.Fatalf("想定外のエラーが発生した[%s]", err)
+	}
+
+	expected := `$ST20150730123456.789$`
+	if req.Path != expected {
+		t.Errorf("変数展開後のPathの値が想定と違っている。")
+		t.Logf("想定値：%s", expected)
+		t.Logf("実績値：%s", req.Path)
+	}
+	if req.Workspace != expected {
+		t.Errorf("変数展開後のWorkspaceの値が想定と違っている。")
+		t.Logf("想定値：%s", expected)
+		t.Logf("実績値：%s", req.Workspace)
+	}
+	expected = `2015-07-30 21:34:56.789`
+	if req.Param != expected {
+		t.Errorf("変数展開後のParamの値が想定と違っている。")
+		t.Logf("想定値：%s", expected)
+		t.Logf("実績値：%s", req.Param)
+	}
+	if req.Env != expected {
+		t.Errorf("変数展開後のEnvの値が想定と違っている。")
+		t.Logf("想定値：%s", expected)
+		t.Logf("実績値：%s", req.Env)
+	}
+}
+
 func TestExpandServantVars_エラー発生時は元の値を維持する(t *testing.T) {
 	AddSysValue("ROOT", "", `C:\cute`)
 	os.Setenv("TEST", "testenv")
