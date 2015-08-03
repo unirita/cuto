@@ -45,7 +45,12 @@ func (u *UTCTime) String() string {
 	return u.Format(Default)
 }
 
-// Format returns a textual representation of the time value formatted according to layout.
+// Format returns a textual representation of the utc time value formatted according to layout.
 func (u *UTCTime) Format(layout string) string {
 	return u.tm.Format(layout)
+}
+
+// FormatLocaltime returns a textual representation of the local time value formatted according to layout.
+func (u *UTCTime) FormatLocaltime(layout string) string {
+	return u.tm.Local().Format(layout)
 }

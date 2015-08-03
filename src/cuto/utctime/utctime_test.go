@@ -46,7 +46,7 @@ func TestParseLocaltime(t *testing.T) {
 func TestTimeString(t *testing.T) {
 	u := UTCTime{}
 	var err error
-	u.tm, err = time.Parse("20060102150405", "20150730154407")
+	u.tm, err = time.ParseInLocation(Default, "2015-07-30 15:44:07.000", time.UTC)
 	if err != nil {
 		t.Fatalf("Error occured: %s", err)
 	}
@@ -58,11 +58,23 @@ func TestTimeString(t *testing.T) {
 func TestTimeFormat(t *testing.T) {
 	u := UTCTime{}
 	var err error
-	u.tm, err = time.Parse(Default, "2015-07-30 15:44:07.000")
+	u.tm, err = time.ParseInLocation(Default, "2015-07-30 15:44:07.000", time.UTC)
 	if err != nil {
 		t.Fatalf("Error occured: %s", err)
 	}
 	if u.Format("20060102150405") != "20150730154407" {
 		t.Errorf("u.Format() => %s, want %s", u.Format("20060102150405"), "20150730154407")
+	}
+}
+
+func TestTimeFormatInLocal(t *testing.T) {
+	u := UTCTime{}
+	var err error
+	u.tm, err = time.ParseInLocation(Default, "2015-07-30 15:44:07.000", time.UTC)
+	if err != nil {
+		t.Fatalf("Error occured: %s", err)
+	}
+	if u.FormatLocaltime("20060102150405") != "20150731004407" {
+		t.Errorf("u.FormatLocaltime() => %s, want %s", u.FormatLocaltime("20060102150405"), "20150730154407")
 	}
 }
