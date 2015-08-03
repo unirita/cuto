@@ -4,16 +4,14 @@
 package db
 
 import (
-	"time"
-
-	"cuto/util"
-
 	"testing"
+
+	"cuto/utctime"
 )
 
 func TestNewJobNetworkResult_初期化できる(t *testing.T) {
 	name := "ABC"
-	start := util.DateFormat(time.Now())
+	start := utctime.Now().String()
 	status := NORMAL
 
 	net := NewJobNetworkResult(name, start, status)
