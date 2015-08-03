@@ -178,6 +178,15 @@ if %errorlevel% neq 0 (
 popd
 popd
 
+pushd utctime
+echo utctime package tested...
+go test -coverprofile cover.out>> %LOGFILE%
+if %errorlevel% neq 0 (
+  echo NG.
+  set RETCODE=1
+)
+popd
+
 if "%1" neq "" type %LOGFILE%
 if "%1" equ "" pause
 
