@@ -16,6 +16,7 @@ import (
 	"cuto/db"
 	"cuto/master/config"
 	"cuto/show/gen"
+	"cuto/utctime"
 	"cuto/util"
 )
 
@@ -182,4 +183,30 @@ func getStatusType(status string) (int, error) {
 		return db.WARN, nil
 	}
 	return 0, fmt.Errorf("Unknown status type [%v].", status)
+}
+
+func parseFromTo(fromArg, toArg string, isUTC bool) (string, string, error) {
+	parseMethod := utctime.Parse
+	if !isUTC {
+		parseMethod = utctime.ParseLocaltime
+	}
+	var from, to string
+
+	if len(fromArg) != 0 {
+		f, err := parseMethod(utctime.Date8Num, fromArg)
+		if err != nil {
+			return "", "", fmt.Errorf("Invalid [from] format. [%s]", fromArg)
+		}
+		from = f.String()
+	}
+
+	if len(toArg) != 0 {
+		t, err := parseMethod(utctime.Date8Num, toArg)
+		if err != nil {
+			return "", "", fmt.Errorf("Invalid [to] format. [%s]", toArg)
+		}
+		to = t.String()
+	}
+
+	return from, to, nil
 }
