@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"os"
 	"runtime"
-	"time"
 
 	"path/filepath"
 
@@ -17,7 +16,6 @@ import (
 	"cuto/master/config"
 	"cuto/show/gen"
 	"cuto/utctime"
-	"cuto/util"
 )
 
 // 実行時引数のオプション
@@ -85,28 +83,21 @@ func realMain(args *arguments) int {
 		console.DisplayError("CTU006E", args.config)
 		return rc_PARMERR
 	}
-	var from, to string
-	if len(args.from) > 0 { // fromが指定されている
-		from = util.CreateFromDate(args.from)
-		if len(from) == 0 {
-			console.DisplayError("CTU003E", fmt.Sprintf("Invalid [from] format.[%v]", args.from))
-			showUsage()
-			return rc_PARMERR
+	if len(args.from) == 0 && len(args.to) == 0 { // From-to指定無しの場合は、現在のCPU日付のみを対象とする
+		now := utctime.Now()
+		if args.isUTC {
+			args.from = now.Format(utctime.Date8Num)
+			args.to = args.from
+		} else {
+			args.from = now.FormatLocaltime(utctime.Date8Num)
+			args.to = args.from
 		}
 	}
-	if len(args.to) > 0 { // toが指定されている
-		to = util.CreateToDate(args.to)
-		if len(to) == 0 {
-			console.DisplayError("CTU003E", fmt.Sprintf("Invalid [to] format.[%v]", args.to))
-			showUsage()
-			return rc_PARMERR
-		}
-	}
-	if len(from) == 0 && len(to) == 0 { // From-to指定無しの場合は、現在のCPU日付のみを対象とする
-		now := time.Now()
-		today := fmt.Sprintf("%04d%02d%02d", now.Year(), now.Month(), now.Day())
-		from = util.CreateFromDate(today)
-		to = util.CreateToDate(today)
+	from, to, err := parseFromTo(args.from, args.to, args.isUTC)
+	if err != nil {
+		console.DisplayError("CTU003E", err)
+		showUsage()
+		return rc_PARMERR
 	}
 	status, err := getStatusType(args.status) // status取得
 	if err != nil {
@@ -191,7 +182,6 @@ func parseFromTo(fromArg, toArg string, isUTC bool) (string, string, error) {
 		parseMethod = utctime.ParseLocaltime
 	}
 	var from, to string
-
 	if len(fromArg) != 0 {
 		f, err := parseMethod(utctime.Date8Num, fromArg)
 		if err != nil {
@@ -199,12 +189,12 @@ func parseFromTo(fromArg, toArg string, isUTC bool) (string, string, error) {
 		}
 		from = f.String()
 	}
-
 	if len(toArg) != 0 {
-		t, err := parseMethod(utctime.Date8Num, toArg)
+		t, err := parseMethod(utctime.NoDelimiter, toArg+"235959.999")
 		if err != nil {
 			return "", "", fmt.Errorf("Invalid [to] format. [%s]", toArg)
 		}
+
 		to = t.String()
 	}
 

@@ -83,6 +83,7 @@ func TestRealMain_1日分のジョブネットを表示(t *testing.T) {
 		status: "",
 		format: "",
 		config: confFile,
+		isUTC:  true,
 	}
 	ce := testutil.NewStderrCapturer()
 	ce.Start()
@@ -510,9 +511,9 @@ func TestParseFromTo_UTCの場合(t *testing.T) {
 		t.Logf("想定値: %s", "2015-07-25 00:00:00.000")
 		t.Logf("実績値: %s", from)
 	}
-	if to != "2015-08-01 00:00:00.000" {
+	if to != "2015-08-01 23:59:59.999" {
 		t.Errorf("toの値が想定と違っている。")
-		t.Logf("想定値: %s", "2015-08-01 00:00:00.000")
+		t.Logf("想定値: %s", "2015-08-01 23:59:59.999")
 		t.Logf("実績値: %s", to)
 	}
 }
@@ -527,9 +528,9 @@ func TestParseFromTo_Localtimeの場合(t *testing.T) {
 		t.Logf("想定値: %s", "2015-07-24 15:00:00.000")
 		t.Logf("実績値: %s", from)
 	}
-	if to != "2015-07-31 15:00:00.000" {
+	if to != "2015-08-01 14:59:59.999" {
 		t.Errorf("toの値が想定と違っている。")
-		t.Logf("想定値: %s", "2015-07-31 15:00:00.000")
+		t.Logf("想定値: %s", "2015-08-01 14:59:59.999")
 		t.Logf("実績値: %s", to)
 	}
 }
