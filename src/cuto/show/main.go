@@ -112,7 +112,7 @@ func realMain(args *arguments) int {
 		return rc_PARMERR
 	}
 	param := NewShowParam(args.nid, args.jobnet, from, to, status, gen)
-	rc, err := param.Run(config.DB.DBFile)
+	rc, err := param.Run(config.DB.DBFile, args.isUTC)
 	if err != nil {
 		console.DisplayError("CTU004E", err)
 		return rc_ERROR

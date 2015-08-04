@@ -86,7 +86,7 @@ func TestSetOutputStructure_出力情報のセッティング(t *testing.T) {
 	}
 	jobnet.jobs = append(jobnet.jobs, &jRes2)
 	// *** ここまで ***
-	output := jobnet.setOutputStructure()
+	output := jobnet.setOutputStructure(true)
 	if output.Id != jnetRes.ID {
 		t.Errorf("[%v]であるべきデータが、[%v]と返りました。", jnetRes.ID, output.Id)
 	}
@@ -183,6 +183,65 @@ func TestSetOutputStructure_出力情報のセッティング(t *testing.T) {
 	}
 	if output.Jobs[1].UpdateDate != jRes2.UpdateDate {
 		t.Errorf("[%v]であるべきデータが、[%v]と返りました。", jRes2.UpdateDate, output.Jobs[1].UpdateDate)
+	}
+
+}
+
+func TestSetOutputStructure_ローカルタイムゾーンでの出力(t *testing.T) {
+	// *** テストデータ作成 ***
+	jobnet := &oneJobnetwork{}
+	jnetRes := &db.JobNetworkResult{
+		ID:         123,
+		JobnetWork: "Jobnet123",
+		StartDate:  "2015-04-27 14:15:24.999",
+		EndDate:    "2015-04-27 15:15:24.999",
+		Status:     1,
+		Detail:     "",
+		CreateDate: "2015-04-27 14:15:24.999",
+		UpdateDate: "2015-04-27 15:15:24.999",
+	}
+	jobnet.jobnet = jnetRes
+	jRes := db.JobResult{
+		ID:         123,
+		JobId:      "Job1",
+		JobName:    "Jobname1",
+		StartDate:  "2015-04-27 14:15:24.999",
+		EndDate:    "2015-04-27 14:25:24.999",
+		Status:     1,
+		Detail:     "d1",
+		Rc:         0,
+		Node:       "localhost",
+		Port:       2015,
+		Variable:   "Var123",
+		CreateDate: "2015-04-27 14:15:24.999",
+		UpdateDate: "2015-04-27 14:25:24.999",
+	}
+	jobnet.jobs = append(jobnet.jobs, &jRes)
+	// *** ここまで ***
+	output := jobnet.setOutputStructure(false)
+	if output.StartDate != "2015-04-27 23:15:24.999" {
+		t.Errorf("[%v]であるべきデータが、[%v]と返りました。", "2015-04-27 23:15:24.999", output.StartDate)
+	}
+	if output.EndDate != "2015-04-28 00:15:24.999" {
+		t.Errorf("[%v]であるべきデータが、[%v]と返りました。", "2015-04-28 00:15:24.999", output.EndDate)
+	}
+	if output.CreateDate != "2015-04-27 23:15:24.999" {
+		t.Errorf("[%v]であるべきデータが、[%v]と返りました。", "2015-04-27 23:15:24.999", output.CreateDate)
+	}
+	if output.UpdateDate != "2015-04-28 00:15:24.999" {
+		t.Errorf("[%v]であるべきデータが、[%v]と返りました。", "2015-04-28 00:15:24.999", output.UpdateDate)
+	}
+	if output.Jobs[0].StartDate != "2015-04-27 23:15:24.999" {
+		t.Errorf("[%v]であるべきデータが、[%v]と返りました。", "2015-04-27 23:15:24.999", output.Jobs[0].StartDate)
+	}
+	if output.Jobs[0].EndDate != "2015-04-27 23:25:24.999" {
+		t.Errorf("[%v]であるべきデータが、[%v]と返りました。", "2015-04-27 23:25:24.999", output.Jobs[0].EndDate)
+	}
+	if output.Jobs[0].CreateDate != "2015-04-27 23:15:24.999" {
+		t.Errorf("[%v]であるべきデータが、[%v]と返りました。", "2015-04-27 23:15:24.999", output.Jobs[0].CreateDate)
+	}
+	if output.Jobs[0].UpdateDate != "2015-04-27 23:25:24.999" {
+		t.Errorf("[%v]であるべきデータが、[%v]と返りました。", "2015-04-27 23:25:24.999", output.Jobs[0].UpdateDate)
 	}
 
 }
