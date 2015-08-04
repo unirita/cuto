@@ -111,7 +111,7 @@ func realMain(args *arguments) int {
 		showUsage()
 		return rc_PARMERR
 	}
-	param := NewShowParam(args.nid, args.jobnet, from, to, status, &gen)
+	param := NewShowParam(args.nid, args.jobnet, from, to, status, gen)
 	rc, err := param.Run(config.DB.DBFile)
 	if err != nil {
 		console.DisplayError("CTU004E", err)
@@ -153,9 +153,9 @@ func showUsage() {
 // 出力形態の取得
 func getSeparatorType(value string) gen.Generator {
 	if len(value) == 0 || value == "json" {
-		return *new(gen.JsonGenerator)
+		return new(gen.JsonGenerator)
 	} else if value == "csv" {
-		return *new(gen.CsvGenerator)
+		return new(gen.CsvGenerator)
 	}
 	return nil
 }

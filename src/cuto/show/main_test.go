@@ -448,21 +448,21 @@ func TestGetStatusType_指定毎に返るステータスを確認(t *testing.T) 
 func TestGetSeparatorType_指定毎に返るジェネレーターを確認(t *testing.T) {
 	g := getSeparatorType("")
 	switch g.(type) {
-	case gen.JsonGenerator:
+	case *gen.JsonGenerator:
 	default:
 		t.Error("JsonGeneratorになるべきところ、異なる型が返った。")
 	}
 
 	g = getSeparatorType("json")
 	switch g.(type) {
-	case gen.JsonGenerator:
+	case *gen.JsonGenerator:
 	default:
 		t.Error("JsonGeneratorになるべきところ、異なる型が返った。")
 	}
 
 	g = getSeparatorType("csv")
 	switch g.(type) {
-	case gen.CsvGenerator:
+	case *gen.CsvGenerator:
 	default:
 		t.Error("CsvGeneratorになるべきところ、異なる型が返った。")
 	}

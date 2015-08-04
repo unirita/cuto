@@ -20,7 +20,7 @@ type ShowParam struct {
 	from       string         // FROM日付
 	to         string         // TO日付
 	status     int            // ステータス
-	gen        *gen.Generator // 出力ジェネレーター
+	gen        gen.Generator  // 出力ジェネレーター
 	conn       db.IConnection // DBコネクション
 }
 
@@ -31,7 +31,7 @@ type oneJobnetwork struct {
 }
 
 // ShowParam構造体のコンストラクタ。
-func NewShowParam(nid int, jobnetName string, from string, to string, status int, gen *gen.Generator) *ShowParam {
+func NewShowParam(nid int, jobnetName string, from string, to string, status int, gen gen.Generator) *ShowParam {
 	return &ShowParam{
 		nid:        nid,
 		jobnetName: jobnetName,
@@ -70,7 +70,7 @@ func (s *ShowParam) Run(db_name string) (int, error) {
 		out.Jobnetworks = append(out.Jobnetworks, oneJobnet.setOutputStructure())
 	}
 	// ジェネレーターで出力メッセージ作成。
-	msg, err := (*s.gen).Generate(&out)
+	msg, err := s.gen.Generate(&out)
 	if err != nil {
 		return 0, err
 	}
