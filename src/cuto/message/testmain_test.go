@@ -7,10 +7,6 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	var err error
-	time.Local, err = time.LoadLocation("Asia/Tokyo")
-	if err != nil {
-		panic(err)
-	}
+	time.Local = time.FixedZone("JST", 9*60*60)
 	os.Exit(m.Run())
 }

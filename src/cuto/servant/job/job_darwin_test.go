@@ -23,14 +23,10 @@ var testJobPath string
 
 // ジョブログなどの掃除
 func init() {
-	var err error
-	time.Local, err = time.LoadLocation("Asia/Tokyo")
-	if err != nil {
-		panic("Location Asia/Tokyo is not found.")
-	}
+	time.Local = time.FixedZone("JST", 9*60*60)
 
 	testJobPath = filepath.Join(os.Getenv("GOPATH"), "test", "cuto", "servant", "job")
-	err = os.Chdir(testJobPath)
+	err := os.Chdir(testJobPath)
 	config.RootPath = testJobPath
 	if err != nil {
 		panic(err.Error())

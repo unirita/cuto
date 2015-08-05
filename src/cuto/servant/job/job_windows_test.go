@@ -21,15 +21,11 @@ var conf *config.ServantConfig
 
 // ジョブログなどの掃除
 func init() {
-	var err error
-	time.Local, err = time.LoadLocation("Asia/Tokyo")
-	if err != nil {
-		panic("Location Asia/Tokyo is not found.")
-	}
+	time.Local = time.FixedZone("JST", 9*60*60)
 
 	s := os.PathSeparator
 	testPath := fmt.Sprintf("%s%c%s%c%s%c%s%c%s", os.Getenv("GOPATH"), s, "test", s, "cuto", s, "servant", s, "job")
-	err = os.Chdir(testPath)
+	err := os.Chdir(testPath)
 	config.RootPath = testPath
 	if err != nil {
 		panic(err.Error())

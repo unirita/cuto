@@ -47,11 +47,7 @@ func setConfigFile() string {
 }
 
 func init() {
-	l, err := time.LoadLocation("Asia/Tokyo")
-	if err != nil {
-		panic("Cannot find timezone Asia/Tokyo.")
-	}
-	time.Local = l
+	time.Local = time.FixedZone("JST", 9*60*60)
 
 	os.Chdir(confPath) // 設定ファイル内を固定するため、作業フォルダを固定する。
 }
