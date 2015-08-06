@@ -40,6 +40,7 @@ Option :
     -status=running    :   Status indicates only something of RUNNING.
     -format=json       :   It outputs by the form of JSON.
     -format=csv        :   It outputs by the form of CSV.
+	-utc               :   Consider timezone as UTC.
     
 When omitting [-from] and [-to], only Jobnetwork begun today is indicated.
 	

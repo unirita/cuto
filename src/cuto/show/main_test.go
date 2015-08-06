@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"strings"
 	"syscall"
+	"time"
 
 	"os/exec"
 
@@ -46,6 +47,8 @@ func setConfigFile() string {
 }
 
 func init() {
+	time.Local = time.FixedZone("JST", 9*60*60)
+
 	os.Chdir(confPath) // 設定ファイル内を固定するため、作業フォルダを固定する。
 }
 
@@ -76,6 +79,7 @@ func TestRealMain_1日分のジョブネットを表示(t *testing.T) {
 		status: "",
 		format: "",
 		config: confFile,
+		isUTC:  true,
 	}
 	ce := testutil.NewStderrCapturer()
 	ce.Start()
@@ -440,21 +444,21 @@ func TestGetStatusType_指定毎に返るステータスを確認(t *testing.T) 
 func TestGetSeparatorType_指定毎に返るジェネレーターを確認(t *testing.T) {
 	g := getSeparatorType("")
 	switch g.(type) {
-	case gen.JsonGenerator:
+	case *gen.JsonGenerator:
 	default:
 		t.Error("JsonGeneratorになるべきところ、異なる型が返った。")
 	}
 
 	g = getSeparatorType("json")
 	switch g.(type) {
-	case gen.JsonGenerator:
+	case *gen.JsonGenerator:
 	default:
 		t.Error("JsonGeneratorになるべきところ、異なる型が返った。")
 	}
 
 	g = getSeparatorType("csv")
 	switch g.(type) {
-	case gen.CsvGenerator:
+	case *gen.CsvGenerator:
 	default:
 		t.Error("CsvGeneratorになるべきところ、異なる型が返った。")
 	}
@@ -491,4 +495,51 @@ func TestShowUsage_Usage表示(t *testing.T) {
 
 func TestFetchArgs_実行時引数のフェッチ(t *testing.T) {
 	fetchArgs()
+}
+
+func TestParseFromTo_UTCの場合(t *testing.T) {
+	from, to, err := parseFromTo("20150725", "20150801", true)
+	if err != nil {
+		t.Fatalf("想定外のエラーが発生した: %s", err)
+	}
+	if from != "2015-07-25 00:00:00.000" {
+		t.Errorf("fromの値が想定と違っている。")
+		t.Logf("想定値: %s", "2015-07-25 00:00:00.000")
+		t.Logf("実績値: %s", from)
+	}
+	if to != "2015-08-01 23:59:59.999" {
+		t.Errorf("toの値が想定と違っている。")
+		t.Logf("想定値: %s", "2015-08-01 23:59:59.999")
+		t.Logf("実績値: %s", to)
+	}
+}
+
+func TestParseFromTo_Localtimeの場合(t *testing.T) {
+	from, to, err := parseFromTo("20150725", "20150801", false)
+	if err != nil {
+		t.Fatalf("想定外のエラーが発生した: %s", err)
+	}
+	if from != "2015-07-24 15:00:00.000" {
+		t.Errorf("fromの値が想定と違っている。")
+		t.Logf("想定値: %s", "2015-07-24 15:00:00.000")
+		t.Logf("実績値: %s", from)
+	}
+	if to != "2015-08-01 14:59:59.999" {
+		t.Errorf("toの値が想定と違っている。")
+		t.Logf("想定値: %s", "2015-08-01 14:59:59.999")
+		t.Logf("実績値: %s", to)
+	}
+}
+
+func TestParseFromTo_指定なしの場合(t *testing.T) {
+	from, to, err := parseFromTo("", "", true)
+	if err != nil {
+		t.Fatalf("想定外のエラーが発生した: %s", err)
+	}
+	if from != "" {
+		t.Errorf("想定外のfrom[%s]が返却された。", from)
+	}
+	if to != "" {
+		t.Errorf("想定外のto[%s]が返却された。", to)
+	}
 }

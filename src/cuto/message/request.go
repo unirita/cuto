@@ -96,11 +96,11 @@ func (r *Request) ExpandServantVars() error {
 	if err != nil {
 		return err
 	}
-	newParam, err := ExpandStringVars(r.Param, plcServant, kndSys, kndEnv)
+	newParam, err := ExpandStringVars(r.Param, plcServant, kndSys, kndEnv, kndTime)
 	if err != nil {
 		return err
 	}
-	newEnv, err := ExpandStringVars(r.Env, plcServant, kndSys, kndEnv)
+	newEnv, err := ExpandStringVars(r.Env, plcServant, kndSys, kndEnv, kndTime)
 	if err != nil {
 		return err
 	}

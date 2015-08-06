@@ -11,6 +11,7 @@ import (
 	"cuto/db"
 	"cuto/db/query"
 	"cuto/show/gen"
+	"cuto/utctime"
 )
 
 // 表示に使用する構造体。
@@ -20,7 +21,7 @@ type ShowParam struct {
 	from       string         // FROM日付
 	to         string         // TO日付
 	status     int            // ステータス
-	gen        *gen.Generator // 出力ジェネレーター
+	gen        gen.Generator  // 出力ジェネレーター
 	conn       db.IConnection // DBコネクション
 }
 
@@ -31,7 +32,7 @@ type oneJobnetwork struct {
 }
 
 // ShowParam構造体のコンストラクタ。
-func NewShowParam(nid int, jobnetName string, from string, to string, status int, gen *gen.Generator) *ShowParam {
+func NewShowParam(nid int, jobnetName string, from string, to string, status int, gen gen.Generator) *ShowParam {
 	return &ShowParam{
 		nid:        nid,
 		jobnetName: jobnetName,
@@ -44,7 +45,7 @@ func NewShowParam(nid int, jobnetName string, from string, to string, status int
 
 // ユーティリティ実行のメインルーチン
 // 成功した場合は、出力したジョブネットワークの件数を返します。
-func (s *ShowParam) Run(db_name string) (int, error) {
+func (s *ShowParam) Run(db_name string, isOutputUTC bool) (int, error) {
 	conn, err := db.Open(db_name)
 	if err != nil {
 		return 0, err
@@ -67,10 +68,10 @@ func (s *ShowParam) Run(db_name string) (int, error) {
 		if err != nil { // ジョブネットワーク内のジョブ取得に失敗したが、ジョブネットワークだけでも出力する。
 			console.DisplayError("CTU005W", oneJobnet.jobnet.ID, err)
 		}
-		out.Jobnetworks = append(out.Jobnetworks, oneJobnet.setOutputStructure())
+		out.Jobnetworks = append(out.Jobnetworks, oneJobnet.setOutputStructure(isOutputUTC))
 	}
 	// ジェネレーターで出力メッセージ作成。
-	msg, err := (*s.gen).Generate(&out)
+	msg, err := s.gen.Generate(&out)
 	if err != nil {
 		return 0, err
 	}
@@ -115,33 +116,44 @@ func (o *oneJobnetwork) getJobList(conn db.IConnection) error {
 }
 
 // 出力ジェネレータ構造体への格納
-func (o *oneJobnetwork) setOutputStructure() *gen.OutputJobNet {
+func (o *oneJobnetwork) setOutputStructure(isOutputUTC bool) *gen.OutputJobNet {
 	jobNet := &gen.OutputJobNet{
 		Id:         o.jobnet.ID,
 		Jobnetwork: o.jobnet.JobnetWork,
-		StartDate:  o.jobnet.StartDate,
-		EndDate:    o.jobnet.EndDate,
+		StartDate:  correctTimezone(o.jobnet.StartDate, isOutputUTC),
+		EndDate:    correctTimezone(o.jobnet.EndDate, isOutputUTC),
 		Status:     o.jobnet.Status,
 		Detail:     o.jobnet.Detail,
-		CreateDate: o.jobnet.CreateDate,
-		UpdateDate: o.jobnet.UpdateDate,
+		CreateDate: correctTimezone(o.jobnet.CreateDate, isOutputUTC),
+		UpdateDate: correctTimezone(o.jobnet.UpdateDate, isOutputUTC),
 	}
 	for _, job := range o.jobs {
 		j := &gen.OutputJob{
 			JobId:      job.JobId,
 			Jobname:    job.JobName,
-			StartDate:  job.StartDate,
-			EndDate:    job.EndDate,
+			StartDate:  correctTimezone(job.StartDate, isOutputUTC),
+			EndDate:    correctTimezone(job.EndDate, isOutputUTC),
 			Status:     job.Status,
 			Detail:     job.Detail,
 			Rc:         job.Rc,
 			Node:       job.Node,
 			Port:       job.Port,
 			Variable:   job.Variable,
-			CreateDate: job.CreateDate,
-			UpdateDate: job.UpdateDate,
+			CreateDate: correctTimezone(job.CreateDate, isOutputUTC),
+			UpdateDate: correctTimezone(job.UpdateDate, isOutputUTC),
 		}
 		jobNet.Jobs = append(jobNet.Jobs, j)
 	}
 	return jobNet
+}
+
+func correctTimezone(utcStr string, isOutputUTC bool) string {
+	if isOutputUTC {
+		return utcStr
+	}
+	t, err := utctime.Parse(utctime.Default, utcStr)
+	if err != nil {
+		return utcStr
+	}
+	return t.FormatLocaltime(utctime.Default)
 }
