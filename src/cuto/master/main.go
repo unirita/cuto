@@ -9,6 +9,8 @@ import (
 	"os"
 
 	"cuto/console"
+	"cuto/db"
+	"cuto/db/query"
 	"cuto/log"
 	"cuto/message"
 
@@ -96,6 +98,15 @@ func realMain(args *arguments) int {
 		console.Display("CTM002I", rc)
 	}()
 
+	if args.rerunInstance != 0 {
+		nwkResult, err := getNetworkResult(args.rerunInstance)
+		if err != nil {
+			console.Display("CTM019E", err)
+			return rc_ERROR
+		}
+		args.networkName = nwkResult.JobnetWork
+	}
+
 	nwk := jobnet.LoadNetwork(args.networkName)
 	if nwk == nil {
 		rc = rc_ERROR
@@ -161,4 +172,14 @@ func showVersion() {
 func showUsage() {
 	console.Display("CTM003E")
 	fmt.Print(console.USAGE)
+}
+
+func getNetworkResult(instanceID int) (*db.JobNetworkResult, error) {
+	conn, err := db.Open(config.DB.DBFile)
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	return query.GetJobnetwork(conn, instanceID)
 }
