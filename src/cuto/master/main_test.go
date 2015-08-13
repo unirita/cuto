@@ -63,7 +63,7 @@ func runTestServant(t *testing.T, waitInitCh chan<- struct{}) {
 }
 
 func TestFetchArgs_コマンドラインオプションを取得できる(t *testing.T) {
-	os.Args = append(os.Args, "-v", "-n", "test", "-s", "-c", "test.ini")
+	os.Args = append(os.Args, "-v", "-n", "test", "-s", "-r", "123", "-c", "test.ini")
 	args := fetchArgs()
 
 	if args.versionFlag != flag_ON {
@@ -74,6 +74,9 @@ func TestFetchArgs_コマンドラインオプションを取得できる(t *tes
 	}
 	if args.startFlag != flag_ON {
 		t.Error("-sオプションの指定を検出できなかった。")
+	}
+	if args.rerunInstance != 123 {
+		t.Error("-rオプションの指定を検出できなかった。")
 	}
 	if args.configPath != "test.ini" {
 		t.Error("-cオプションの値を取得できなかった。")
@@ -99,7 +102,7 @@ func TestRealMain_バージョン出力オプションが指定された場合(t
 	}
 }
 
-func TestRealMain_ネットワーク名が指定されなかった場合(t *testing.T) {
+func TestRealMain_ネットワーク名およびインスタンスIDの両方が指定されなかった場合(t *testing.T) {
 	c := testutil.NewStdoutCapturer()
 
 	args := new(arguments)
@@ -112,6 +115,26 @@ func TestRealMain_ネットワーク名が指定されなかった場合(t *test
 		t.Errorf("想定外のrc[%d]が返された。", rc)
 	}
 	if !strings.Contains(out, "INVALID ARGUMENT.") {
+		t.Error("出力内容が想定と違っている。")
+		t.Logf("出力: %s", out)
+	}
+}
+
+func TestRealMain_ネットワーク名およびインスタンスIDの両方が指定された場合(t *testing.T) {
+	c := testutil.NewStdoutCapturer()
+
+	args := new(arguments)
+	args.networkName = "test"
+	args.rerunInstance = 123
+
+	c.Start()
+	rc := realMain(args)
+	out := c.Stop()
+
+	if rc != rc_ERROR {
+		t.Errorf("想定外のrc[%d]が返された。", rc)
+	}
+	if !strings.Contains(out, "EXCEPTION") {
 		t.Error("出力内容が想定と違っている。")
 		t.Logf("出力: %s", out)
 	}

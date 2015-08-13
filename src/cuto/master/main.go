@@ -18,10 +18,11 @@ import (
 
 // 実行時引数のオプション
 type arguments struct {
-	versionFlag bool   // バージョン情報表示フラグ
-	networkName string // ジョブネットワーク名
-	startFlag   bool   // 実行フラグ
-	configPath  string // 設定ファイルのパス
+	versionFlag   bool   // バージョン情報表示フラグ
+	networkName   string // ジョブネットワーク名
+	startFlag     bool   // 実行フラグ
+	rerunInstance int    // リランを行うインスタンスID
+	configPath    string // 設定ファイルのパス
 }
 
 // masterの戻り値
@@ -51,8 +52,13 @@ func realMain(args *arguments) int {
 		return rc_OK
 	}
 
-	if args.networkName == "" {
+	if args.networkName == "" && args.rerunInstance == 0 {
 		showUsage()
+		return rc_ERROR
+	}
+
+	if args.networkName != "" && args.rerunInstance != 0 {
+		console.Display("CTM019E", "Cannot use both -n and -r option.")
 		return rc_ERROR
 	}
 
@@ -140,6 +146,7 @@ func fetchArgs() *arguments {
 	flag.BoolVar(&args.versionFlag, "v", false, "version option")
 	flag.StringVar(&args.networkName, "n", "", "network name option")
 	flag.BoolVar(&args.startFlag, "s", false, "start option")
+	flag.IntVar(&args.rerunInstance, "r", 0, "start option")
 	flag.StringVar(&args.configPath, "c", "", "config file option")
 	flag.Parse()
 	return args
