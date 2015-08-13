@@ -11,6 +11,7 @@ type JobNetworkResult struct {
 	EndDate    string // 終了日時
 	Status     int    // ジョブネットワークのステータス
 	Detail     string // 詳細メッセージ
+	PID        int    // masterのPID
 	CreateDate string // 作成日時
 	UpdateDate string // 更新日時
 }

@@ -26,7 +26,7 @@ func JobnetworkCountAll(conn db.IConnection) int {
 }
 
 func CreateJobnetworkQuery(conn db.IConnection) *JobNetResultQuery {
-	sql := fmt.Sprintf("select ID,JOBNETWORK,STARTDATE,ENDDATE,STATUS,DETAIL,CREATEDATE,UPDATEDATE from JOBNETWORK where 0=0 ")
+	sql := fmt.Sprintf("select ID,JOBNETWORK,STARTDATE,ENDDATE,STATUS,DETAIL,PID,CREATEDATE,UPDATEDATE from JOBNETWORK where 0=0 ")
 	return &JobNetResultQuery{sql, conn}
 }
 
