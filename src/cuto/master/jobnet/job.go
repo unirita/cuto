@@ -154,6 +154,7 @@ func (j *Job) Execute() (Element, error) {
 
 	resMsg, err := j.sendRequestWithRetry(reqMsg, stCh)
 	if j.isNecessaryToRetry(err) && j.SecondaryNode != "" {
+		j.useSecondaryNode()
 		console.Display("CTM028W", j.Name, j.SecondaryNode)
 		resMsg, err = j.sendSecondaryRequestWithRetry(reqMsg, stCh)
 	}
@@ -255,6 +256,19 @@ func (j *Job) start(req *message.Request) {
 	tx.InsertJob(j.Instance.Result.GetConnection(), jobres, &j.Instance.localMutex)
 
 	console.Display("CTM023I", j.Name, j.Node, j.Instance.ID, j.id)
+}
+
+// 実行ノードをセカンダリノードに変更する。
+func (j *Job) useSecondaryNode() {
+	jobres, exist := j.Instance.Result.Jobresults[j.id]
+	if !exist {
+		log.Error(fmt.Errorf("Job result[id = %s] is unregisted.", j.id))
+		return
+	}
+
+	jobres.Node = j.SecondaryNode
+	jobres.Port = j.SecondaryPort
+	tx.UpdateJob(j.Instance.Result.GetConnection(), jobres, &j.Instance.localMutex)
 }
 
 // ジョブ実行結果にジョブの開始時刻をセットする。
