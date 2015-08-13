@@ -105,6 +105,7 @@ func realMain(args *arguments) int {
 			return rc_ERROR
 		}
 		args.networkName = nwkResult.JobnetWork
+		args.startFlag = flag_ON
 	}
 
 	nwk := jobnet.LoadNetwork(args.networkName)
@@ -135,7 +136,12 @@ func realMain(args *arguments) int {
 		return rc
 	}
 
-	err = nwk.Run()
+	if args.rerunInstance == 0 {
+		err = nwk.Run()
+	} else {
+		// @Todo implement nwk.Rerun()
+		// err = nwk.Rerun()
+	}
 	if err != nil {
 		console.Display("CTM013I", nwk.Name, nwk.ID, "ABNORMAL")
 		// ジョブ自体の異常終了では、エラーメッセージが空で返るので、出力しない
