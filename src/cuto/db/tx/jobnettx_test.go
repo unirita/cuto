@@ -99,6 +99,42 @@ func TestStartJobNetwork_Insertに失敗(t *testing.T) {
 	}
 }
 
+func TestResumeJobNetwork_前回の実行実績を取得できる(t *testing.T) {
+	dbfile := fmt.Sprintf("%v%c%v", db_path, os.PathSeparator, "resume.sqlite")
+	res, err := ResumeJobNetwork(1, dbfile)
+	if err != nil {
+		t.Fatalf("想定外のエラーが発生した: %s", err)
+	}
+
+	if res.JobnetResult.JobnetWork != "JNet1" {
+		t.Errorf("ジョブネット[%s]が見つかるはずが、異なるジョブネット[%s]が返りました。", res.JobnetResult.JobnetWork, "JNet1")
+	}
+	if len(res.Jobresults) != 2 {
+		t.Fatalf("ジョブ実行結果の件数が%d件取得されるはずが、%d件取得された。", 2, len(res.Jobresults))
+	}
+	if _, ok := res.Jobresults["JOB001"]; !ok {
+		t.Errorf("ジョブ[%s]の実行結果が取得されるはずが、されなかった。", "JOB001")
+	}
+	if _, ok := res.Jobresults["JOB002"]; !ok {
+		t.Errorf("ジョブ[%s]の実行結果が取得されるはずが、されなかった。", "JOB002")
+	}
+}
+
+func TestResumeJobNetwork_DBOpenに失敗(t *testing.T) {
+	_, err := ResumeJobNetwork(1, "db_name")
+	if err == nil {
+		t.Error("存在しないDBファイルを指定したのに、エラーが返りませんでした")
+	}
+}
+
+func TestResumeJobNetwork_Selectに失敗(t *testing.T) {
+	dummy_db := fmt.Sprintf("%v%c%v", db_path, os.PathSeparator, "dummy.sqlite")
+	_, err := ResumeJobNetwork(1, dummy_db)
+	if err == nil {
+		t.Error("不正なDBファイルを指定したのに、エラーが返りませんでした")
+	}
+}
+
 func TestEndJobNetwork_ジョブネットワークの開始ステータスに正常を登録(t *testing.T) {
 	// ここからはテスト前データ登録 ///////
 	name := "JNet2"

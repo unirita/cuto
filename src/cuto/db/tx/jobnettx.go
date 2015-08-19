@@ -7,6 +7,7 @@ import (
 	"fmt"
 
 	"cuto/db"
+	"cuto/db/query"
 	"cuto/log"
 	"cuto/utctime"
 )
@@ -42,6 +43,31 @@ func StartJobNetwork(jobnetName string, dbname string) (*ResultMap, error) {
 	if err := resMap.insertJobNetwork(); err != nil {
 		return nil, err
 	}
+	return resMap, nil
+}
+
+// ジョブネットワークの実行結果を復元する。
+func ResumeJobNetwork(nid int, dbname string) (*ResultMap, error) {
+	conn, err := db.Open(dbname)
+	if err != nil {
+		return nil, err
+	}
+	jn, err := query.GetJobnetwork(conn, nid)
+	if err != nil {
+		return nil, err
+	}
+
+	jr, err := query.GetJobMapOfTargetNetwork(conn, nid)
+	if err != nil {
+		return nil, err
+	}
+
+	resMap := &ResultMap{
+		JobnetResult: jn,
+		Jobresults:   jr,
+		conn:         conn,
+	}
+
 	return resMap, nil
 }
 

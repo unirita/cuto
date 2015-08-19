@@ -46,6 +46,24 @@ func GetJobsOfTargetNetwork(conn db.IConnection, nid int, orderby int) ([]*db.Jo
 	return results, nil
 }
 
+//　ジョブネットワークのインスタンスIDを指定して、ジョブ情報をマップ形式で取得する。
+func GetJobMapOfTargetNetwork(conn db.IConnection, nid int) (map[string]*db.JobResult, error) {
+	q := CreateJobQuery(conn)
+	q.AddAndWhereID(nid)
+
+	list, err := conn.GetDbMap().Select(db.JobResult{}, q.sql)
+	if err != nil {
+		return nil, err
+	}
+
+	results := make(map[string]*db.JobResult)
+	for _, l := range list {
+		r := l.(*db.JobResult)
+		results[r.JobId] = r
+	}
+	return results, nil
+}
+
 func CreateJobQuery(conn db.IConnection) *jobQuery {
 	sql := fmt.Sprintf("select ID,JOBID,JOBNAME,STARTDATE,ENDDATE,STATUS,DETAIL,RC,NODE,PORT,VARIABLE,CREATEDATE,UPDATEDATE from JOB where 0=0 ")
 	return &jobQuery{sql, conn}
