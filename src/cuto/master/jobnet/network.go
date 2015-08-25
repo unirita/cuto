@@ -334,6 +334,48 @@ func (n *Network) Run() error {
 	panic("Not reached.")
 }
 
+// ネットワークをリランする。
+//
+// return : エラー情報。
+func (n *Network) Rerun() error {
+	n.setIsRerunJob()
+
+	current := n.Start
+	if current == nil {
+		return fmt.Errorf("Start element of network is nil.")
+	}
+
+	err := n.resume()
+	if err != nil {
+		console.Display("CTM019E", err)
+		return err
+	}
+	console.Display("CTM012I", n.Name, n.ID)
+
+	for {
+		next, err := current.Execute()
+		if err != nil {
+			return n.end(err)
+		}
+		if current == n.End {
+			return n.end(nil)
+		} else if next == nil {
+			err := fmt.Errorf("Element[id = %s] cannot terminate network because it is not a endEvent.", current.ID())
+			return n.end(err)
+		}
+		current = next
+	}
+	panic("Not reached.")
+}
+
+func (n *Network) setIsRerunJob() {
+	for _, e := range n.elements {
+		if j, ok := e.(*Job); ok {
+			j.IsRerunJob = true
+		}
+	}
+}
+
 // ジョブネットワークの開始処理
 func (n *Network) start() error {
 	timeout := config.Job.DefaultTimeoutMin * 60 * 1000
@@ -356,6 +398,33 @@ func (n *Network) start() error {
 	}
 
 	n.ID = n.Result.JobnetResult.ID
+	message.AddSysValue(`JOBNET`, `ID`, strconv.Itoa(n.ID))
+	message.AddSysValue(`JOBNET`, `SD`, n.Result.JobnetResult.StartDate)
+
+	return nil
+}
+
+// ジョブネットワークの再実行開始処理
+func (n *Network) resume() error {
+	timeout := config.Job.DefaultTimeoutMin * 60 * 1000
+	if timeout <= 0 {
+		timeout = 60000
+	}
+
+	err := n.globalLock.Lock(timeout)
+	if err != nil {
+		if err != util.ErrBusy {
+			return err
+		}
+		return fmt.Errorf("Lock Timeout.")
+	}
+	defer n.globalLock.Unlock()
+
+	n.Result, err = tx.ResumeJobNetwork(n.ID, config.DB.DBFile)
+	if err != nil {
+		return err
+	}
+
 	message.AddSysValue(`JOBNET`, `ID`, strconv.Itoa(n.ID))
 	message.AddSysValue(`JOBNET`, `SD`, n.Result.JobnetResult.StartDate)
 

@@ -40,6 +40,7 @@ type Job struct {
 	Next          Element  // 次ノード
 	Instance      *Network // ネットワーク情報構造体のポインタ
 	sendRequest   sendFunc // リクエスト送信メソッド
+	IsRerunJob    bool     // リランジョブであるかどうか
 }
 
 // Job構造体のコンストラクタ関数。
