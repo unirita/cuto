@@ -121,6 +121,21 @@ func (j *Job) SetDefaultEx() {
 //
 // return : エラー情報。
 func (j *Job) Execute() (Element, error) {
+	res, err := j.executeRequest()
+	if err != nil {
+		return nil, j.abnormalEnd(err)
+	}
+	defer j.end(res)
+
+	if isAbnormalEnd(res) {
+		console.Display("CTM026I", j.createJoblogFileName(res), j.Node)
+		return nil, fmt.Errorf("")
+	}
+
+	return j.Next, nil
+}
+
+func (j *Job) executeRequest() (*message.Response, error) {
 	req := new(message.Request)
 	req.NID = j.Instance.ID
 	req.JID = j.ID()
@@ -138,12 +153,12 @@ func (j *Job) Execute() (Element, error) {
 
 	err := req.ExpandMasterVars()
 	if err != nil {
-		return nil, j.abnormalEnd(err)
+		return nil, err
 	}
 
 	reqMsg, err := req.GenerateJSON()
 	if err != nil {
-		return nil, j.abnormalEnd(err)
+		return nil, err
 	}
 
 	stCh := make(chan string, 1)
@@ -162,22 +177,16 @@ func (j *Job) Execute() (Element, error) {
 
 	close(stCh)
 	if err != nil {
-		return nil, j.abnormalEnd(err)
+		return nil, err
 	}
 
 	res := new(message.Response)
 	err = res.ParseJSON(resMsg)
 	if err != nil {
-		return nil, j.abnormalEnd(err)
-	}
-	defer j.end(res)
-
-	if isAbnormalEnd(res) {
-		console.Display("CTM026I", j.createJoblogFileName(res), j.Node)
-		return nil, fmt.Errorf("")
+		return nil, err
 	}
 
-	return j.Next, nil
+	return res, nil
 }
 
 // ジョブ実行リクエストを送信する。
