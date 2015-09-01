@@ -24,41 +24,41 @@ func DoJobResultCheck(chk *message.JobCheck, conf *config.ServantConfig) *messag
 	logPath := filepath.Join(conf.Dir.LogDir, "servant.log")
 	endRecord, err := searchJobEndRecordFromLog(logPath, result.NID, result.JID)
 	if err != nil || len(endRecord) == 0 {
-		return result
+		return createErrorResult(chk.NID, chk.JID)
 	}
 
 	et, err := extractTimestampFromRecord(endRecord)
 	if err != nil {
-		return result
+		return createErrorResult(chk.NID, chk.JID)
 	}
 	result.Et = et.Format(utctime.Default)
 
 	status, err := extractStatusFromRecord(endRecord)
 	if err != nil {
-		return result
+		return createErrorResult(chk.NID, chk.JID)
 	}
 	result.Stat = status
 
 	rc, err := extractRCFromRecord(endRecord)
 	if err != nil {
-		return result
+		return createErrorResult(chk.NID, chk.JID)
 	}
 	result.RC = rc
 
 	joblog, err := searchLatestJoblog(conf.Dir.JoblogDir, chk.NID, chk.JID, et)
 	if err != nil {
-		return result
+		return createErrorResult(chk.NID, chk.JID)
 	}
 
 	st, err := extractTimestampFromJoblog(joblog)
 	if err != nil {
-		return result
+		return createErrorResult(chk.NID, chk.JID)
 	}
 	result.St = st.Format(utctime.Default)
 
 	variable, err := extractVariableFromJoblog(joblog)
 	if err != nil {
-		return result
+		return createErrorResult(chk.NID, chk.JID)
 	}
 	result.Var = variable
 
@@ -122,10 +122,9 @@ func extractRCFromRecord(record string) (int, error) {
 }
 
 func searchLatestJoblog(joblogDir string, nid int, jid string, et utctime.UTCTime) (string, error) {
-	dirNames := make([]string, 3)
-	dirNames[0] = et.AddDays(1).FormatLocaltime(utctime.Date8Num)
-	dirNames[1] = et.FormatLocaltime(utctime.Date8Num)
-	dirNames[2] = et.AddDays(-1).FormatLocaltime(utctime.Date8Num)
+	dirNames := make([]string, 2)
+	dirNames[0] = et.FormatLocaltime(utctime.Date8Num)
+	dirNames[1] = et.AddDays(-1).FormatLocaltime(utctime.Date8Num)
 
 	matchStr := fmt.Sprintf(`^%d\.[^.]+\.%s\.`, nid, jid)
 	matcher := regexp.MustCompile(matchStr)
@@ -171,4 +170,11 @@ func extractVariableFromJoblog(joblog string) (string, error) {
 	}
 
 	return variable, nil
+}
+
+func createErrorResult(nid int, jid string) *message.JobResult {
+	result := new(message.JobResult)
+	result.NID = nid
+	result.JID = jid
+	return result
 }
