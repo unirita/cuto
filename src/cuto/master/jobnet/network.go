@@ -338,8 +338,6 @@ func (n *Network) Run() error {
 //
 // return : エラー情報。
 func (n *Network) Rerun() error {
-	n.setIsRerunJob()
-
 	current := n.Start
 	if current == nil {
 		return fmt.Errorf("Start element of network is nil.")
@@ -351,6 +349,7 @@ func (n *Network) Rerun() error {
 		return err
 	}
 	console.Display("CTM012I", n.Name, n.ID)
+	n.setIsRerunJob()
 
 	for {
 		next, err := current.Execute()
@@ -371,7 +370,9 @@ func (n *Network) Rerun() error {
 func (n *Network) setIsRerunJob() {
 	for _, e := range n.elements {
 		if j, ok := e.(*Job); ok {
-			j.IsRerunJob = true
+			if _, exists := n.Result.Jobresults[j.ID()]; exists {
+				j.IsRerunJob = true
+			}
 		}
 	}
 }

@@ -121,6 +121,9 @@ func (j *Job) SetDefaultEx() {
 //
 // return : エラー情報。
 func (j *Job) Execute() (Element, error) {
+	if j.IsRerunJob {
+		j.requestLatestJobResult()
+	}
 	res, err := j.executeRequest()
 	if err != nil {
 		return nil, j.abnormalEnd(err)
@@ -189,6 +192,30 @@ func (j *Job) executeRequest() (*message.Response, error) {
 	return res, nil
 }
 
+func (j *Job) requestLatestJobResult() (*message.JobResult, error) {
+	chk := new(message.JobCheck)
+	chk.NID = j.Instance.ID
+	chk.JID = j.ID()
+
+	chkMsg, err := chk.GenerateJSON()
+	if err != nil {
+		return nil, err
+	}
+
+	resultMsg, err := j.sendResultCheckRequestWithRetry(chkMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	result := new(message.JobResult)
+	err = result.ParseJSON(resultMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
 // ジョブ実行リクエストを送信する。
 // 送信失敗時には必要な回数だけリトライを行う。
 func (j *Job) sendRequestWithRetry(reqMsg string, stCh chan<- string) (string, error) {
@@ -227,6 +254,27 @@ func (j *Job) sendSecondaryRequestWithRetry(reqMsg string, stCh chan<- string) (
 	}
 
 	return resMsg, err
+}
+
+func (j *Job) sendResultCheckRequestWithRetry(chkMsg string) (string, error) {
+	stCh := make(chan string, 1)
+	defer close(stCh)
+
+	limit := config.Job.AttemptLimit
+	var resultMsg string
+	var err error
+	for i := 0; i < limit; i++ {
+		if i != 0 {
+			console.Display("CTM027W", j.Name, i, limit-1)
+		}
+
+		resultMsg, err = j.sendRequest(j.Node, j.Port, chkMsg, stCh)
+		if err == nil {
+			break
+		}
+	}
+
+	return resultMsg, err
 }
 
 // リトライの必要があるかを判定する。
