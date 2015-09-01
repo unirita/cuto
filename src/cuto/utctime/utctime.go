@@ -41,16 +41,21 @@ func ParseLocaltime(layout, value string) (UTCTime, error) {
 }
 
 // String returns the time formatted using the Default layout.
-func (u *UTCTime) String() string {
+func (u UTCTime) String() string {
 	return u.Format(Default)
 }
 
 // Format returns a textual representation of the utc time value formatted according to layout.
-func (u *UTCTime) Format(layout string) string {
+func (u UTCTime) Format(layout string) string {
 	return u.tm.Format(layout)
 }
 
 // FormatLocaltime returns a textual representation of the local time value formatted according to layout.
-func (u *UTCTime) FormatLocaltime(layout string) string {
+func (u UTCTime) FormatLocaltime(layout string) string {
 	return u.tm.Local().Format(layout)
+}
+
+// AddDays returns UTCTime that has tm after days from u.tm
+func (u UTCTime) AddDays(days int) UTCTime {
+	return UTCTime{tm: u.tm.Add(time.Duration(days) * 24 * time.Hour)}
 }
