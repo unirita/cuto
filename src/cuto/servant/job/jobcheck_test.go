@@ -141,7 +141,7 @@ func TestDoJobResultCheck_RegardOnlyStartJobAsExecuting(t *testing.T) {
 	}
 }
 
-func TestSearchEndRecordFromLog(t *testing.T) {
+func TestSearchEndRecordFromLogEndRecord(t *testing.T) {
 	conf := getJobCheckTestConfig()
 	logPath := filepath.Join(conf.Dir.LogDir, "servant.log")
 	record, err := searchJobEndRecordFromLog(logPath, 1, "job1")
@@ -150,6 +150,24 @@ func TestSearchEndRecordFromLog(t *testing.T) {
 	}
 
 	expected := `2015-08-01 12:34:56.789 [16594] [INF] CTS011I JOB [/home/cuto/testjob] ENDED. INSTANCE [1] ID [job1] STATUS [2] RC [5].`
+	if record != expected {
+		t.Errorf("Record is not expected value.")
+		t.Log("Actual:")
+		t.Log(record)
+		t.Log("Expected: ")
+		t.Log(expected)
+	}
+}
+
+func TestSearchEndRecordFromLog_StartRecord(t *testing.T) {
+	conf := getJobCheckTestConfig()
+	logPath := filepath.Join(conf.Dir.LogDir, "servant.log")
+	record, err := searchJobEndRecordFromLog(logPath, 3, "job1")
+	if err != nil {
+		t.Fatalf("Unexpected error occured: %s", err)
+	}
+
+	expected := `2015-08-01 09:20:25.012 [3412] [INF] CTS010I JOB [/home/cuto/testjob] STARTED. INSTANCE [3] ID [job1] PID [2341].`
 	if record != expected {
 		t.Errorf("Record is not expected value.")
 		t.Log("Actual:")
