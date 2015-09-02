@@ -124,7 +124,7 @@ func (j *Job) Execute() (Element, error) {
 	if j.IsRerunJob {
 		jobres := j.Instance.Result.Jobresults[j.id]
 		if jobres.Status == 1 || jobres.Status == 2 {
-			resumeJobVlue()
+			j.resumeJobVlue()
 			return j.Next, nil
 		} else {
 			j.requestLatestJobResult()
