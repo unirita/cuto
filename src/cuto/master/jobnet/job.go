@@ -122,7 +122,13 @@ func (j *Job) SetDefaultEx() {
 // return : エラー情報。
 func (j *Job) Execute() (Element, error) {
 	if j.IsRerunJob {
-		j.requestLatestJobResult()
+		jobres := j.Instance.Result.Jobresults[j.id]
+		if jobres.Status == 1 || jobres.Status == 2 {
+			resumeJobVlue()
+			return j.Next, nil
+		} else {
+			j.requestLatestJobResult()
+		}
 	}
 	res, err := j.executeRequest()
 	if err != nil {
@@ -394,6 +400,18 @@ func (j *Job) abnormalEnd(err error) error {
 
 	console.Display("CTM025W", j.Name, j.Node, j.Instance.ID, j.id, jobres.Status, jobres.Detail)
 	return err
+}
+
+func (j *Job) resumeJobVlue() {
+	jobres := j.Instance.Result.Jobresults[j.id]
+
+	res := new(message.Response)
+	res.JID = j.id
+	res.RC = jobres.Rc
+	res.St = jobres.StartDate
+	res.Et = jobres.EndDate
+	res.Var = jobres.Variable
+	message.AddJobValue(j.Name, res)
 }
 
 func (j *Job) startTimer(endCh chan struct{}) {
