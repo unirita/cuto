@@ -24,20 +24,20 @@ func DoJobResultCheck(chk *message.JobCheck, conf *config.ServantConfig) *messag
 	logPath := filepath.Join(conf.Dir.LogDir, "servant.log")
 	endRecord, err := searchJobEndRecordFromLog(logPath, result.NID, result.JID)
 	if err != nil || len(endRecord) == 0 {
+		return createUnexecutedResult(chk.NID, chk.JID)
+	}
+
+	status, err := extractStatusFromRecord(endRecord)
+	if err != nil || status == 0 {
 		return createErrorResult(chk.NID, chk.JID)
 	}
+	result.Stat = status
 
 	et, err := extractTimestampFromRecord(endRecord)
 	if err != nil {
 		return createErrorResult(chk.NID, chk.JID)
 	}
 	result.Et = et.Format(utctime.Default)
-
-	status, err := extractStatusFromRecord(endRecord)
-	if err != nil {
-		return createErrorResult(chk.NID, chk.JID)
-	}
-	result.Stat = status
 
 	rc, err := extractRCFromRecord(endRecord)
 	if err != nil {
@@ -73,7 +73,7 @@ func searchJobEndRecordFromLog(path string, nid int, jid string) (string, error)
 	defer file.Close()
 
 	matchStr := fmt.Sprintf(
-		`^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} \[\d+\] \[INF\] CTS011I.*INSTANCE \[%d\] ID \[%s\]`,
+		`^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}\.\d{3} \[\d+\] \[INF\] CTS01[01]I.*INSTANCE \[%d\] ID \[%s\]`,
 		nid, jid)
 	matcher := regexp.MustCompile(matchStr)
 	var endRecord string
@@ -94,6 +94,10 @@ func extractTimestampFromRecord(record string) (utctime.UTCTime, error) {
 }
 
 func extractStatusFromRecord(record string) (int, error) {
+	if strings.Contains(record, "CTS010I") {
+		return 0, nil
+	}
+
 	finder := regexp.MustCompile(`STATUS \[\d+\]`)
 	statusStr := finder.FindString(record)
 	if len(statusStr) < 9 {
@@ -170,6 +174,14 @@ func extractVariableFromJoblog(joblog string) (string, error) {
 	}
 
 	return variable, nil
+}
+
+func createUnexecutedResult(nid int, jid string) *message.JobResult {
+	result := new(message.JobResult)
+	result.NID = nid
+	result.JID = jid
+	result.Stat = -1
+	return result
 }
 
 func createErrorResult(nid int, jid string) *message.JobResult {

@@ -60,7 +60,7 @@ func TestDoJobResultCheck_Base(t *testing.T) {
 	}
 }
 
-func TestDoJobResultCheck_RegardNoRecordJobAsExecuting(t *testing.T) {
+func TestDoJobResultCheck_RegardNoRecordJobAsUnexecuted(t *testing.T) {
 	chk := &message.JobCheck{
 		Type:    "jobcheck",
 		Version: "1.2.3",
@@ -78,8 +78,8 @@ func TestDoJobResultCheck_RegardNoRecordJobAsExecuting(t *testing.T) {
 	if result.JID != "noexists" {
 		t.Errorf("result.JID => %s, wants %s", result.JID, "noexists")
 	}
-	if result.Stat != 0 {
-		t.Errorf("result.Stat => %d, wants %d", result.Stat, 0)
+	if result.Stat != -1 {
+		t.Errorf("result.Stat => %d, wants %d", result.Stat, -1)
 	}
 }
 
@@ -115,6 +115,29 @@ func TestDoJobResultCheck_DifferentNID(t *testing.T) {
 	}
 	if result.Et != "2015-07-31 15:12:34.567" {
 		t.Errorf("result.Et => %s, wants %s", result.Et, "2015-07-31 15:12:34.567")
+	}
+}
+
+func TestDoJobResultCheck_RegardOnlyStartJobAsExecuting(t *testing.T) {
+	chk := &message.JobCheck{
+		Type:    "jobcheck",
+		Version: "1.2.3",
+		NID:     3,
+		JID:     "job1",
+	}
+
+	result := DoJobResultCheck(chk, getJobCheckTestConfig())
+	if result == nil {
+		t.Fatalf("DoJobResultCheck() returned nil.")
+	}
+	if result.NID != 3 {
+		t.Errorf("result.NID => %d, wants %d", result.NID, 3)
+	}
+	if result.JID != "job1" {
+		t.Errorf("result.JID => %s, wants %s", result.JID, "job1")
+	}
+	if result.Stat != 0 {
+		t.Errorf("result.Stat => %d, wants %d", result.Stat, 0)
 	}
 }
 
