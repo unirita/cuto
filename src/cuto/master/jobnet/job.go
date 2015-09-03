@@ -123,11 +123,26 @@ func (j *Job) SetDefaultEx() {
 func (j *Job) Execute() (Element, error) {
 	if j.IsRerunJob {
 		jobres := j.Instance.Result.Jobresults[j.id]
-		if jobres.Status == 1 || jobres.Status == 2 {
+		if jobres.Status == db.NORMAL || jobres.Status == db.WARN {
 			j.resumeJobValue()
 			return j.Next, nil
 		} else {
-			j.requestLatestJobResult()
+			result, err := j.requestLatestJobResult()
+			if err != nil {
+				return nil, j.abnormalEnd(err)
+			}
+
+			switch result.Stat {
+			case db.RUNNING:
+				return nil, fmt.Errorf("Job ID [%s] still running.", j.id)
+			case db.NORMAL:
+				fallthrough
+			case db.WARN:
+				j.updateNormalEndResult(result)
+				return j.Next, nil
+			default:
+				j.changeStatusRunning()
+			}
 		}
 	}
 	res, err := j.executeRequest()
@@ -158,7 +173,9 @@ func (j *Job) executeRequest() (*message.Response, error) {
 	req.ErrStr = j.ErrPtn
 	req.Timeout = j.Timeout
 
-	j.start(req)
+	if !j.IsRerunJob {
+		j.start(req)
+	}
 
 	err := req.ExpandMasterVars()
 	if err != nil {
@@ -412,6 +429,35 @@ func (j *Job) resumeJobValue() {
 	res.Et = jobres.EndDate
 	res.Var = jobres.Variable
 	message.AddJobValue(j.Name, res)
+}
+
+func (j *Job) updateNormalEndResult(result *message.JobResult) {
+	jobres, exists := j.Instance.Result.Jobresults[j.id]
+	if !exists {
+		log.Error(fmt.Errorf("Job result[id = %s] is unregisted.", j.id))
+		return
+	}
+
+	jobres.Status = result.Stat
+	jobres.Rc = result.RC
+	jobres.StartDate = result.St
+	jobres.EndDate = result.Et
+	jobres.Detail = ""
+	jobres.Variable = result.Var
+	tx.UpdateJob(j.Instance.Result.GetConnection(), jobres, &j.Instance.localMutex)
+
+	j.resumeJobValue()
+}
+
+func (j *Job) changeStatusRunning() {
+	jobres, exists := j.Instance.Result.Jobresults[j.id]
+	if !exists {
+		log.Error(fmt.Errorf("Job result[id = %s] is unregisted.", j.id))
+		return
+	}
+
+	jobres.Status = db.RUNNING
+	tx.UpdateJob(j.Instance.Result.GetConnection(), jobres, &j.Instance.localMutex)
 }
 
 func (j *Job) startTimer(endCh chan struct{}) {
