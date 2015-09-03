@@ -177,6 +177,8 @@ func (j *Job) executeRequest() (*message.Response, error) {
 		j.start(req)
 	}
 
+	console.Display("CTM023I", j.Name, j.Node, j.Instance.ID, j.id)
+
 	err := req.ExpandMasterVars()
 	if err != nil {
 		return nil, err
@@ -335,8 +337,6 @@ func (j *Job) start(req *message.Request) {
 
 	j.Instance.Result.Jobresults[j.ID()] = jobres
 	tx.InsertJob(j.Instance.Result.GetConnection(), jobres, &j.Instance.localMutex)
-
-	console.Display("CTM023I", j.Name, j.Node, j.Instance.ID, j.id)
 }
 
 // 実行ノードをセカンダリノードに変更する。
