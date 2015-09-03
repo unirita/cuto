@@ -139,8 +139,7 @@ func realMain(args *arguments) int {
 	if args.rerunInstance == 0 {
 		err = nwk.Run()
 	} else {
-		// @Todo implement nwk.Rerun()
-		// err = nwk.Rerun()
+		err = nwk.Rerun()
 	}
 	if err != nil {
 		console.Display("CTM013I", nwk.Name, nwk.ID, "ABNORMAL")
