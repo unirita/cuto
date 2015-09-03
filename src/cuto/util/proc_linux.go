@@ -2,13 +2,16 @@ package util
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os/exec"
 )
 
 func IsProcessExists(pid int) bool {
+	ptn := fmt.Sprintf("^%d$", pid)
+
 	pgrepCmd := exec.Command("pgrep", "master")
-	grepCmd := exec.Command("grep", "^"+pid+"$")
+	grepCmd := exec.Command("grep", ptn)
 	wcCmd := exec.Command("wc", "-l")
 
 	r1, w1 := io.Pipe()
