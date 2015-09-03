@@ -104,6 +104,12 @@ func realMain(args *arguments) int {
 			console.Display("CTM019E", err)
 			return rc_ERROR
 		}
+
+		if nwkResult.Status == db.NORMAL || nwkResult.Status == db.WARN {
+			console.Display("CTM029I", args.rerunInstance)
+			return rc_OK
+		}
+
 		args.networkName = nwkResult.JobnetWork
 		args.startFlag = flag_ON
 	}
