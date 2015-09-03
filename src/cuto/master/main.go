@@ -139,6 +139,7 @@ func realMain(args *arguments) int {
 	if args.rerunInstance == 0 {
 		err = nwk.Run()
 	} else {
+		nwk.ID = args.rerunInstance
 		err = nwk.Rerun()
 	}
 	if err != nil {
@@ -162,7 +163,7 @@ func fetchArgs() *arguments {
 	flag.BoolVar(&args.versionFlag, "v", false, "version option")
 	flag.StringVar(&args.networkName, "n", "", "network name option")
 	flag.BoolVar(&args.startFlag, "s", false, "start option")
-	flag.IntVar(&args.rerunInstance, "r", 0, "start option")
+	flag.IntVar(&args.rerunInstance, "r", 0, "rerun option")
 	flag.StringVar(&args.configPath, "c", "", "config file option")
 	flag.Parse()
 	return args
