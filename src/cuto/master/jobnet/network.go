@@ -348,6 +348,12 @@ func (n *Network) Rerun() error {
 		console.Display("CTM019E", err)
 		return err
 	}
+
+	prePID := n.Result.JobnetResult.PID
+	if util.IsProcessExists(prePID) {
+		return fmt.Errorf("JOBNETWORK [%d] still running.", n.ID)
+	}
+
 	console.Display("CTM012I", n.Name, n.ID)
 	n.setIsRerunJob()
 
