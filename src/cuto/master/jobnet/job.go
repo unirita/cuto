@@ -127,6 +127,8 @@ func (j *Job) Execute() (Element, error) {
 			j.resumeJobValue()
 			return j.Next, nil
 		} else {
+			j.Node = jobres.Node
+			j.Port = jobres.Port
 			result, err := j.requestLatestJobResult()
 			if err != nil {
 				return nil, j.abnormalEnd(err)
