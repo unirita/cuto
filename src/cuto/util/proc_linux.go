@@ -18,14 +18,10 @@ func IsProcessExists(pid int) bool {
 	r1, w1 := io.Pipe()
 	pgrepCmd.Stdout = w1
 	grepCmd.Stdin = r1
-	defer w1.Close()
-	defer r1.Close()
 
 	r2, w2 := io.Pipe()
 	grepCmd.Stdout = w2
 	wcCmd.Stdin = r2
-	defer w2.Close()
-	defer r2.Close()
 
 	b := new(bytes.Buffer)
 	wcCmd.Stdout = b
@@ -40,7 +36,9 @@ func IsProcessExists(pid int) bool {
 		panic(err)
 	}
 	pgrepCmd.Wait()
+	w1.Close()
 	grepCmd.Wait()
+	w2.Close()
 	wcCmd.Wait()
 
 	s := strings.Trim(b.String(), " \t\r\n")
