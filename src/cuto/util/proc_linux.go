@@ -40,7 +40,11 @@ func IsProcessExists(pid int) bool {
 	w2.Close()
 	wcCmd.Wait()
 
-	if b.String() == "0" {
+	s := b.String()
+	fmt.Println("debug message start.")
+	fmt.Println(s)
+	fmt.Println("debug message end.")
+	if s == "0" {
 		return true
 	}
 	return false
