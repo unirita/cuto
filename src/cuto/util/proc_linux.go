@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-func IsProcessExists(pid int) bool {
+func isProcessExists(pid int) bool {
 	ptn := fmt.Sprintf(`^\s*%d$`, pid)
 
 	pgrepCmd := exec.Command("ps", "-eo", "pid")
