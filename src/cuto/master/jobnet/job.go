@@ -200,7 +200,7 @@ func (j *Job) executeRequest() (*message.Response, error) {
 	if j.isNecessaryToRetry(err) && j.SecondaryNode != "" {
 		j.useSecondaryNode()
 		console.Display("CTM028W", j.Name, j.SecondaryNode)
-		resMsg, err = j.sendSecondaryRequestWithRetry(reqMsg, stCh)
+		resMsg, err = j.sendRequestWithRetry(reqMsg, stCh)
 	}
 
 	close(stCh)
@@ -253,26 +253,6 @@ func (j *Job) sendRequestWithRetry(reqMsg string, stCh chan<- string) (string, e
 		}
 
 		resMsg, err = j.sendRequest(j.Node, j.Port, reqMsg, stCh)
-		if !j.isNecessaryToRetry(err) {
-			break
-		}
-	}
-
-	return resMsg, err
-}
-
-// セカンダリサーバントへのジョブ実行リクエストを送信する。
-// 送信失敗時には必要な回数だけリトライを行う。
-func (j *Job) sendSecondaryRequestWithRetry(reqMsg string, stCh chan<- string) (string, error) {
-	limit := config.Job.AttemptLimit
-	var resMsg string
-	var err error
-	for i := 0; i < limit; i++ {
-		if i != 0 {
-			console.Display("CTM027W", j.Name, i, limit-1)
-		}
-
-		resMsg, err = j.sendRequest(j.SecondaryNode, j.SecondaryPort, reqMsg, stCh)
 		if !j.isNecessaryToRetry(err) {
 			break
 		}
@@ -341,6 +321,9 @@ func (j *Job) start(req *message.Request) {
 
 // 実行ノードをセカンダリノードに変更する。
 func (j *Job) useSecondaryNode() {
+	j.Node = j.SecondaryNode
+	j.Port = j.SecondaryPort
+
 	jobres, exist := j.Instance.Result.Jobresults[j.id]
 	if !exist {
 		log.Error(fmt.Errorf("Job result[id = %s] is unregisted.", j.id))
