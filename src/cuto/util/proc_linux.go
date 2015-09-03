@@ -8,9 +8,9 @@ import (
 )
 
 func IsProcessExists(pid int) bool {
-	ptn := fmt.Sprintf("^%d$", pid)
+	ptn := fmt.Sprintf(`^\s.%d$`, pid)
 
-	pgrepCmd := exec.Command("pgrep", "master")
+	pgrepCmd := exec.Command("ps", "-eo", "pid")
 	grepCmd := exec.Command("grep", ptn)
 	wcCmd := exec.Command("wc", "-l")
 
@@ -44,7 +44,7 @@ func IsProcessExists(pid int) bool {
 	fmt.Println("debug message start.")
 	fmt.Println(s)
 	fmt.Println("debug message end.")
-	if s == "0" {
+	if s == "1" {
 		return true
 	}
 	return false
