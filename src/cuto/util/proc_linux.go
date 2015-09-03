@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"strings"
 )
 
 func IsProcessExists(pid int) bool {
@@ -40,12 +41,9 @@ func IsProcessExists(pid int) bool {
 	w2.Close()
 	wcCmd.Wait()
 
-	s := b.String()
-	fmt.Println("debug message start.")
-	fmt.Println(s)
-	fmt.Println("debug message end.")
-	if s == "1" {
-		return true
+	s := strings.Trim(b.String(), " \t\r\n")
+	if s == "0" {
+		return false
 	}
-	return false
+	return true
 }
