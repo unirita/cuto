@@ -5,6 +5,6 @@ import (
 	"strconv"
 )
 
-func createSleepCommand(second int) {
+func createSleepCommand(second int) *exec.Cmd {
 	return exec.Command("/bin/sleep", strconv.Itoa(second))
 }
