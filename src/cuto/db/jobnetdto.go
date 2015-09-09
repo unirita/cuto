@@ -3,6 +3,8 @@
 
 package db
 
+import "os"
+
 // ジョブネットワーク実行結果
 type JobNetworkResult struct {
 	ID         int    // ジョブネットワークのインシデントID
@@ -11,6 +13,7 @@ type JobNetworkResult struct {
 	EndDate    string // 終了日時
 	Status     int    // ジョブネットワークのステータス
 	Detail     string // 詳細メッセージ
+	PID        int    // masterのPID
 	CreateDate string // 作成日時
 	UpdateDate string // 更新日時
 }
@@ -29,5 +32,6 @@ func NewJobNetworkResult(jobnetName string, startDate string, status int) *JobNe
 		JobnetWork: jobnetName,
 		StartDate:  startDate,
 		Status:     status,
+		PID:        os.Getpid(),
 	}
 }

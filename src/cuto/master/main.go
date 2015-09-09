@@ -9,6 +9,8 @@ import (
 	"os"
 
 	"cuto/console"
+	"cuto/db"
+	"cuto/db/query"
 	"cuto/log"
 	"cuto/message"
 
@@ -18,10 +20,11 @@ import (
 
 // 実行時引数のオプション
 type arguments struct {
-	versionFlag bool   // バージョン情報表示フラグ
-	networkName string // ジョブネットワーク名
-	startFlag   bool   // 実行フラグ
-	configPath  string // 設定ファイルのパス
+	versionFlag   bool   // バージョン情報表示フラグ
+	networkName   string // ジョブネットワーク名
+	startFlag     bool   // 実行フラグ
+	rerunInstance int    // リランを行うインスタンスID
+	configPath    string // 設定ファイルのパス
 }
 
 // masterの戻り値
@@ -51,8 +54,13 @@ func realMain(args *arguments) int {
 		return rc_OK
 	}
 
-	if args.networkName == "" {
+	if args.networkName == "" && args.rerunInstance == 0 {
 		showUsage()
+		return rc_ERROR
+	}
+
+	if args.networkName != "" && args.rerunInstance != 0 {
+		console.Display("CTM019E", "Cannot use both -n and -r option.")
 		return rc_ERROR
 	}
 
@@ -90,6 +98,22 @@ func realMain(args *arguments) int {
 		console.Display("CTM002I", rc)
 	}()
 
+	if args.rerunInstance != 0 {
+		nwkResult, err := getNetworkResult(args.rerunInstance)
+		if err != nil {
+			console.Display("CTM019E", err)
+			return rc_ERROR
+		}
+
+		if nwkResult.Status == db.NORMAL || nwkResult.Status == db.WARN {
+			console.Display("CTM029I", args.rerunInstance)
+			return rc_OK
+		}
+
+		args.networkName = nwkResult.JobnetWork
+		args.startFlag = flag_ON
+	}
+
 	nwk := jobnet.LoadNetwork(args.networkName)
 	if nwk == nil {
 		rc = rc_ERROR
@@ -118,7 +142,12 @@ func realMain(args *arguments) int {
 		return rc
 	}
 
-	err = nwk.Run()
+	if args.rerunInstance == 0 {
+		err = nwk.Run()
+	} else {
+		nwk.ID = args.rerunInstance
+		err = nwk.Rerun()
+	}
 	if err != nil {
 		console.Display("CTM013I", nwk.Name, nwk.ID, "ABNORMAL")
 		// ジョブ自体の異常終了では、エラーメッセージが空で返るので、出力しない
@@ -140,6 +169,7 @@ func fetchArgs() *arguments {
 	flag.BoolVar(&args.versionFlag, "v", false, "version option")
 	flag.StringVar(&args.networkName, "n", "", "network name option")
 	flag.BoolVar(&args.startFlag, "s", false, "start option")
+	flag.IntVar(&args.rerunInstance, "r", 0, "rerun option")
 	flag.StringVar(&args.configPath, "c", "", "config file option")
 	flag.Parse()
 	return args
@@ -154,4 +184,14 @@ func showVersion() {
 func showUsage() {
 	console.Display("CTM003E")
 	fmt.Print(console.USAGE)
+}
+
+func getNetworkResult(instanceID int) (*db.JobNetworkResult, error) {
+	conn, err := db.Open(config.DB.DBFile)
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Close()
+
+	return query.GetJobnetwork(conn, instanceID)
 }

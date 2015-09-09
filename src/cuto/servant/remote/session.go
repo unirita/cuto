@@ -37,34 +37,39 @@ func NewSession(conn net.Conn, body string) *Session {
 	return s
 }
 
-// セッションに対応したジョブ実行要求に基いてジョブを実行する。
+// セッションに対応した処理を実行する。
 // 引数：conf 設定情報
 // 戻り値：なし
 func (s *Session) Do(conf *config.ServantConfig) error {
 	defer s.Conn.Close()
 	defer s.endHeartbeat()
 
+	var msg string
 	req := new(message.Request)
 	if err := req.ParseJSON(s.Body); err != nil {
-		console.Display("CTS015E", err.Error())
-		return err
+		chk := new(message.JobCheck)
+		if err := chk.ParseJSON(s.Body); err != nil {
+			console.Display("CTS015E", err.Error())
+			return err
+		}
+
+		resultMsg, err := s.doJobCheck(chk, conf)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+
+		msg = resultMsg
+	} else {
+		resMsg, err := s.doRequest(req, conf)
+		if err != nil {
+			log.Error(err)
+			return err
+		}
+		msg = resMsg
 	}
 
-	res, err := s.doRequest(req, conf)
-	if err != nil {
-		log.Error(err)
-		res = s.createErrorResponse(req, err)
-	}
-
-	var resMsg string
-	resMsg, err = res.GenerateJSON()
-	if err != nil {
-		log.Error(err)
-		return err
-	}
-
-	_, err = s.Conn.Write([]byte(resMsg + MsgEnd))
-	if err != nil {
+	if _, err := s.Conn.Write([]byte(msg + MsgEnd)); err != nil {
 		log.Error(err)
 		return err
 	}
@@ -72,11 +77,12 @@ func (s *Session) Do(conf *config.ServantConfig) error {
 	return nil
 }
 
-func (s *Session) doRequest(req *message.Request, conf *config.ServantConfig) (*message.Response, error) {
+func (s *Session) doRequest(req *message.Request, conf *config.ServantConfig) (string, error) {
 	err := req.ExpandServantVars()
 	if err != nil {
 		console.Display("CTS015E", err.Error())
-		return nil, err
+		res := s.createErrorResponse(req, err)
+		return res.GenerateJSON()
 	}
 
 	stCh := make(chan string, 1)
@@ -84,7 +90,12 @@ func (s *Session) doRequest(req *message.Request, conf *config.ServantConfig) (*
 	defer close(stCh)
 
 	res := s.doJobRequest(req, conf, stCh)
-	return res, nil
+	return res.GenerateJSON()
+}
+
+func (s *Session) doJobCheck(chk *message.JobCheck, conf *config.ServantConfig) (string, error) {
+	result := job.DoJobResultCheck(chk, conf)
+	return result.GenerateJSON()
 }
 
 // ハートビートを開始する。

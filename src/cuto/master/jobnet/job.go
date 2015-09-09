@@ -40,6 +40,7 @@ type Job struct {
 	Next          Element  // 次ノード
 	Instance      *Network // ネットワーク情報構造体のポインタ
 	sendRequest   sendFunc // リクエスト送信メソッド
+	IsRerunJob    bool     // リランジョブであるかどうか
 }
 
 // Job構造体のコンストラクタ関数。
@@ -120,6 +121,47 @@ func (j *Job) SetDefaultEx() {
 //
 // return : エラー情報。
 func (j *Job) Execute() (Element, error) {
+	if j.IsRerunJob {
+		jobres := j.Instance.Result.Jobresults[j.id]
+		if jobres.Status == db.NORMAL || jobres.Status == db.WARN {
+			j.resumeJobValue()
+			return j.Next, nil
+		} else {
+			j.Node = jobres.Node
+			j.Port = jobres.Port
+			result, err := j.requestLatestJobResult()
+			if err != nil {
+				return nil, j.abnormalEnd(err)
+			}
+
+			switch result.Stat {
+			case db.RUNNING:
+				return nil, fmt.Errorf("Job ID [%s] still running.", j.id)
+			case db.NORMAL:
+				fallthrough
+			case db.WARN:
+				j.updateNormalEndResult(result)
+				return j.Next, nil
+			default:
+				j.changeStatusRunning()
+			}
+		}
+	}
+	res, err := j.executeRequest()
+	if err != nil {
+		return nil, j.abnormalEnd(err)
+	}
+	defer j.end(res)
+
+	if isAbnormalEnd(res) {
+		console.Display("CTM026I", j.createJoblogFileName(res), j.Node)
+		return nil, fmt.Errorf("")
+	}
+
+	return j.Next, nil
+}
+
+func (j *Job) executeRequest() (*message.Response, error) {
 	req := new(message.Request)
 	req.NID = j.Instance.ID
 	req.JID = j.ID()
@@ -133,16 +175,20 @@ func (j *Job) Execute() (Element, error) {
 	req.ErrStr = j.ErrPtn
 	req.Timeout = j.Timeout
 
-	j.start(req)
+	if !j.IsRerunJob {
+		j.start(req)
+	}
+
+	console.Display("CTM023I", j.Name, j.Node, j.Instance.ID, j.id)
 
 	err := req.ExpandMasterVars()
 	if err != nil {
-		return nil, j.abnormalEnd(err)
+		return nil, err
 	}
 
 	reqMsg, err := req.GenerateJSON()
 	if err != nil {
-		return nil, j.abnormalEnd(err)
+		return nil, err
 	}
 
 	stCh := make(chan string, 1)
@@ -154,28 +200,47 @@ func (j *Job) Execute() (Element, error) {
 
 	resMsg, err := j.sendRequestWithRetry(reqMsg, stCh)
 	if j.isNecessaryToRetry(err) && j.SecondaryNode != "" {
+		j.useSecondaryNode()
 		console.Display("CTM028W", j.Name, j.SecondaryNode)
-		resMsg, err = j.sendSecondaryRequestWithRetry(reqMsg, stCh)
+		resMsg, err = j.sendRequestWithRetry(reqMsg, stCh)
 	}
 
 	close(stCh)
 	if err != nil {
-		return nil, j.abnormalEnd(err)
+		return nil, err
 	}
 
 	res := new(message.Response)
 	err = res.ParseJSON(resMsg)
 	if err != nil {
-		return nil, j.abnormalEnd(err)
-	}
-	defer j.end(res)
-
-	if isAbnormalEnd(res) {
-		console.Display("CTM026I", j.createJoblogFileName(res), j.Node)
-		return nil, fmt.Errorf("")
+		return nil, err
 	}
 
-	return j.Next, nil
+	return res, nil
+}
+
+func (j *Job) requestLatestJobResult() (*message.JobResult, error) {
+	chk := new(message.JobCheck)
+	chk.NID = j.Instance.ID
+	chk.JID = j.ID()
+
+	chkMsg, err := chk.GenerateJSON()
+	if err != nil {
+		return nil, err
+	}
+
+	resultMsg, err := j.sendResultCheckRequestWithRetry(chkMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	result := new(message.JobResult)
+	err = result.ParseJSON(resultMsg)
+	if err != nil {
+		return nil, err
+	}
+
+	return result, nil
 }
 
 // ジョブ実行リクエストを送信する。
@@ -198,24 +263,25 @@ func (j *Job) sendRequestWithRetry(reqMsg string, stCh chan<- string) (string, e
 	return resMsg, err
 }
 
-// セカンダリサーバントへのジョブ実行リクエストを送信する。
-// 送信失敗時には必要な回数だけリトライを行う。
-func (j *Job) sendSecondaryRequestWithRetry(reqMsg string, stCh chan<- string) (string, error) {
+func (j *Job) sendResultCheckRequestWithRetry(chkMsg string) (string, error) {
+	stCh := make(chan string, 1)
+	defer close(stCh)
+
 	limit := config.Job.AttemptLimit
-	var resMsg string
+	var resultMsg string
 	var err error
 	for i := 0; i < limit; i++ {
 		if i != 0 {
 			console.Display("CTM027W", j.Name, i, limit-1)
 		}
 
-		resMsg, err = j.sendRequest(j.SecondaryNode, j.SecondaryPort, reqMsg, stCh)
-		if !j.isNecessaryToRetry(err) {
+		resultMsg, err = j.sendRequest(j.Node, j.Port, chkMsg, stCh)
+		if err == nil {
 			break
 		}
 	}
 
-	return resMsg, err
+	return resultMsg, err
 }
 
 // リトライの必要があるかを判定する。
@@ -253,8 +319,22 @@ func (j *Job) start(req *message.Request) {
 
 	j.Instance.Result.Jobresults[j.ID()] = jobres
 	tx.InsertJob(j.Instance.Result.GetConnection(), jobres, &j.Instance.localMutex)
+}
 
-	console.Display("CTM023I", j.Name, j.Node, j.Instance.ID, j.id)
+// 実行ノードをセカンダリノードに変更する。
+func (j *Job) useSecondaryNode() {
+	j.Node = j.SecondaryNode
+	j.Port = j.SecondaryPort
+
+	jobres, exist := j.Instance.Result.Jobresults[j.id]
+	if !exist {
+		log.Error(fmt.Errorf("Job result[id = %s] is unregisted.", j.id))
+		return
+	}
+
+	jobres.Node = j.SecondaryNode
+	jobres.Port = j.SecondaryPort
+	tx.UpdateJob(j.Instance.Result.GetConnection(), jobres, &j.Instance.localMutex)
 }
 
 // ジョブ実行結果にジョブの開始時刻をセットする。
@@ -322,6 +402,47 @@ func (j *Job) abnormalEnd(err error) error {
 
 	console.Display("CTM025W", j.Name, j.Node, j.Instance.ID, j.id, jobres.Status, jobres.Detail)
 	return err
+}
+
+func (j *Job) resumeJobValue() {
+	jobres := j.Instance.Result.Jobresults[j.id]
+
+	res := new(message.Response)
+	res.JID = j.id
+	res.RC = jobres.Rc
+	res.St = jobres.StartDate
+	res.Et = jobres.EndDate
+	res.Var = jobres.Variable
+	message.AddJobValue(j.Name, res)
+}
+
+func (j *Job) updateNormalEndResult(result *message.JobResult) {
+	jobres, exists := j.Instance.Result.Jobresults[j.id]
+	if !exists {
+		log.Error(fmt.Errorf("Job result[id = %s] is unregisted.", j.id))
+		return
+	}
+
+	jobres.Status = result.Stat
+	jobres.Rc = result.RC
+	jobres.StartDate = result.St
+	jobres.EndDate = result.Et
+	jobres.Detail = ""
+	jobres.Variable = result.Var
+	tx.UpdateJob(j.Instance.Result.GetConnection(), jobres, &j.Instance.localMutex)
+
+	j.resumeJobValue()
+}
+
+func (j *Job) changeStatusRunning() {
+	jobres, exists := j.Instance.Result.Jobresults[j.id]
+	if !exists {
+		log.Error(fmt.Errorf("Job result[id = %s] is unregisted.", j.id))
+		return
+	}
+
+	jobres.Status = db.RUNNING
+	tx.UpdateJob(j.Instance.Result.GetConnection(), jobres, &j.Instance.localMutex)
 }
 
 func (j *Job) startTimer(endCh chan struct{}) {
