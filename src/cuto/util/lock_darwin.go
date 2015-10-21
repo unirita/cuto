@@ -21,7 +21,7 @@ type LockHandle struct {
 var (
 	ErrBusy = errors.New("Locked by other process.")
 
-	lockFilePath = filepath.Join(GetRootPath(), "temp")
+	lockFilePath = os.TempDir()
 )
 
 // ファイルを利用した同期処理機能の初期化関数。

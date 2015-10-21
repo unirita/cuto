@@ -24,8 +24,9 @@ func TestNewFileLock_初期化できる(t *testing.T) {
 	l, err := InitLock(lockFile)
 	if err != nil {
 		t.Errorf("同期処理の初期化に失敗しました。 - %s", err.Error())
+	} else {
+		l.TermLock()
 	}
-	defer l.TermLock()
 }
 
 func TestNewFileLock_初期化に失敗(t *testing.T) {
