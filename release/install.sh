@@ -2,7 +2,7 @@
 
 VERSION="V0.9.5L0"
 
-echo -e "\n"
+echo ""
 echo "***********************************************************"
 echo "*                                                         *"
 echo "*                                                         *"
@@ -18,7 +18,8 @@ HOSTNAME=`hostname`
 CURRENT_DIR=`pwd`
 CURRENT_USER=`whoami`
 
-echo -e "\ncheack operating system..."
+echo ""
+echo "cheack operating system..."
 if [ $OSNAME = "Linux" ] ; then
     echo " OS = $OSNAME $OSNMAER"
 elif [ $OSNAME = "Darwin" ] ; then
@@ -30,14 +31,16 @@ else
 fi
 echo "Ok..."
 
-echo -e "\ncheack already installed file..."
+echo ""
+echo "cheack already installed file..."
 if [ -s .installsed ] ; then
      echo "<error> Already instaled."
      echo "File [.installsed ] existed"
      echo "...abort"
      exit
 fi
-echo -e "Ok ...\n"
+echo "Ok ..."
+echo ""
 
 INSTALL_DIR=$CURRENT_DIR
 BIND_ADDRESS=
@@ -55,16 +58,16 @@ if [ "$SILENT_MODE" != "ON" ] ; then
         echo "Do you want to install GoCuto $VERSION [ y/n ] ?"
         read YES_NO
         if [ "$YES_NO" = "y" ] ; then
-            echo -e "\nStarting to install..."
+            echo "Starting to install..."
         elif [ "$YES_NO" = "n" ] ; then
-            echo -e "\n...canceled"
+            echo "...canceled"
             exit
         else
             YES_NO=
         fi
     done
     
-    echo -e "\nPlease enter bind-address name of the GoCuto Servant"
+    echo "Please enter bind-address name of the GoCuto Servant"
     echo " [ Defalt  = 0.0.0.0 ]"
     echo "When you use the defalut value , please push an enter key as it is. "
     read BIND_ADDRESS
@@ -76,7 +79,7 @@ if [ "$SILENT_MODE" != "ON" ] ; then
         echo "Node name of the GoCuto Servant = $BIND_ADDRESS "
     fi
     
-    echo -e "\nPlease enter port number of the GoCuto Servant "
+    echo "Please enter port number of the GoCuto Servant "
     echo " [ Defalt Port Number = 2015 ]"
     echo "When you use the defalut value , please push an enter key as it is. "
     read LISTEN_PORT
@@ -84,7 +87,7 @@ if [ "$SILENT_MODE" != "ON" ] ; then
         LISTEN_PORT="2015"
         echo "Use defalt [ $LISTEN_PORT ]"
     else
-        echo -e "Port number of the GoCuto Servant [ $LISTEN_PORT ]\n"
+        echo "Port number of the GoCuto Servant [ $LISTEN_PORT ]"
     fi
 fi
 
