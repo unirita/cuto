@@ -1,0 +1,9 @@
+<definitions>
+  <process>
+    <startEvent id="start"/>
+    <endEvent id="end"/>
+    <serviceTask id="j1" name="job1"/>
+    <sequenceFlow sourceRef="start" targetRef="j1"/>
+    <sequenceFlow sourceRef="j1" targetRef="end"/>
+  </process>
+</definitions>
