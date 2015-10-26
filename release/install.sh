@@ -18,7 +18,7 @@ HOSTNAME=`hostname`
 CURRENT_DIR=`pwd`
 CURRENT_USER=`whoami`
 
-echo -e "\ncheack operating system..."
+echo -e "\ncheck operating system..."
 if [ $OSNAME = "Linux" ] ; then
     echo " OS = $OSNAME $OSNMAER"
 elif [ $OSNAME = "Darwin" ] ; then
@@ -30,7 +30,7 @@ else
 fi
 echo "Ok..."
 
-echo -e "\ncheack already installed file..."
+echo -e "\ncheck already installed file..."
 if [ -s .installsed ] ; then
      echo "<error> Already instaled."
      echo "File [.installsed ] existed"

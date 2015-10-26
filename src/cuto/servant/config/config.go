@@ -108,6 +108,7 @@ func ReadConfig(configPath string) *ServantConfig {
 	}
 	Servant, err = loadFile(FilePath)
 	if err != nil {
+		console.Display("CTS019E", err)
 		console.Display("CTS004W", FilePath)
 		Servant = DefaultServantConfig()
 	}

@@ -71,6 +71,7 @@ func realMain(args *arguments) int {
 	message.MasterVersion = Version
 
 	if err := config.Load(args.configPath); err != nil {
+		console.Display("CTM019E", err)
 		console.Display("CTM004E", args.configPath)
 		return rc_ERROR
 	}
