@@ -2,11 +2,11 @@
 
 VERSION="V0.9.5L0"
 
-echo -e "\n"
+echo ""
 echo "***********************************************************"
 echo "*                                                         *"
 echo "*                                                         *"
-echo "*           GoCUTO $VERSION Instaler                      *"
+echo "*           GoCuto $VERSION Instaler                      *"
 echo "*                         Last Update 2015/09/09          *"
 echo "*                                           UNIRITA Inc.  *"
 echo "*                                                         *"
@@ -18,7 +18,8 @@ HOSTNAME=`hostname`
 CURRENT_DIR=`pwd`
 CURRENT_USER=`whoami`
 
-echo -e "\ncheck operating system..."
+echo ""
+echo "check operating system..."
 if [ $OSNAME = "Linux" ] ; then
     echo " OS = $OSNAME $OSNMAER"
 elif [ $OSNAME = "Darwin" ] ; then
@@ -30,14 +31,16 @@ else
 fi
 echo "Ok..."
 
-echo -e "\ncheck already installed file..."
+echo ""
+echo "check already installed file..."
 if [ -s .installsed ] ; then
      echo "<error> Already instaled."
      echo "File [.installsed ] existed"
      echo "...abort"
      exit
 fi
-echo -e "Ok ...\n"
+echo "Ok ..."
+echo ""
 
 INSTALL_DIR=$CURRENT_DIR
 BIND_ADDRESS=
@@ -55,16 +58,16 @@ if [ "$SILENT_MODE" != "ON" ] ; then
         echo "Do you want to install GoCuto $VERSION [ y/n ] ?"
         read YES_NO
         if [ "$YES_NO" = "y" ] ; then
-            echo -e "\nStarting to install..."
+            echo "Starting to install..."
         elif [ "$YES_NO" = "n" ] ; then
-            echo -e "\n...canceled"
+            echo "...canceled"
             exit
         else
             YES_NO=
         fi
     done
     
-    echo -e "\nPlease enter bind-address name of the CUTO Servant"
+    echo "Please enter bind-address name of the GoCuto Servant"
     echo " [ Defalt  = 0.0.0.0 ]"
     echo "When you use the defalut value , please push an enter key as it is. "
     read BIND_ADDRESS
@@ -73,10 +76,10 @@ if [ "$SILENT_MODE" != "ON" ] ; then
         BIND_ADDRESS="0.0.0.0"
         echo "Use defalt [ $BIND_ADDRESS ]"
     else
-        echo "Node name of the CUTO Servant = $BIND_ADDRESS "
+        echo "Node name of the GoCuto Servant = $BIND_ADDRESS "
     fi
     
-    echo -e "\nPlease enter port number of the CUTO Servant "
+    echo "Please enter port number of the GoCuto Servant "
     echo " [ Defalt Port Number = 2015 ]"
     echo "When you use the defalut value , please push an enter key as it is. "
     read LISTEN_PORT
@@ -84,17 +87,17 @@ if [ "$SILENT_MODE" != "ON" ] ; then
         LISTEN_PORT="2015"
         echo "Use defalt [ $LISTEN_PORT ]"
     else
-        echo -e "Port number of the CUTO Servant [ $LISTEN_PORT ]\n"
+        echo "Port number of the GoCuto Servant [ $LISTEN_PORT ]"
     fi
 fi
 
 echo ""
-echo "Install GoCUTO with the following setup information."
+echo "Install GoCuto with the following setup information."
 echo "****************************************************"
 echo "  Install User                    = $CURRENT_USER"
 echo "  Install Directory of the GoCuto = $INSTALL_DIR"
-echo "  CUTO Servant bind-address       = $BIND_ADDRESS"
-echo "  CUTO Servant Port Number        = $LISTEN_PORT"
+echo "  GoCuto Servant bind-address     = $BIND_ADDRESS"
+echo "  GoCuto Servant Port Number      = $LISTEN_PORT"
 echo "****************************************************"
 echo ""
 
@@ -176,4 +179,4 @@ cd $CURRENT_DIR
 mkdir joblog log temp
 
 echo "...completed !"
-echo "Thank you for installing GoCUTO !"
+echo "Thank you for installing GoCuto !"
