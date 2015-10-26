@@ -6,6 +6,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"syscall"
@@ -39,11 +40,11 @@ func getDiff() string {
 }
 
 func setConfigPath() string {
-	return fmt.Sprintf("%v%c%v%c%v%c%v", os.Getenv("GOPATH"),
-		os.PathSeparator, "test", os.PathSeparator, "cuto", os.PathSeparator, "show")
+	currentDir, _ := os.Getwd()
+	return filepath.Join(currentDir, "_testdata")
 }
 func setConfigFile() string {
-	return fmt.Sprintf("%v%c%v", confPath, os.PathSeparator, "show_test.ini")
+	return filepath.Join(confPath, "show_test.ini")
 }
 
 func init() {
