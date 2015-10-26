@@ -35,5 +35,7 @@ cutoroot/
 evidence/
 
 # External packages
-src/github.com/*
-!src/github.com/unirita/cuto
+/src/github.com/*
+!/src/github.com/unirita
+/src/github.com/unirita/*
+!/src/github.com/unirita/cuto
