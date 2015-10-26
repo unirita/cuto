@@ -1,13 +1,13 @@
 #!/bin/sh
 
 OSNAME=`uname`
-TESTROOT=$GOPATH/src/cuto
+TESTROOT=$GOPATH/src/github.com/unirita/cuto
 LOGFILE=$TESTROOT/cover_all_$OSNAME.txt
 RETCODE=0
 
 
 cd $TESTROOT/console
-echo "console package tested..."
+echo "github.com/unirita/cuto/console package tested..."
 go test -coverprofile cover.out> $LOGFILE
 if [ "$?" -ne "0" ] ; then
   echo "NG."
@@ -16,14 +16,14 @@ fi
 
 
 cd $TESTROOT/db
-echo "db package tested..."
+echo "github.com/unirita/cuto/db package tested..."
 go test -coverprofile cover.out>> $LOGFILE
 if [ "$?" -ne "0" ] ; then
   echo "NG."
   RETCODE=1
 fi
 cd $TESTROOT/db/query
-echo "db/query package tested..."
+echo "github.com/unirita/cuto/db/query package tested..."
 go test -coverprofile cover.out>> $LOGFILE
 if [ "$?" -ne "0" ] ; then
   echo "NG."
@@ -31,7 +31,7 @@ if [ "$?" -ne "0" ] ; then
 fi
 
 cd $TESTROOT/db/tx
-echo "db/tx package tested..."
+echo "github.com/unirita/cuto/db/tx package tested..."
 go test -coverprofile cover.out>> $LOGFILE
 if [ "$?" -ne "0" ] ; then
   echo "NG."
@@ -41,7 +41,7 @@ fi
 
 
 cd $TESTROOT/log
-echo "log package tested..."
+echo "github.com/unirita/cuto/log package tested..."
 go test -coverprofile cover.out>> $LOGFILE
 if [ "$?" -ne "0" ] ; then
   echo "NG."
@@ -50,14 +50,14 @@ fi
 
 
 cd $TESTROOT/master
-echo "master package tested..."
+echo "github.com/unirita/cuto/master package tested..."
 go test -coverprofile cover.out>> $LOGFILE
 if [ "$?" -ne "0" ] ; then
   echo "NG."
   RETCODE=1
 fi
 cd $TESTROOT/master/config
-echo "master/config package tested..."
+echo "github.com/unirita/cuto/master/config package tested..."
 go test -coverprofile cover.out>> $LOGFILE
 if [ "$?" -ne "0" ] ; then
   echo "NG."
@@ -65,14 +65,14 @@ if [ "$?" -ne "0" ] ; then
 fi
 
 cd $TESTROOT/master/jobnet
-echo "master/jobnet package tested..."
+echo "github.com/unirita/cuto/master/jobnet package tested..."
 go test -coverprofile cover.out>> $LOGFILE
 if [ "$?" -ne "0" ] ; then
   echo "NG."
   RETCODE=1
 fi
 cd $TESTROOT/master/jobnet/parser
-echo "master/jobnet/parser package tested..."
+echo "github.com/unirita/cuto/master/jobnet/parser package tested..."
 go test -coverprofile cover.out>> $LOGFILE
 if [ "$?" -ne "0" ] ; then
   echo "NG."
@@ -81,7 +81,7 @@ fi
 
 
 cd $TESTROOT/master/remote
-echo "master/remote package tested..."
+echo "github.com/unirita/cuto/master/remote package tested..."
 go test -coverprofile cover.out>> $LOGFILE
 if [ "$?" -ne "0" ] ; then
   echo "NG."
@@ -91,7 +91,7 @@ fi
 
 
 cd $TESTROOT/message
-echo "message package tested..."
+echo "github.com/unirita/cuto/message package tested..."
 go test -coverprofile cover.out>> $LOGFILE
 if [ "$?" -ne "0" ] ; then
   echo "NG."
@@ -100,13 +100,14 @@ fi
 
 
 cd $TESTROOT/servant
-echo "servant package tested..."
+echo "github.com/unirita/cuto/servant package tested..."
 go test -coverprofile cover.out>> $LOGFILE
 if [ "$?" -ne "0" ] ; then
   echo "NG."
   RETCODE=1
 fi
 cd $TESTROOT/servant/config
+echo "github.com/unirita/cuto/servant/config package tested..."
 go test -coverprofile cover.out>> $LOGFILE
 if [ "$?" -ne "0" ] ; then
   echo "NG."
@@ -114,7 +115,7 @@ if [ "$?" -ne "0" ] ; then
 fi
 
 cd $TESTROOT/servant/job
-echo "servant/job package tested..."
+echo "github.com/unirita/cuto/servant/job package tested..."
 go test -coverprofile cover.out>> $LOGFILE
 if [ "$?" -ne "0" ] ; then
   echo "NG."
@@ -122,7 +123,7 @@ if [ "$?" -ne "0" ] ; then
 fi
 
 cd $TESTROOT/servant/remote
-echo "servant/remote package tested..."
+echo "github.com/unirita/cuto/servant/remote package tested..."
 go test -coverprofile cover.out>> $LOGFILE
 if [ "$?" -ne "0" ] ; then
   echo "NG."
@@ -132,14 +133,14 @@ fi
 
 
 cd $TESTROOT/show
-echo "show package tested..."
+echo "github.com/unirita/cuto/show package tested..."
 go test -coverprofile cover.out>> $LOGFILE
 if [ "$?" -ne "0" ] ; then
   echo "NG."
   RETCODE=1
 fi
 cd $TESTROOT/show/gen
-echo "show/gen package tested..."
+echo "github.com/unirita/cuto/show/gen package tested..."
 go test -coverprofile cover.out>> $LOGFILE
 if [ "$?" -ne "0" ] ; then
   echo "NG."
@@ -149,7 +150,7 @@ fi
 
 
 cd $TESTROOT/util
-echo "util package tested..."
+echo "github.com/unirita/cuto/util package tested..."
 go test -coverprofile cover.out>> $LOGFILE
 if [ "$?" -ne "0" ] ; then
   echo "NG."
@@ -159,7 +160,7 @@ fi
 
 
 cd $TESTROOT/flowgen/converter
-echo "flowgen/converter package tested..."
+echo "github.com/unirita/cuto/flowgen/converter package tested..."
 go test -coverprofile cover.out>> $LOGFILE
 if [ "$?" -ne "0" ] ; then
   echo "NG."
@@ -169,7 +170,7 @@ fi
 
 
 cd $TESTROOT/realtime/network
-echo "realtime/network package tested..."
+echo "github.com/unirita/cuto/realtime/network package tested..."
 go test -coverprofile cover.out>> $LOGFILE
 if [ "$?" -ne "0" ] ; then
   echo "NG."
@@ -179,7 +180,7 @@ fi
 
 
 cd $TESTROOT/utctime
-echo "utctime package tested..."
+echo "github.com/unirita/cuto/utctime package tested..."
 go test -coverprofile cover.out>> $LOGFILE
 if [ "$?" -ne "0" ] ; then
   echo "NG."

@@ -6,7 +6,7 @@ set RETCODE=0
 cd /d "%~dp0"
 
 pushd console
-echo console package tested...
+echo github.com/unirita/cuto/console package tested...
 go test -coverprofile cover.out> %LOGFILE%
 if %errorlevel% neq 0 (
   echo NG.
@@ -15,14 +15,14 @@ if %errorlevel% neq 0 (
 popd
 
 pushd db
-echo db package tested...
+echo github.com/unirita/cuto/db package tested...
 go test -coverprofile cover.out>> %LOGFILE%
 if %errorlevel% neq 0 (
   echo NG.
   set RETCODE=1
 )
 pushd query
-echo db/query package tested...
+echo github.com/unirita/cuto/db/query package tested...
 go test -coverprofile cover.out>> %LOGFILE%
 if %errorlevel% neq 0 (
   echo NG.
@@ -30,7 +30,7 @@ if %errorlevel% neq 0 (
 )
 popd
 pushd tx
-echo db/tx package tested...
+echo github.com/unirita/cuto/db/tx package tested...
 go test -coverprofile cover.out>> %LOGFILE%
 if %errorlevel% neq 0 (
   echo NG.
@@ -40,7 +40,7 @@ popd
 popd
 
 pushd log
-echo log package tested...
+echo github.com/unirita/cuto/log package tested...
 go test -coverprofile cover.out>> %LOGFILE%
 if %errorlevel% neq 0 (
   echo NG.
@@ -49,14 +49,14 @@ if %errorlevel% neq 0 (
 popd
 
 pushd master
-echo master package tested...
+echo github.com/unirita/cuto/master package tested...
 go test -coverprofile cover.out>> %LOGFILE%
 if %errorlevel% neq 0 (
   echo NG.
   set RETCODE=1
 )
 pushd config
-echo master/config package tested...
+echo github.com/unirita/cuto/master/config package tested...
 go test -coverprofile cover.out>> %LOGFILE%
 if %errorlevel% neq 0 (
   echo NG.
@@ -64,14 +64,14 @@ if %errorlevel% neq 0 (
 )
 popd
 pushd jobnet
-echo master/jobnet package tested...
+echo github.com/unirita/cuto/master/jobnet package tested...
 go test -coverprofile cover.out>> %LOGFILE%
 if %errorlevel% neq 0 (
   echo NG.
   set RETCODE=1
 )
 pushd parser
-echo master/jobnet/parser package tested...
+echo github.com/unirita/cuto/master/jobnet/parser package tested...
 go test -coverprofile cover.out>> %LOGFILE%
 if %errorlevel% neq 0 (
   echo NG.
@@ -80,7 +80,7 @@ if %errorlevel% neq 0 (
 popd
 popd
 pushd remote
-echo master/remote package tested...
+echo github.com/unirita/cuto/master/remote package tested...
 go test -coverprofile cover.out>> %LOGFILE%
 if %errorlevel% neq 0 (
   echo NG.
@@ -90,7 +90,7 @@ popd
 popd
 
 pushd message
-echo message package tested...
+echo github.com/unirita/cuto/message package tested...
 go test -coverprofile cover.out>> %LOGFILE%
 if %errorlevel% neq 0 (
   echo NG.
@@ -99,13 +99,14 @@ if %errorlevel% neq 0 (
 popd
 
 pushd servant
-echo servant package tested...
+echo github.com/unirita/cuto/servant package tested...
 go test -coverprofile cover.out>> %LOGFILE%
 if %errorlevel% neq 0 (
   echo NG.
   set RETCODE=1
 )
 pushd config
+echo github.com/unirita/cuto/servant/config package tested...
 go test -coverprofile cover.out>> %LOGFILE%
 if %errorlevel% neq 0 (
   echo NG.
@@ -113,7 +114,7 @@ if %errorlevel% neq 0 (
 )
 popd
 pushd job
-echo servant/job package tested...
+echo github.com/unirita/cuto/servant/job package tested...
 go test -coverprofile cover.out>> %LOGFILE%
 if %errorlevel% neq 0 (
   echo NG.
@@ -121,7 +122,7 @@ if %errorlevel% neq 0 (
 )
 popd
 pushd remote
-echo servant/remote package tested...
+echo github.com/unirita/cuto/servant/remote package tested...
 go test -coverprofile cover.out>> %LOGFILE%
 if %errorlevel% neq 0 (
   echo NG.
@@ -131,14 +132,14 @@ popd
 popd
 
 pushd show
-echo show package tested...
+echo github.com/unirita/cuto/show package tested...
 go test -coverprofile cover.out>> %LOGFILE%
 if %errorlevel% neq 0 (
   echo NG.
   set RETCODE=1
 )
 pushd gen
-echo show/gen package tested...
+echo github.com/unirita/cuto/show/gen package tested...
 go test -coverprofile cover.out>> %LOGFILE%
 if %errorlevel% neq 0 (
   echo NG.
@@ -148,7 +149,7 @@ popd
 popd
 
 pushd util
-echo util package tested...
+echo github.com/unirita/cuto/util package tested...
 go test -coverprofile cover.out>> %LOGFILE%
 if %errorlevel% neq 0 (
   echo NG.
@@ -158,7 +159,7 @@ popd
 
 pushd flowgen
 pushd converter
-echo flowgen/converter package tested...
+echo github.com/unirita/cuto/flowgen/converter package tested...
 go test -coverprofile cover.out>> %LOGFILE%
 if %errorlevel% neq 0 (
   echo NG.
@@ -169,7 +170,7 @@ popd
 
 pushd realtime
 pushd network
-echo realtime/network package tested...
+echo github.com/unirita/cuto/realtime/network package tested...
 go test -coverprofile cover.out>> %LOGFILE%
 if %errorlevel% neq 0 (
   echo NG.
@@ -179,7 +180,7 @@ popd
 popd
 
 pushd utctime
-echo utctime package tested...
+echo github.com/unirita/cuto/utctime package tested...
 go test -coverprofile cover.out>> %LOGFILE%
 if %errorlevel% neq 0 (
   echo NG.
