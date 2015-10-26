@@ -23,8 +23,8 @@ var conf *config.ServantConfig
 func init() {
 	time.Local = time.FixedZone("JST", 9*60*60)
 
-	currentDir, _ := os.Getwd()
-	testPath := filepath.Join(currentDir, "_testdata")
+	testPath := filepath.Join(os.Getenv("GOPATH"), "src", "github.com", "unirita",
+		"cuto", "servant", "job", "_testdata")
 	err := os.Chdir(testPath)
 	config.RootPath = testPath
 	if err != nil {

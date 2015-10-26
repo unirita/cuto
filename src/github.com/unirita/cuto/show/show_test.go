@@ -6,8 +6,8 @@ package main
 import (
 	"testing"
 
-	"cuto/db"
-	"cuto/show/gen"
+	"github.com/unirita/cuto/db"
+	"github.com/unirita/cuto/show/gen"
 )
 
 func TestNewShowParam_ShowParamの初期化(t *testing.T) {

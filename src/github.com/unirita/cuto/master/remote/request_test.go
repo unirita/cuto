@@ -10,7 +10,7 @@ import (
 	"github.com/unirita/cuto/message"
 )
 
-func setTestConfig() {
+func init() {
 	config.Job.ConnectionTimeoutSec = 1
 }
 
@@ -104,8 +104,7 @@ func runTestReceiverWithStartTime(t *testing.T, listener net.Listener, msq chan<
 }
 
 func TestSendMessage_メッセージを送信できる(t *testing.T) {
-	setTestConfig()
-	host := "localhost"
+	host := "127.0.0.1"
 	port := 12345
 	hostPort := fmt.Sprintf("%s:%d", host, port)
 
@@ -136,8 +135,7 @@ func TestSendMessage_メッセージを送信できる(t *testing.T) {
 }
 
 func TestSendMessage_一定時間応答がない場合はタイムアウトする(t *testing.T) {
-	setTestConfig()
-	host := "localhost"
+	host := "127.0.0.1"
 	port := 12345
 	hostPort := fmt.Sprintf("%s:%d", host, port)
 
@@ -160,8 +158,7 @@ func TestSendMessage_一定時間応答がない場合はタイムアウトす�
 }
 
 func TestSendMessage_ハートビートが返される場合はタイムアウトしない(t *testing.T) {
-	setTestConfig()
-	host := "localhost"
+	host := "127.0.0.1"
 	port := 12345
 	hostPort := fmt.Sprintf("%s:%d", host, port)
 
@@ -192,8 +189,7 @@ func TestSendMessage_ハートビートが返される場合はタイムアウ�
 }
 
 func TestSendMessage_スタート時刻をチャンネルから取得できる(t *testing.T) {
-	setTestConfig()
-	host := "localhost"
+	host := "127.0.0.1"
 	port := 12345
 	hostPort := fmt.Sprintf("%s:%d", host, port)
 
