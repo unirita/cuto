@@ -6,6 +6,7 @@ package util
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"cuto/testutil"
@@ -13,20 +14,18 @@ import (
 
 var (
 	lockFile = "unit_test.lock"
-	testPath = fmt.Sprintf("%s%s", os.Getenv("GOPATH"), "/test/cuto/util/")
 )
 
 func init() {
-	os.Remove(testPath + lockFile)
+	os.Remove(filepath.Join(lockFilePath, lockFile))
 }
 
 func TestNewFileLock_初期化できる(t *testing.T) {
 	l, err := InitLock(lockFile)
 	if err != nil {
 		t.Errorf("同期処理の初期化に失敗しました。 - %s", err.Error())
-	} else {
-		l.TermLock()
 	}
+	defer l.TermLock()
 }
 
 func TestNewFileLock_初期化に失敗(t *testing.T) {
@@ -50,7 +49,6 @@ func TestLock_初期化せずにロック(t *testing.T) {
 }
 
 func TestLock_ロックする(t *testing.T) {
-	lockFilePath = testPath
 	l, err := InitLock(lockFile)
 	if err != nil {
 		t.Fatalf("同期処理の初期化に失敗しました。 - %s", err.Error())
@@ -63,24 +61,23 @@ func TestLock_ロックする(t *testing.T) {
 	}
 	defer l.Unlock()
 
-	if _, err = os.Stat(testPath + lockFile); err != nil {
+	if _, err = os.Stat(filepath.Join(lockFilePath, lockFile)); err != nil {
 		t.Errorf("ロックファイルが存在しない。 - %v", err)
 	}
 }
 
 //func TestLock_上位の権限プロセスがロック中のためにロックに失敗する(t *testing.T) {
-//	lockFilePath = testPath
 //	l, err := InitLock(lockFile)
 //	if err != nil {
 //		t.Fatalf("同期処理の初期化に失敗しました。 - %s", err.Error())
 //	}
 //	defer l.TermLock()
 //	// 他プロセスによってロック
-//	file, err := os.OpenFile(lockFilePath+lockFile, os.O_CREATE|os.O_WRONLY, 0600)
+//	file, err := os.OpenFile(filepath.Join(lockFilePath, lockFile), os.O_CREATE|os.O_WRONLY, 0600)
 //	if err != nil {
 //		t.Fatalf("ロックファイルの作成失敗。 - %v", err)
 //	}
-//	defer os.Remove(lockFilePath + lockFile)
+//	defer os.Remove(filepath.Join(lockFilePath, lockFile))
 //	file.WriteString("1") // init.d or launch.d or system
 //	file.Close()
 
@@ -98,18 +95,17 @@ func TestLock_ロックする(t *testing.T) {
 //}
 
 //func TestLock_他プロセスがロック中なのでロックに失敗する(t *testing.T) {
-//	lockFilePath = testPath
 //	l, err := InitLock(lockFile)
 //	if err != nil {
 //		t.Fatalf("同期処理の初期化に失敗しました。 - %s", err.Error())
 //	}
 //	defer l.TermLock()
 //	// 他プロセスによってロック
-//	file, err := os.OpenFile(lockFilePath+lockFile, os.O_CREATE|os.O_WRONLY, 0600)
+//	file, err := os.OpenFile(filepath.Join(lockFilePath, lockFile), os.O_CREATE|os.O_WRONLY, 0600)
 //	if err != nil {
 //		t.Fatalf("ロックファイルの作成失敗。 - %v", err)
 //	}
-//	defer os.Remove(lockFilePath + lockFile)
+//	defer os.Remove(filepath.Join(lockFilePath, lockFile))
 //	file.WriteString("1") // init.d or launch.d or system
 //	file.Close()
 
@@ -127,18 +123,17 @@ func TestLock_ロックする(t *testing.T) {
 //}
 
 func TestLock_ロックファイルが残っている状態でロックに成功する(t *testing.T) {
-	lockFilePath = testPath
 	l, err := InitLock(lockFile)
 	if err != nil {
 		t.Fatalf("同期処理の初期化に失敗しました。 - %s", err.Error())
 	}
 	defer l.TermLock()
 	// 他プロセスによってロック
-	file, err := os.OpenFile(lockFilePath+lockFile, os.O_CREATE|os.O_WRONLY, 0600)
+	file, err := os.OpenFile(filepath.Join(lockFilePath, lockFile), os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		t.Fatalf("ロックファイルの作成失敗。 - %v", err)
 	}
-	defer os.Remove(lockFilePath + lockFile)
+	defer os.Remove(filepath.Join(lockFilePath, lockFile))
 	file.WriteString("99999") // ありえないプロセス
 	file.Close()
 
@@ -156,18 +151,17 @@ func TestLock_ロックファイルが残っている状態でロックに成功
 }
 
 func TestLock_不正なロックファイルが残っている状態でロックに成功する(t *testing.T) {
-	lockFilePath = testPath
 	l, err := InitLock(lockFile)
 	if err != nil {
 		t.Fatalf("同期処理の初期化に失敗しました。 - %s", err.Error())
 	}
 	defer l.TermLock()
 	// 他プロセスによってロック
-	file, err := os.OpenFile(lockFilePath+lockFile, os.O_CREATE|os.O_WRONLY, 0600)
+	file, err := os.OpenFile(filepath.Join(lockFilePath, lockFile), os.O_CREATE|os.O_WRONLY, 0600)
 	if err != nil {
 		t.Fatalf("ロックファイルの作成失敗。 - %v", err)
 	}
-	defer os.Remove(lockFilePath + lockFile)
+	defer os.Remove(filepath.Join(lockFilePath, lockFile))
 	file.WriteString("A") // ありえないプロセス
 	file.Close()
 
@@ -198,7 +192,6 @@ func TestUnlock_初期化前にアンロックする(t *testing.T) {
 }
 
 func TestUnlock_ロック前にアンロックする(t *testing.T) {
-	lockFilePath = testPath
 	l, err := InitLock(lockFile)
 	if err != nil {
 		t.Fatalf("同期処理の初期化に失敗しました。 - %s", err.Error())
@@ -211,18 +204,17 @@ func TestUnlock_ロック前にアンロックする(t *testing.T) {
 }
 
 //func TestUnlock_他プロセスがロック中なのでアンロックに失敗(t *testing.T) {
-//	lockFilePath = testPath
 //	l, err := InitLock(lockFile)
 //	if err != nil {
 //		t.Fatalf("同期処理の初期化に失敗しました。 - %s", err.Error())
 //	}
 //	defer l.TermLock()
 //	// 他プロセスによってロック
-//	file, err := os.OpenFile(lockFilePath+lockFile, os.O_CREATE|os.O_WRONLY, 0600)
+//	file, err := os.OpenFile(filepath.Join(lockFilePath, lockFile), os.O_CREATE|os.O_WRONLY, 0600)
 //	if err != nil {
 //		t.Fatalf("ロックファイルの作成失敗。 - %v", err)
 //	}
-//	defer os.Remove(lockFilePath + lockFile)
+//	defer os.Remove(filepath.Join(lockFilePath, lockFile))
 //	file.WriteString("99999") // ありえないプロセス
 //	file.Close()
 
@@ -235,18 +227,17 @@ func TestUnlock_ロック前にアンロックする(t *testing.T) {
 //}
 
 //func TestUnlock_不正なロック中でアンロックに失敗(t *testing.T) {
-//	lockFilePath = testPath
 //	l, err := InitLock(lockFile)
 //	if err != nil {
 //		t.Fatalf("同期処理の初期化に失敗しました。 - %s", err.Error())
 //	}
 //	defer l.TermLock()
 //	// 他プロセスによってロック
-//	file, err := os.OpenFile(lockFilePath+lockFile, os.O_CREATE|os.O_WRONLY, 0600)
+//	file, err := os.OpenFile(filepath.Join(lockFilePath, lockFile), os.O_CREATE|os.O_WRONLY, 0600)
 //	if err != nil {
 //		t.Fatalf("ロックファイルの作成失敗。 - %v", err)
 //	}
-//	defer os.Remove(lockFilePath + lockFile)
+//	defer os.Remove(filepath.Join(lockFilePath, lockFile))
 //	file.WriteString("S") // ありえないプロセス
 //	file.Close()
 
