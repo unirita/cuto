@@ -25,7 +25,8 @@ var testJobPath string
 func init() {
 	time.Local = time.FixedZone("JST", 9*60*60)
 
-	testJobPath = filepath.Join(os.Getenv("GOPATH"), "test", "cuto", "servant", "job")
+	currentDir, _ := os.Getwd()
+	testJobPath = filepath.Join(currentDir, "_testdata")
 	err := os.Chdir(testJobPath)
 	config.RootPath = testJobPath
 	if err != nil {
@@ -52,21 +53,12 @@ func stToLocalTimestamp(st string) string {
 // ジョブログファイル名をフルパスで作成する。
 // ”開始日(YYYYMMDD)\インスタンスID.ジョブ名（拡張子なし）.開始日時（yyyyMMddHHmmss.sss).log
 func createJoblogFileName(req *message.Request, st string, nID int, jID string) string {
-	var job string
-	if strings.LastIndex(req.Path, "\\") != -1 {
-		tokens := strings.Split(req.Path, "\\")
-		job = tokens[len(tokens)-1]
-	} else if strings.LastIndex(req.Path, "/") != -1 {
-		tokens := strings.Split(req.Path, "/")
-		job = tokens[len(tokens)-1]
-	} else {
-		job = req.Path
-	}
+	job := filepath.Base(req.Path)
 	if extpos := strings.LastIndex(job, "."); extpos != -1 {
 		job = job[:extpos]
 	}
-	joblogDir := filepath.Join(conf.Dir.JoblogDir, st[:8])
-	return fmt.Sprintf("%v%c%v.%v.%v.%v.log", joblogDir, os.PathSeparator, nID, job, jID, st)
+	joblogFile := fmt.Sprintf("%v.%v.%v.%v.log", nID, job, jID, st)
+	return filepath.Join(conf.Dir.JoblogDir, st[:8], joblogFile)
 }
 
 func TestDoJobRequest_拡張子無しSHジョブが正常に実行できる(t *testing.T) {
@@ -150,7 +142,6 @@ func TestDoJobRequest_パス指定ありCSHジョブが正常に実行できる(
 		ErrRC:     12,
 		ErrStr:    "ERR",
 	}
-	req.Path = filepath.Join(testJobPath, "jobscript", "job.csh")
 
 	stCh := make(chan string, 1)
 	res := DoJobRequest(req, conf, stCh)

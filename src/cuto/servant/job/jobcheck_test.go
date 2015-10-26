@@ -17,7 +17,7 @@ func init() {
 }
 
 func getJobCheckTestConfig() *config.ServantConfig {
-	testDir := filepath.Join(os.Getenv("GOPATH"), "test", "cuto", "servant", "job", "jobcheck")
+	testDir := filepath.Join(os.Getenv("GOPATH"), "src", "cuto", "servant", "job", "_testdata", "jobcheck")
 
 	conf := new(config.ServantConfig)
 	conf.Dir.JoblogDir = filepath.Join(testDir, "joblog")

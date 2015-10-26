@@ -7,6 +7,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
@@ -23,14 +24,14 @@ var conf *config.ServantConfig
 func init() {
 	time.Local = time.FixedZone("JST", 9*60*60)
 
-	s := os.PathSeparator
-	testPath := fmt.Sprintf("%s%c%s%c%s%c%s%c%s", os.Getenv("GOPATH"), s, "test", s, "cuto", s, "servant", s, "job")
+	currentDir, _ := os.Getwd()
+	testPath := filepath.Join(currentDir, "_testdata")
 	err := os.Chdir(testPath)
 	config.RootPath = testPath
 	if err != nil {
 		panic(err.Error())
 	}
-	configPath := fmt.Sprintf("%s%c%s", testPath, s, "servant.ini")
+	configPath := filepath.Join(testPath, "servant.ini")
 	conf = config.ReadConfig(configPath)
 	os.RemoveAll(conf.Dir.JoblogDir)
 	err = os.Mkdir(conf.Dir.JoblogDir, 0666)
@@ -51,21 +52,12 @@ func stToLocalTimestamp(st string) string {
 // ジョブログファイル名をフルパスで作成する。
 // ”開始日(YYYYMMDD)\インスタンスID.ジョブ名（拡張子なし）.開始日時（yyyyMMddHHmmss.sss).log
 func createJoblogFileName(req *message.Request, st string, nID int, jID string) string {
-	var job string
-	if strings.LastIndex(req.Path, "\\") != -1 {
-		tokens := strings.Split(req.Path, "\\")
-		job = tokens[len(tokens)-1]
-	} else if strings.LastIndex(req.Path, "/") != -1 {
-		tokens := strings.Split(req.Path, "/")
-		job = tokens[len(tokens)-1]
-	} else {
-		job = req.Path
-	}
+	job := filepath.Base(req.Path)
 	if extpos := strings.LastIndex(job, "."); extpos != -1 {
 		job = job[:extpos]
 	}
-	joblogDir := fmt.Sprintf("%v%c%v", conf.Dir.JoblogDir, os.PathSeparator, st[:8])
-	return fmt.Sprintf("%v%c%v.%v.%v.%v.log", joblogDir, os.PathSeparator, nID, job, jID, st)
+	joblogFile := fmt.Sprintf("%v.%v.%v.%v.log", nID, job, jID, st)
+	return filepath.Join(conf.Dir.JoblogDir, st[:8], joblogFile)
 }
 
 func TestDoJobRequest_ジョブが正常に実行できる(t *testing.T) {
@@ -150,11 +142,6 @@ func TestDoJobRequest_パス指定あり引数なしジョブが正常に実行�
 		ErrRC:     12,
 		ErrStr:    "ERR",
 	}
-	gopath := os.Getenv("GOPATH")
-	req.Path = fmt.Sprintf("%s%c%s%c%s%c%s%c%s%c%s%c%s",
-		gopath, os.PathSeparator, "test", os.PathSeparator,
-		"cuto", os.PathSeparator, "servant", os.PathSeparator, "job", os.PathSeparator,
-		"jobscript", os.PathSeparator, "job.bat")
 
 	stCh := make(chan string, 1)
 	res := DoJobRequest(req, conf, stCh)
