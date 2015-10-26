@@ -3,6 +3,7 @@ package jobnet
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"reflect"
 	"strings"
 	"testing"
@@ -35,9 +36,7 @@ func (u *undefinedElement) Execute() (Element, error) {
 }
 
 func getTestDBPath() string {
-	s := os.PathSeparator
-	return fmt.Sprintf("%s%c%s%c%s%c%s%c%s%c%s",
-		os.Getenv("GOPATH"), s, "test", s, "cuto", s, "master", s, "jobnet", s, "test.sqlite")
+	return filepath.Join("_testdata", "test.sqlite")
 }
 
 func loadTestConfig() {
