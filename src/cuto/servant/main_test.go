@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
@@ -12,9 +12,7 @@ import (
 )
 
 func getTestDataDir() string {
-	const s = os.PathSeparator
-	return fmt.Sprintf("%s%c%s%c%s%c%s%c%s",
-		os.Getenv("GOPATH"), s, "test", s, "cuto", s, "servant", s, "main")
+	return "_testdata"
 }
 
 func TestRealMain_バージョン確認ができる(t *testing.T) {
@@ -39,8 +37,7 @@ func TestRealMain_設定ファイルから設定がロードされた上で内�
 	} else {
 		configFile = "error_l.ini"
 	}
-	config.FilePath = fmt.Sprintf("%s%c%s",
-		getTestDataDir(), s, configFile)
+	config.FilePath = filepath.Join(getTestDataDir(), configFile)
 
 	args := new(arguments)
 	rc := realMain(args)
@@ -61,8 +58,7 @@ func TestRealMain_ロガー初期化でのエラー発生時にリターンコ�
 	} else {
 		configFile = "logerror_l.ini"
 	}
-	config.FilePath = fmt.Sprintf("%s%c%s",
-		getTestDataDir(), s, configFile)
+	config.FilePath = filepath.Join(getTestDataDir(), configFile)
 
 	args := new(arguments)
 	rc := realMain(args)
@@ -80,8 +76,7 @@ func TestRealMain_Run関数でのエラー発生時にリターンコードrc_er
 	} else {
 		configFile = "binderror_l.ini"
 	}
-	config.FilePath = fmt.Sprintf("%s%c%s",
-		getTestDataDir(), s, configFile)
+	config.FilePath = filepath.Join(getTestDataDir(), configFile)
 
 	args := new(arguments)
 	rc := realMain(args)
