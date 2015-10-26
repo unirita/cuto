@@ -1,9 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"net"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -13,10 +13,8 @@ import (
 var testDataDir string
 
 func init() {
-	s := os.PathSeparator
-	testDataDir = fmt.Sprintf("%s%c%s%c%s%c%s%c%s",
-		os.Getenv("GOPATH"), s, "test", s, "cuto", s, "master", s, "main")
-
+	currentDir, _ := os.Getwd()
+	testDataDir = filepath.Join(currentDir, "_testdata")
 	os.Chdir(testDataDir)
 	os.RemoveAll("log")
 	os.Mkdir("log", 0777)
