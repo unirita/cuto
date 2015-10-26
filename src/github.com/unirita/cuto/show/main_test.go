@@ -38,8 +38,7 @@ func getDiff() string {
 }
 
 func setConfigPath() string {
-	currentDir, _ := os.Getwd()
-	return filepath.Join(currentDir, "_testdata")
+	return filepath.Join(testutil.GetBaseDir(), "show", "_testdata")
 }
 func setConfigFile() string {
 	return filepath.Join(confPath, "show_test.ini")

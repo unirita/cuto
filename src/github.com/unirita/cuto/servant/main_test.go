@@ -12,7 +12,7 @@ import (
 )
 
 func getTestDataDir() string {
-	return "_testdata"
+	return filepath.Join(testutil.GetBaseDir(), "servant", "_testdata")
 }
 
 func TestRealMain_バージョン確認ができる(t *testing.T) {

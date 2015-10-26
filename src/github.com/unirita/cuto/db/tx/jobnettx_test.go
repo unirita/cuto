@@ -9,10 +9,11 @@ import (
 
 	"github.com/unirita/cuto/db"
 	"github.com/unirita/cuto/db/query"
+	"github.com/unirita/cuto/testutil"
 )
 
 // テストDB名
-var db_path = "_testdata"
+var db_path = filepath.Join(testutil.GetBaseDir(), "db", "tx", "_testdata")
 var db_name = filepath.Join(db_path, "test_tx.sqlite")
 
 // DB接続後の失敗を誘うためのダミーファイル

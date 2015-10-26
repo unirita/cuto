@@ -9,11 +9,12 @@ import (
 	"testing"
 
 	"github.com/unirita/cuto/db"
+	"github.com/unirita/cuto/testutil"
 )
 
 // テストDB名
 var (
-	db_root = "_testdata"
+	db_root = filepath.Join(testutil.GetBaseDir(), "db", "query", "_testdata")
 	db_name = filepath.Join(db_root, "test_q.sqlite")
 	conn    = dbOpen()
 

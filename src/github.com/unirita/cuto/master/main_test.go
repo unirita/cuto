@@ -13,8 +13,7 @@ import (
 var testDataDir string
 
 func init() {
-	currentDir, _ := os.Getwd()
-	testDataDir = filepath.Join(currentDir, "_testdata")
+	testDataDir = filepath.Join(testutil.GetBaseDir(), "master", "_testdata")
 	os.Chdir(testDataDir)
 	os.RemoveAll("log")
 	os.Mkdir("log", 0777)

@@ -10,6 +10,7 @@ import (
 
 	"github.com/unirita/cuto/master/config"
 	"github.com/unirita/cuto/master/jobnet/parser"
+	"github.com/unirita/cuto/testutil"
 )
 
 // ※補足事項
@@ -36,7 +37,8 @@ func (u *undefinedElement) Execute() (Element, error) {
 }
 
 func getTestDBPath() string {
-	return filepath.Join("_testdata", "test.sqlite")
+	return filepath.Join(testutil.GetBaseDir(),
+		"master", "jobnet", "_testdata", "test.sqlite")
 }
 
 func loadTestConfig() {

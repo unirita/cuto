@@ -1,7 +1,6 @@
 package job
 
 import (
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -9,6 +8,7 @@ import (
 
 	"github.com/unirita/cuto/message"
 	"github.com/unirita/cuto/servant/config"
+	"github.com/unirita/cuto/testutil"
 	"github.com/unirita/cuto/utctime"
 )
 
@@ -17,8 +17,7 @@ func init() {
 }
 
 func getJobCheckTestConfig() *config.ServantConfig {
-	testDir := filepath.Join(os.Getenv("GOPATH"), "src", "github.com", "unirita",
-		"cuto", "servant", "job", "_testdata", "jobcheck")
+	testDir := filepath.Join(testutil.GetBaseDir(), "servant", "job", "_testdata", "jobcheck")
 
 	conf := new(config.ServantConfig)
 	conf.Dir.JoblogDir = filepath.Join(testDir, "joblog")

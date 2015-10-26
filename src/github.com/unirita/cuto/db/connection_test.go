@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 
 	"testing"
+
+	"github.com/unirita/cuto/testutil"
 )
 
 var (
@@ -14,7 +16,7 @@ var (
 )
 
 func getDBFile() string {
-	return filepath.Join("_testdata", "test.sqlite")
+	return filepath.Join(testutil.GetBaseDir(), "db", "_testdata", "test.sqlite")
 }
 
 func TestOpen_DBコネクションがOpenできる(t *testing.T) {

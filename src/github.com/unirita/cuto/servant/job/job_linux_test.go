@@ -15,6 +15,7 @@ import (
 	"github.com/unirita/cuto/db"
 	"github.com/unirita/cuto/message"
 	"github.com/unirita/cuto/servant/config"
+	"github.com/unirita/cuto/testutil"
 )
 
 var conf *config.ServantConfig
@@ -24,8 +25,7 @@ var testJobPath string
 func init() {
 	time.Local = time.FixedZone("JST", 9*60*60)
 
-	currentDir, _ := os.Getwd()
-	testJobPath = filepath.Join(currentDir, "_testdata")
+	testJobPath = filepath.Join(testutil.GetBaseDir(), "servant", "job", "_testdata")
 	err := os.Chdir(testJobPath)
 	config.RootPath = testJobPath
 	if err != nil {
