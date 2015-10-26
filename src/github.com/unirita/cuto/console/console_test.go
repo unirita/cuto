@@ -6,7 +6,7 @@ package console
 import (
 	"testing"
 
-	"cuto/testutil"
+	"github.com/unirita/cuto/testutil"
 )
 
 func TestDisplay_メッセージを出力できる_引数なし(t *testing.T) {

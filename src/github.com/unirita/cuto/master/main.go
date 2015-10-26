@@ -8,14 +8,13 @@ import (
 	"fmt"
 	"os"
 
-	"cuto/console"
-	"cuto/db"
-	"cuto/db/query"
-	"cuto/log"
-	"cuto/message"
-
-	"cuto/master/config"
-	"cuto/master/jobnet"
+	"github.com/unirita/cuto/console"
+	"github.com/unirita/cuto/db"
+	"github.com/unirita/cuto/db/query"
+	"github.com/unirita/cuto/log"
+	"github.com/unirita/cuto/master/config"
+	"github.com/unirita/cuto/master/jobnet"
+	"github.com/unirita/cuto/message"
 )
 
 // 実行時引数のオプション

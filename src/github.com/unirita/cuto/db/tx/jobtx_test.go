@@ -7,8 +7,8 @@ import (
 	"sync"
 	"testing"
 
-	"cuto/db"
-	"cuto/utctime"
+	"github.com/unirita/cuto/db"
+	"github.com/unirita/cuto/utctime"
 )
 
 var mutex sync.Mutex

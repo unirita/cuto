@@ -7,10 +7,9 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"path/filepath"
 	"syscall"
 	"time"
-
-	"path/filepath"
 )
 
 type LockHandle struct {

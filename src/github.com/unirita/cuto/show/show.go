@@ -7,11 +7,11 @@ import (
 	"fmt"
 	"os"
 
-	"cuto/console"
-	"cuto/db"
-	"cuto/db/query"
-	"cuto/show/gen"
-	"cuto/utctime"
+	"github.com/unirita/cuto/console"
+	"github.com/unirita/cuto/db"
+	"github.com/unirita/cuto/db/query"
+	"github.com/unirita/cuto/show/gen"
+	"github.com/unirita/cuto/utctime"
 )
 
 // 表示に使用する構造体。

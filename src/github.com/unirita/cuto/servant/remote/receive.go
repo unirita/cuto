@@ -10,8 +10,8 @@ import (
 	"net"
 	"time"
 
-	"cuto/console"
-	"cuto/log"
+	"github.com/unirita/cuto/console"
+	"github.com/unirita/cuto/log"
 )
 
 // 送受信メッセージの終端文字

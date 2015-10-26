@@ -10,15 +10,14 @@ import (
 	"strconv"
 	"sync"
 
-	"cuto/console"
-	"cuto/db"
-	"cuto/db/tx"
-	"cuto/log"
-	"cuto/message"
-	"cuto/util"
-
-	"cuto/master/config"
-	"cuto/master/jobnet/parser"
+	"github.com/unirita/cuto/console"
+	"github.com/unirita/cuto/db"
+	"github.com/unirita/cuto/db/tx"
+	"github.com/unirita/cuto/log"
+	"github.com/unirita/cuto/master/config"
+	"github.com/unirita/cuto/master/jobnet/parser"
+	"github.com/unirita/cuto/message"
+	"github.com/unirita/cuto/util"
 )
 
 // ジョブネット全体を表す構造体

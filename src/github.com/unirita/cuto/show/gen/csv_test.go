@@ -6,7 +6,6 @@ package gen
 import (
 	"bufio"
 	"os"
-
 	"testing"
 )
 

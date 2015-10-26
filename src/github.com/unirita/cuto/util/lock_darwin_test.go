@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"cuto/testutil"
+	"github.com/unirita/cuto/testutil"
 )
 
 var (

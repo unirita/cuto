@@ -9,12 +9,11 @@ import (
 	"os"
 	"strconv"
 
-	"cuto/console"
-	"cuto/log"
-	"cuto/message"
-	"cuto/util"
-
-	"cuto/servant/config"
+	"github.com/unirita/cuto/console"
+	"github.com/unirita/cuto/log"
+	"github.com/unirita/cuto/message"
+	"github.com/unirita/cuto/servant/config"
+	"github.com/unirita/cuto/util"
 )
 
 type arguments struct {

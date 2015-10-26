@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"cuto/servant/config"
-	"cuto/testutil"
+	"github.com/unirita/cuto/servant/config"
+	"github.com/unirita/cuto/testutil"
 )
 
 func getTestDataDir() string {

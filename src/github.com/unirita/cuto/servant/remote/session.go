@@ -8,12 +8,12 @@ import (
 	"net"
 	"time"
 
-	"cuto/console"
-	"cuto/db"
-	"cuto/log"
-	"cuto/message"
-	"cuto/servant/config"
-	"cuto/servant/job"
+	"github.com/unirita/cuto/console"
+	"github.com/unirita/cuto/db"
+	"github.com/unirita/cuto/log"
+	"github.com/unirita/cuto/message"
+	"github.com/unirita/cuto/servant/config"
+	"github.com/unirita/cuto/servant/job"
 )
 
 type endSig struct{}

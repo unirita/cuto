@@ -10,9 +10,9 @@ import (
 	"strings"
 	"time"
 
-	"cuto/log"
-	"cuto/master/config"
-	"cuto/message"
+	"github.com/unirita/cuto/log"
+	"github.com/unirita/cuto/master/config"
+	"github.com/unirita/cuto/message"
 )
 
 type response struct {

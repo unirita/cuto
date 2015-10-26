@@ -6,20 +6,18 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"runtime"
 	"strings"
 	"syscall"
+	"testing"
 	"time"
 
-	"os/exec"
-
-	"testing"
-
-	"cuto/console"
-	"cuto/db"
-	"cuto/show/gen"
-	"cuto/testutil"
+	"github.com/unirita/cuto/console"
+	"github.com/unirita/cuto/db"
+	"github.com/unirita/cuto/show/gen"
+	"github.com/unirita/cuto/testutil"
 )
 
 // テスト結果確認用の一時出力ファイル。

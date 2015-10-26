@@ -6,7 +6,7 @@ package query
 import (
 	"fmt"
 
-	"cuto/db"
+	"github.com/unirita/cuto/db"
 )
 
 type jobQuery struct {

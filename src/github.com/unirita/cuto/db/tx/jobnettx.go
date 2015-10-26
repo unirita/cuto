@@ -6,10 +6,10 @@ package tx
 import (
 	"fmt"
 
-	"cuto/db"
-	"cuto/db/query"
-	"cuto/log"
-	"cuto/utctime"
+	"github.com/unirita/cuto/db"
+	"github.com/unirita/cuto/db/query"
+	"github.com/unirita/cuto/log"
+	"github.com/unirita/cuto/utctime"
 )
 
 // ジョブIDをキーに持つ

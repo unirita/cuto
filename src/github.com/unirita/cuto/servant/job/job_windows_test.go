@@ -12,10 +12,9 @@ import (
 	"testing"
 	"time"
 
-	"cuto/db"
-	"cuto/message"
-
-	"cuto/servant/config"
+	"github.com/unirita/cuto/db"
+	"github.com/unirita/cuto/message"
+	"github.com/unirita/cuto/servant/config"
 )
 
 var conf *config.ServantConfig

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"os"
 
-	"cuto/log"
+	"github.com/unirita/cuto/log"
 )
 
 // USAGE表示用の定義メッセージ

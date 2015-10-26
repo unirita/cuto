@@ -4,14 +4,13 @@
 package main
 
 import (
-	"syscall"
-
 	"os"
 	"os/signal"
+	"syscall"
 
-	"cuto/log"
-	"cuto/servant/config"
-	"cuto/servant/remote"
+	"github.com/unirita/cuto/log"
+	"github.com/unirita/cuto/servant/config"
+	"github.com/unirita/cuto/servant/remote"
 )
 
 var isTest bool = false

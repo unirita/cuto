@@ -7,15 +7,14 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
-	"path/filepath"
-
-	"cuto/db"
-	"cuto/message"
-	"cuto/servant/config"
+	"github.com/unirita/cuto/db"
+	"github.com/unirita/cuto/message"
+	"github.com/unirita/cuto/servant/config"
 )
 
 var conf *config.ServantConfig

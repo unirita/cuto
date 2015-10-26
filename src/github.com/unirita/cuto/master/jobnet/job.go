@@ -8,14 +8,14 @@ import (
 	"strings"
 	"time"
 
-	"cuto/console"
-	"cuto/db"
-	"cuto/db/tx"
-	"cuto/log"
-	"cuto/master/config"
-	"cuto/master/remote"
-	"cuto/message"
-	"cuto/util"
+	"github.com/unirita/cuto/console"
+	"github.com/unirita/cuto/db"
+	"github.com/unirita/cuto/db/tx"
+	"github.com/unirita/cuto/log"
+	"github.com/unirita/cuto/master/config"
+	"github.com/unirita/cuto/master/remote"
+	"github.com/unirita/cuto/message"
+	"github.com/unirita/cuto/util"
 )
 
 type sendFunc func(string, int, string, chan<- string) (string, error)

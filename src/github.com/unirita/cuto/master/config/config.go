@@ -11,7 +11,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 
-	"cuto/util"
+	"github.com/unirita/cuto/util"
 )
 
 type config struct {

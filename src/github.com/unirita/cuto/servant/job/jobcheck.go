@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"strings"
 
-	"cuto/message"
-	"cuto/servant/config"
-	"cuto/utctime"
+	"github.com/unirita/cuto/message"
+	"github.com/unirita/cuto/servant/config"
+	"github.com/unirita/cuto/utctime"
 )
 
 func DoJobResultCheck(chk *message.JobCheck, conf *config.ServantConfig) *message.JobResult {

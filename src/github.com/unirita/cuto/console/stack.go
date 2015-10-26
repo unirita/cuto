@@ -4,7 +4,7 @@
 package console
 
 import (
-	"cuto/log"
+	"github.com/unirita/cuto/log"
 	"runtime"
 )
 

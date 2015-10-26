@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"strings"
 
-	"cuto/utctime"
+	"github.com/unirita/cuto/utctime"
 )
 
 const (

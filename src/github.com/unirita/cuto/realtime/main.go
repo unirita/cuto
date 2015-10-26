@@ -7,9 +7,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"cuto/master/config"
-	"cuto/realtime/network"
-	"cuto/util"
+	"github.com/unirita/cuto/master/config"
+	"github.com/unirita/cuto/realtime/network"
+	"github.com/unirita/cuto/util"
 )
 
 // Runtime arguments

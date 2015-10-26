@@ -6,7 +6,7 @@ package db
 import (
 	"testing"
 
-	"cuto/utctime"
+	"github.com/unirita/cuto/utctime"
 )
 
 func TestNewJobNetworkResult_初期化できる(t *testing.T) {

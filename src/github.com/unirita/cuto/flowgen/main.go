@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"cuto/flowgen/converter"
+	"github.com/unirita/cuto/flowgen/converter"
 )
 
 const usage = `Usage :

@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"cuto/servant/config"
-	"cuto/servant/remote"
-	"cuto/testutil"
+	"github.com/unirita/cuto/servant/config"
+	"github.com/unirita/cuto/servant/remote"
+	"github.com/unirita/cuto/testutil"
 )
 
 func testEventLoop(signalCh <-chan os.Signal, sq <-chan *remote.Session) {

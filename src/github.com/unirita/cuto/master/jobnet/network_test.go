@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"cuto/master/config"
-	"cuto/master/jobnet/parser"
+	"github.com/unirita/cuto/master/config"
+	"github.com/unirita/cuto/master/jobnet/parser"
 )
 
 // ※補足事項

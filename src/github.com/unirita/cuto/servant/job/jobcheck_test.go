@@ -7,9 +7,9 @@ import (
 	"testing"
 	"time"
 
-	"cuto/message"
-	"cuto/servant/config"
-	"cuto/utctime"
+	"github.com/unirita/cuto/message"
+	"github.com/unirita/cuto/servant/config"
+	"github.com/unirita/cuto/utctime"
 )
 
 func init() {

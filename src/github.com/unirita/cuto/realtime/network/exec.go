@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"cuto/util"
+	"github.com/unirita/cuto/util"
 )
 
 // Command represents a master command which executes realtime network.

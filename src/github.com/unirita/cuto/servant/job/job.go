@@ -9,18 +9,17 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
 	"syscall"
 	"time"
 
-	"os/exec"
-
-	"cuto/console"
-	"cuto/db"
-	"cuto/log"
-	"cuto/message"
-	"cuto/servant/config"
-	"cuto/utctime"
+	"github.com/unirita/cuto/console"
+	"github.com/unirita/cuto/db"
+	"github.com/unirita/cuto/log"
+	"github.com/unirita/cuto/message"
+	"github.com/unirita/cuto/servant/config"
+	"github.com/unirita/cuto/utctime"
 )
 
 // 実行ジョブ情報

@@ -11,8 +11,8 @@ import (
 
 	"github.com/BurntSushi/toml"
 
-	"cuto/console"
-	"cuto/util"
+	"github.com/unirita/cuto/console"
+	"github.com/unirita/cuto/util"
 )
 
 const (

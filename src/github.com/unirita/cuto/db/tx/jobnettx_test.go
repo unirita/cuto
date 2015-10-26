@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"cuto/db"
-	"cuto/db/query"
+	"github.com/unirita/cuto/db"
+	"github.com/unirita/cuto/db/query"
 )
 
 // テストDB名

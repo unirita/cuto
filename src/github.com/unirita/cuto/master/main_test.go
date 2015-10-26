@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"cuto/testutil"
+	"github.com/unirita/cuto/testutil"
 )
 
 var testDataDir string

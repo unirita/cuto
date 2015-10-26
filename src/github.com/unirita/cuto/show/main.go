@@ -7,15 +7,14 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"runtime"
 
-	"path/filepath"
-
-	"cuto/console"
-	"cuto/db"
-	"cuto/master/config"
-	"cuto/show/gen"
-	"cuto/utctime"
+	"github.com/unirita/cuto/console"
+	"github.com/unirita/cuto/db"
+	"github.com/unirita/cuto/master/config"
+	"github.com/unirita/cuto/show/gen"
+	"github.com/unirita/cuto/utctime"
 )
 
 // 実行時引数のオプション

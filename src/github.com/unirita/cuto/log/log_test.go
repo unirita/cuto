@@ -4,10 +4,10 @@ import (
 	"runtime"
 	"testing"
 
-	"cuto/testutil"
-	"cuto/util"
-
 	"github.com/cihub/seelog"
+
+	"github.com/unirita/cuto/testutil"
+	"github.com/unirita/cuto/util"
 )
 
 var lockName = getLockName()

@@ -8,10 +8,10 @@ import (
 	"strings"
 	"testing"
 
-	"cuto/db"
-	"cuto/message"
-	"cuto/servant/config"
-	"cuto/testutil"
+	"github.com/unirita/cuto/db"
+	"github.com/unirita/cuto/message"
+	"github.com/unirita/cuto/servant/config"
+	"github.com/unirita/cuto/testutil"
 )
 
 func readTestConfig() *config.ServantConfig {

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"cuto/db"
+	"github.com/unirita/cuto/db"
 )
 
 // テストDB名

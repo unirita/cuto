@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"cuto/db"
-	"cuto/db/tx"
-	"cuto/master/config"
-	"cuto/message"
+	"github.com/unirita/cuto/db"
+	"github.com/unirita/cuto/db/tx"
+	"github.com/unirita/cuto/master/config"
+	"github.com/unirita/cuto/message"
 )
 
 func newTestNetwork() *Network {

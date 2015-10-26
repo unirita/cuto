@@ -9,7 +9,7 @@ import (
 
 	"github.com/cihub/seelog"
 
-	"cuto/util"
+	"github.com/unirita/cuto/util"
 )
 
 const lockHeader = "Unirita_CutoLog_"

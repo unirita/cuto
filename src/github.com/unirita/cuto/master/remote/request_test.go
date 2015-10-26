@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"cuto/master/config"
-	"cuto/message"
+	"github.com/unirita/cuto/master/config"
+	"github.com/unirita/cuto/message"
 )
 
 func setTestConfig() {

@@ -4,8 +4,8 @@ import (
 	"errors"
 	"testing"
 
-	"cuto/servant/config"
-	"cuto/testutil"
+	"github.com/unirita/cuto/servant/config"
+	"github.com/unirita/cuto/testutil"
 )
 
 func init() {

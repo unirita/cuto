@@ -9,7 +9,7 @@ import (
 	"os"
 	"strconv"
 
-	"cuto/log"
+	"github.com/unirita/cuto/log"
 )
 
 // 拡張ジョブ情報

@@ -12,7 +12,7 @@ import (
 
 	scan "github.com/mattn/go-scan"
 
-	"cuto/flowgen/converter"
+	"github.com/unirita/cuto/flowgen/converter"
 )
 
 // Number of columns
