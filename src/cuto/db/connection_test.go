@@ -4,8 +4,7 @@
 package db
 
 import (
-	"fmt"
-	"os"
+	"path/filepath"
 
 	"testing"
 )
@@ -15,8 +14,7 @@ var (
 )
 
 func getDBFile() string {
-	return fmt.Sprintf("%v%c%v%c%v%c%v%c%v", os.Getenv("GOPATH"),
-		os.PathSeparator, "test", os.PathSeparator, "cuto", os.PathSeparator, "db", os.PathSeparator, "test.sqlite")
+	return filepath.Join("_testdata", "test.sqlite")
 }
 
 func TestOpen_DBコネクションがOpenできる(t *testing.T) {

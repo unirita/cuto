@@ -4,8 +4,7 @@
 package tx
 
 import (
-	"fmt"
-	"os"
+	"path/filepath"
 	"testing"
 
 	"cuto/db"
@@ -13,12 +12,11 @@ import (
 )
 
 // テストDB名
-var db_path = fmt.Sprintf("%s%c%s%c%s%c%s%c%s", os.Getenv("GOPATH"), os.PathSeparator, "test",
-	os.PathSeparator, "cuto", os.PathSeparator, "db", os.PathSeparator, "tx")
-var db_name = fmt.Sprintf("%s%c%s", db_path, os.PathSeparator, "test_tx.sqlite")
+var db_path = "_testdata"
+var db_name = filepath.Join(db_path, "test_tx.sqlite")
 
 // DB接続後の失敗を誘うためのダミーファイル
-var dummy_db = fmt.Sprintf("%v%c%v", db_path, os.PathSeparator, "dummy.sqlite")
+var dummy_db = filepath.Join(db_path, "dummy.sqlite")
 
 // DBの初期化。
 func init() {
@@ -91,8 +89,6 @@ func TestStartJobNetwork_DBOpenに失敗(t *testing.T) {
 func TestStartJobNetwork_Insertに失敗(t *testing.T) {
 	name := "JNet1"
 
-	dummy_db := fmt.Sprintf("%v%c%v", db_path, os.PathSeparator, "dummy.sqlite")
-
 	_, err := StartJobNetwork(name, dummy_db)
 	if err == nil {
 		t.Error("存在しないDBファイルを指定したのに、エラーが返りませんでした")
@@ -100,7 +96,7 @@ func TestStartJobNetwork_Insertに失敗(t *testing.T) {
 }
 
 func TestResumeJobNetwork_前回の実行実績を取得できる(t *testing.T) {
-	dbfile := fmt.Sprintf("%v%c%v", db_path, os.PathSeparator, "resume.sqlite")
+	dbfile := filepath.Join(db_path, "resume.sqlite")
 	res, err := ResumeJobNetwork(1, dbfile)
 	if err != nil {
 		t.Fatalf("想定外のエラーが発生した: %s", err)
@@ -128,7 +124,6 @@ func TestResumeJobNetwork_DBOpenに失敗(t *testing.T) {
 }
 
 func TestResumeJobNetwork_Selectに失敗(t *testing.T) {
-	dummy_db := fmt.Sprintf("%v%c%v", db_path, os.PathSeparator, "dummy.sqlite")
 	_, err := ResumeJobNetwork(1, dummy_db)
 	if err == nil {
 		t.Error("不正なDBファイルを指定したのに、エラーが返りませんでした")

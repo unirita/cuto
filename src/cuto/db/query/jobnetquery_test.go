@@ -4,8 +4,7 @@
 package query
 
 import (
-	"fmt"
-	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -14,8 +13,8 @@ import (
 
 // テストDB名
 var (
-	db_root = fmt.Sprintf("%s%c%s%c%s%c%s%c%s", os.Getenv("GOPATH"), os.PathSeparator, "test", os.PathSeparator, "cuto", os.PathSeparator, "db", os.PathSeparator, "query")
-	db_name = fmt.Sprintf("%s%c%s", db_root, os.PathSeparator, "test_q.sqlite")
+	db_root = "_testdata"
+	db_name = filepath.Join(db_root, "test_q.sqlite")
 	conn    = dbOpen()
 
 	all_jobnetNum = 6
