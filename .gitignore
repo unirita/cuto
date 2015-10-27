@@ -28,14 +28,4 @@ _testmain.go
 
 # Test coverage reports
 cover.out
-src/cuto/cover_all.txt
-
-# Integration test directory
-cutoroot/
-evidence/
-
-# External packages
-/src/github.com/*
-!/src/github.com/unirita
-/src/github.com/unirita/*
-!/src/github.com/unirita/cuto
+cover_all.txt
