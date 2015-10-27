@@ -1,0 +1,20 @@
+﻿ジョブ名,実行ノード,ポート番号,実行ファイル,実行時引数,実行時環境変数,作業ディレクトリ,警告終了コード下限,警告終了出力パターン,異常終了コード下限,異常終了出力パターン,実行タイムアウト時間
+start,localhost,2015,$SSROOT$\jobscript\testscript\start.bat,$MSJOBNET:ID$ $MSJOBNET:SD$,TESTENV1=$MEwindir$+TESTENV2=$SEOS$,$SSROOT$,1,war,12,err,10
+01,localhost,2015,$SSROOT$\jobscript\testscript\sleep.bat,10,,,0,,0,,0
+02,localhost,2015,$SSROOT$\jobscript\testscript\02.vbs,,RC=$MJ01:RC$+SD=$MJ01:SD$+ED=$MJ01:ED$+OUT=$MJ01:OUT$,$SSROOT$,1,war,12,err,10
+03,localhost,2015,$SSROOT$\jobscript\testscript\03.js,/PREFIX:abc /SUFFIX:xyz,,,1,war,12,err,1
+04,localhost,2015,$SSROOT$\jobscript\testscript\04.ps1,-a ソース -b 123 -z,,$SSROOT$,1,war,1,err,1
+05,localhost,2015,$SSROOT$\jobscript\testscript\05.exe,"あ,い,う",,$SSROOT$,0,,123,err,0
+06,localhost,2015,$SSROOT$\jobscript\testscript\06.bat,,,$SSROOT$,0,,0,,0
+07,localhost,2015,$SSROOT$\jobscript\testscript\07.vbs,"""a b""",PATH=C:\cuto07,$SSROOT$,1,war,12,err,1
+101,localhost,2015,$SSROOT$\jobscript\testscript\101.bat,"abc ""e f g"" h",,$SSROOT$,0,war,1,err,1
+102,localhost,2015,$SSROOT$\jobscript\testscript\102.bat,,,$SSROOT$,1,war,12,err,1
+103,localhost,2015,$SSROOT$\jobscript\testscript\103.bat,,,$SSROOT$,1,war,12,err,1
+104,localhost,2015,$SSROOT$\jobscript\testscript\104.bat,,,$SSROOT$,1,war,12,err,1
+105,localhost,2015,$SSROOT$\jobscript\testscript\105.bat,,,$SSROOT$,1,war,12,err,1
+106,localhost,2015,$SSROOT$\jobscript\testscript\106.bat,,,$SSROOT$,1,war,12,err,1
+107,localhost,2015,$SSROOT$\jobscript\testscript\107.bat,,,$SSROOT$,1,war,12,err,1
+108,localhost,2015,$SSROOT$\jobscript\testscript\108.bat,,,$SSROOT$,1,war,12,err,1
+109,localhost,2015,$SSROOT$\jobscript\testscript\109.bat,,TEST05=$MJ05:OUT$,$SSROOT$,1,war,12,err,1
+110,localhost,2015,$SSROOT$\jobscript\testscript\110.bat,$MJ06:RC$,,$SSROOT$,1,war,12,err,1
+end,localhost,2015,$SSROOT$\jobscript\testscript\end.jar,,,$SSROOT$,1,war,12,err,1
