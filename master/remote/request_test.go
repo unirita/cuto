@@ -10,6 +10,11 @@ import (
 	"github.com/unirita/cuto/message"
 )
 
+const (
+	testHost = "localhost"
+	testPort = 12345
+)
+
 func init() {
 	config.Job.ConnectionTimeoutSec = 1
 }
@@ -104,11 +109,9 @@ func runTestReceiverWithStartTime(t *testing.T, listener net.Listener, msq chan<
 }
 
 func TestSendMessage_メッセージを送信できる(t *testing.T) {
-	host := "127.0.0.1"
-	port := 12345
-	hostPort := fmt.Sprintf("%s:%d", host, port)
+	addr := fmt.Sprintf(":%d", testPort)
 
-	listener, listenErr := net.Listen("tcp", hostPort)
+	listener, listenErr := net.Listen("tcp", addr)
 	if listenErr != nil {
 		t.Fatalf("テスト用のlistenに失敗しました: %s", listenErr)
 	}
@@ -120,7 +123,7 @@ func TestSendMessage_メッセージを送信できる(t *testing.T) {
 
 	stCh := make(chan string, 1)
 	defer close(stCh)
-	resMsg, err := SendRequest(host, port, `testrequest`, stCh)
+	resMsg, err := SendRequest(testHost, testPort, `testrequest`, stCh)
 	if err != nil {
 		t.Fatalf("エラーが発生しました: %s", err)
 	}
@@ -135,11 +138,9 @@ func TestSendMessage_メッセージを送信できる(t *testing.T) {
 }
 
 func TestSendMessage_一定時間応答がない場合はタイムアウトする(t *testing.T) {
-	host := "127.0.0.1"
-	port := 12345
-	hostPort := fmt.Sprintf("%s:%d", host, port)
+	addr := fmt.Sprintf(":%d", testPort)
 
-	listener, listenErr := net.Listen("tcp", hostPort)
+	listener, listenErr := net.Listen("tcp", addr)
 	if listenErr != nil {
 		t.Fatalf("テスト用のlistenに失敗しました: %s", listenErr)
 	}
@@ -151,18 +152,16 @@ func TestSendMessage_一定時間応答がない場合はタイムアウトす�
 
 	stCh := make(chan string, 1)
 	defer close(stCh)
-	_, err := SendRequest(host, port, `testrequest`, stCh)
+	_, err := SendRequest(testHost, testPort, `testrequest`, stCh)
 	if err == nil {
 		t.Fatalf("タイムアウトが発生しない。")
 	}
 }
 
 func TestSendMessage_ハートビートが返される場合はタイムアウトしない(t *testing.T) {
-	host := "127.0.0.1"
-	port := 12345
-	hostPort := fmt.Sprintf("%s:%d", host, port)
+	addr := fmt.Sprintf(":%d", testPort)
 
-	listener, listenErr := net.Listen("tcp", hostPort)
+	listener, listenErr := net.Listen("tcp", addr)
 	if listenErr != nil {
 		t.Fatalf("テスト用のlistenに失敗しました: %s", listenErr)
 	}
@@ -174,7 +173,7 @@ func TestSendMessage_ハートビートが返される場合はタイムアウ�
 
 	stCh := make(chan string, 1)
 	defer close(stCh)
-	resMsg, err := SendRequest(host, port, `testrequest`, stCh)
+	resMsg, err := SendRequest(testHost, testPort, `testrequest`, stCh)
 	if err != nil {
 		t.Fatalf("エラーが発生しました: %s", err)
 	}
@@ -189,11 +188,9 @@ func TestSendMessage_ハートビートが返される場合はタイムアウ�
 }
 
 func TestSendMessage_スタート時刻をチャンネルから取得できる(t *testing.T) {
-	host := "127.0.0.1"
-	port := 12345
-	hostPort := fmt.Sprintf("%s:%d", host, port)
+	addr := fmt.Sprintf(":%d", testPort)
 
-	listener, listenErr := net.Listen("tcp", hostPort)
+	listener, listenErr := net.Listen("tcp", addr)
 	if listenErr != nil {
 		t.Fatalf("テスト用のlistenに失敗しました: %s", listenErr)
 	}
@@ -205,7 +202,7 @@ func TestSendMessage_スタート時刻をチャンネルから取得できる(t
 
 	stCh := make(chan string, 1)
 	defer close(stCh)
-	resMsg, err := SendRequest(host, port, `testrequest`, stCh)
+	resMsg, err := SendRequest(testHost, testPort, `testrequest`, stCh)
 	if err != nil {
 		t.Fatalf("エラーが発生しました: %s", err)
 	}
