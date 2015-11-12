@@ -1,7 +1,10 @@
 # GoCuto
 
+![banner](_resource/logo-yoko.png)
+
 GoCuto is a process controller tool that can execute cross-server processes in the order you like.
 
+![system_image](_resource/cutoimage.png)
 
 ## Installation
 
