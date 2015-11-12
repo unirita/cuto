@@ -136,7 +136,7 @@ Create Jobnet Flow file as BPMN 2.0 XML format.
 
 If you want to create this flow,
 
-![system_image](_resource/sample_flow.png)
+![system_image](_resource/sample_flow.jpg)
 
 Create flow file, like this.
 
