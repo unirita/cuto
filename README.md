@@ -107,7 +107,7 @@ master.ini is configuration file for Servant command.
 |sys  |bind_address      |String |Listen host name of servant.                                                         |
 |sys  |bind_port         |Integer|Listen port number of servant.                                                       |
 |job  |multi_proc        |Integer|Max number of Job execution at same time.                                            |
-|job  |heartbeat_span_sec|Integer|Time span to send keep alive signel for master. (second)                             |
+|job  |heartbeat_span_sec|Integer|Time span to send keep alive signal for master. (second)                             |
 |dir  |job_dir           |String |Directory to put files be executed as Job in.                                        |
 |dir  |joblog_dir        |String |Directory to output Job log files.                                                   |
 |dir  |log_dir           |String |Directory to output Servant command log files.                                       |
@@ -176,9 +176,9 @@ Create Job detail file as CSV format.
 |   6|Environments     |Environment variables for Job.                                                      |
 |   7|Working directory|Working directory at execution time.                                                |
 |   8|RC to warn       |Job is judged as warning when its RC is over this value.                            |
-|   9|Output to warn   |Job is judged as warning when its stdout or stderr inclues this value.              |
+|   9|Output to warn   |Job is judged as warning when its stdout or stderr includes this value.             |
 |  10|RC to error      |ob is judged as error when its RC is over this value.                               |
-|  11|Output to error  |Job is judged as error when its stdout or stderr inclues this value.                |
+|  11|Output to error  |Job is judged as error when its stdout or stderr includes this value.               |
 |  12|Timeout          |Time limit to wait end of Job execution. (minute)                                   |
 |  13|Secondary node   |Host name of secondary server will be used when Job can not start at first server.  |
 |  14|Secondary port   |Port number of secondary server will be used when Job can not start at first server.|
