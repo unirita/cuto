@@ -23,7 +23,7 @@ Use this command when you want to run Jobnet.
 
     master -n JobnetName -s -c /path/to/master.ini
 
-**options**
+**Options**
 
 |Option       |Description                                                                                    |
 |-------------|-----------------------------------------------------------------------------------------------|
@@ -39,7 +39,7 @@ You must run this command every server to use Master command.
 
     servant -c /path/to/servant.ini
 
-**options**
+**Options**
 
 |Option       |Description                 |
 |-------------|----------------------------|
@@ -52,7 +52,7 @@ Show command is a viewer for Jobnet execution result.
 
     show -c /path/to/master.ini [options]
 
-**options**
+**Options**
 
 |Option              |Description                                                                  |
 |--------------------|-----------------------------------------------------------------------------|
@@ -65,5 +65,52 @@ Show command is a viewer for Jobnet execution result.
 |-status Status      |Narrow result by status (select from "normal", "abnormal", "warn", "running")|
 |-format Format      |Select output format from "json" or "csv"                                    |
 |-utc                |Set or show date value as UTC timezone, not as local timezone                |
+
+
+## Configuration
+
+GoCuto uses some configuration files written by [toml format](https://github.com/toml-lang/toml).
+
+### master.ini
+
+master.ini is configuration file for Master command.
+
+**Tables and Keys**
+
+|Table|Key                   |Type   |Description                                                                          |
+|-----|----------------------|-------|-------------------------------------------------------------------------------------|
+|job  |default_node          |String |Host name of default node which Job (process) is executed on.                        |
+|job  |default_port          |Integer|Port number of default node which Job is executed on.                                |
+|job  |default_timeout_min   |Integer|Default time limit to wait end of Job execution. (minute)                            |
+|job  |connection_timeout_sec|Integer|Time limit to wait connection keep alive signal. (second)                            |
+|job  |time_tracking_span_min|Integer|Time span to display elapsed time from execution started time. (minute)              |
+|job  |attempt_limit         |Integer|Max retry number of times when Job is not able to start.                             |
+|dir  |jobnet_dir            |String |Directory to put Jobnet definition files in.                                         |
+|dir  |log_dir               |String |Directory to output Master command log files.                                        |
+|dir  |db_dir                |String |Directory to put execution result db file in.                                        |
+|log  |output_level          |String |Minimum log level. Select from "trace", "debug", "info", "warn", "error", "critical".|
+|log  |max_size_kb           |Integer|Max size of log file. (KByte)                                                        |
+|log  |max_generation        |Integer|Max generation for log file rotation.                                                |
+|log  |timeout_sec           |Integer|Time limit to wait log output ends.                                                  |
+
+### servant.ini
+
+master.ini is configuration file for Servant command.
+
+**Tables and Keys**
+
+|Table|Key               |Type   |Description                                                                          |
+|-----|------------------|-------|-------------------------------------------------------------------------------------|
+|sys  |bind_address      |String |Listen host name of servant.                                                         |
+|sys  |bind_port         |Integer|Listen port number of servant.                                                       |
+|job  |multi_proc        |Integer|Max number of Job execution at same time.                                            |
+|job  |heartbeat_span_sec|Integer|Time span to send keep alive signel for master. (second)                             |
+|dir  |job_dir           |String |Directory to put files be executed as Job in.                                        |
+|dir  |joblog_dir        |String |Directory to output Job log files.                                                   |
+|dir  |log_dir           |String |Directory to output Servant command log files.                                       |
+|log  |output_level      |String |Minimum log level. Select from "trace", "debug", "info", "warn", "error", "critical".|
+|log  |max_size_kb       |Integer|Max size of log file. (KByte)                                                        |
+|log  |max_generation    |Integer|Max generation for log file rotation.                                                |
+|log  |timeout_sec       |Integer|Time limit to wait log output ends.                                                  |
 
 Copyright. (C) 2015 UNIRITA Inc,
