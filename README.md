@@ -134,7 +134,7 @@ Create Jobnet Flow file as [BPMN 2.0](http://www.omg.org/spec/BPMN/2.0/) XML for
 
 **Example**
 
-If you want to create this flow,
+If you want to design this flow,
 
 ![system_image](_resource/sample_flow.jpg)
 
