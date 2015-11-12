@@ -183,4 +183,8 @@ Create Job detail file as CSV format.
 |  13|Secondary node   |Host name of secondary server will be used when Job can not start at first server.  |
 |  14|Secondary port   |Port number of secondary server will be used when Job can not start at first server.|
 
+## License
+
+Licensed under an [GPL2](LICENSE) license.
+
 Copyright. (C) 2015 UNIRITA Inc,
