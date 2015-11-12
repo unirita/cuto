@@ -116,4 +116,71 @@ master.ini is configuration file for Servant command.
 |log  |max_generation    |Integer|Max generation for log file rotation.                                                |
 |log  |timeout_sec       |Integer|Time limit to wait log output ends.                                                  |
 
+## Jobnet definition
+
+### Flow definition.
+
+Create Jobnet Flow file as BPMN 2.0 XML format.
+
+**Available tags**
+
+|Tag name       |Description                           |
+|---------------|--------------------------------------|
+|ServiceTask    |Corresponds with a Job.               |
+|ParallelGateway|Signifies start or end of branch flow.|
+|StartEvent     |Signifies entry point.                |
+|EndEvent       |Signifies exit point.                 |
+|SequenceFlow   |Connects two nodes.                   |
+
+**Example**
+
+If you want to create this flow,
+
+![system_image](_resource/sample_flow.png)
+
+Create flow file, like this.
+
+    <?xml version="1.0" encoding="UTF-8"?>
+    <Definitions>
+        <Process>
+            <StartEvent id="start"/>
+            <EndEvent id="end"/>
+            <ServiceTask id="job1" name="job1.bat"/>
+            <ServiceTask id="job2" name="job2.bat"/>
+            <ServiceTask id="job3" name="job3.bat"/>
+            <ParallelGateway id="gateway1"/>
+            <ParallelGateway id="gateway2"/>
+            <SequenceFlow sourceRef="start" targetRef="job1"/>
+            <SequenceFlow sourceRef="job1" targetRef="gateway1"/>
+            <SequenceFlow sourceRef="gateway1" targetRef="job2"/>
+            <SequenceFlow sourceRef="gateway1" targetRef="job3"/>
+            <SequenceFlow sourceRef="job2" targetRef="gateway2"/>
+            <SequenceFlow sourceRef="job3" targetRef="gateway2"/>
+            <SequenceFlow sourceRef="gateway2" targetRef="end"/>
+        </Process>
+    </Definitions>
+
+### Job detail definition
+
+Create Job detail file as CSV format.
+
+**CSV Columns**
+
+|#   |Column name      |Description                                                                         |
+|---:|-----------------|------------------------------------------------------------------------------------|
+|   1|Job name         |Name of Job to link with ServiceTask tag in Flow file.                              |
+|   2|Node name        |Host name of server where to execute Job.                                           |
+|   3|Port number      |Port number of server where to execute Job.                                         |
+|   4|File path        |File which is executed as Job.                                                      |
+|   5|Arguments        |Command line arguments for Job.                                                     |
+|   6|Environments     |Environment variables for Job.                                                      |
+|   7|Working directory|Working directory at execution time.                                                |
+|   8|RC to warn       |Job is judged as warning when its RC is over this value.                            |
+|   9|Output to warn   |Job is judged as warning when its stdout or stderr inclues this value.              |
+|  10|RC to error      |ob is judged as error when its RC is over this value.                               |
+|  11|Output to error  |Job is judged as error when its stdout or stderr inclues this value.                |
+|  12|Timeout          |Time limit to wait end of Job execution. (minute)                                   |
+|  13|Secondary node   |Host name of secondary server will be used when Job can not start at first server.  |
+|  14|Secondary port   |Port number of secondary server will be used when Job can not start at first server.|
+
 Copyright. (C) 2015 UNIRITA Inc,
