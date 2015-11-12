@@ -8,9 +8,9 @@ GoCuto is a process control tool that can execute cross-server processes in the 
 
 ## Installation
 
-You can download binary packages on [GoCuto Official Website](http://cuto.unirita.co.jp/cuto/).
+Download binary packages on [GoCuto Official Website](http://cuto.unirita.co.jp/cuto/).
 
-Or, you can build GoCoto with go command. (need Go 1.4 or higher)
+Or, build GoCoto with go command. (need Go 1.4 or higher)
 
     go get github.com/unirita/cuto/master
     go get github.com/unirita/cuto/servant
