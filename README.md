@@ -166,7 +166,7 @@ Create Job detail file as CSV format.
 
 **CSV Columns**
 
-|#   |Column name      |Description                                                                         |
+|   #|Column name      |Description                                                                         |
 |---:|-----------------|------------------------------------------------------------------------------------|
 |   1|Job name         |Name of Job to link with ServiceTask tag in Flow file.                              |
 |   2|Node name        |Host name of server where to execute Job.                                           |
@@ -185,6 +185,6 @@ Create Job detail file as CSV format.
 
 ## License
 
-Licensed under an [GPL2](LICENSE) license.
+Licensed under an [GPLv2](LICENSE) license.
 
 Copyright. (C) 2015 UNIRITA Inc,
