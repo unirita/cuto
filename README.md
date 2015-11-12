@@ -120,7 +120,7 @@ master.ini is configuration file for Servant command.
 
 ### Flow definition.
 
-Create Jobnet Flow file as BPMN 2.0 XML format.
+Create Jobnet Flow file as [BPMN 2.0](http://www.omg.org/spec/BPMN/2.0/) XML format.
 
 **Available tags**
 
