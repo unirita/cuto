@@ -1,4 +1,4 @@
-﻿ジョブ名,実行ノード,ポート番号,実行ファイル,実行時引数,実行時環境変数,作業ディレクトリ,警告終了コード下限,警告終了出力パターン,異常終了コード下限,異常終了出力パターン,実行タイムアウト時間
+ジョブ名,実行ノード,ポート番号,実行ファイル,実行時引数,実行時環境変数,作業ディレクトリ,警告終了コード下限,警告終了出力パターン,異常終了コード下限,異常終了出力パターン,実行タイムアウト時間
 start,localhost,2015,$SSROOT$\jobscript\testscript\start.bat,$MSJOBNET:ID$ $MSJOBNET:SD$,TESTENV1=$MEwindir$+TESTENV2=$SEOS$,$SSROOT$,1,war,12,err,10
 01,localhost,2015,$SSROOT$\jobscript\testscript\sleep.bat,10,,,0,,0,,0
 02,localhost,2015,$SSROOT$\jobscript\testscript\02.vbs,,RC=$MJ01:RC$+SD=$MJ01:SD$+ED=$MJ01:ED$+OUT=$MJ01:OUT$,$SSROOT$,1,war,12,err,10
