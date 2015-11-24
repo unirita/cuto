@@ -482,3 +482,48 @@ func TestCreateJoblogFileName(t *testing.T) {
 		t.Errorf("ジョブログファイル名[%s]は想定値[%s]と違っている。", actual, expected)
 	}
 }
+
+func TestExplodeNodeString_NoContainer(t *testing.T) {
+	node := "testhost"
+	host, containerHost, containerName := explodeNodeString(node)
+	if host != "testhost" {
+		t.Errorf("host => %s, wants %s", host, "testhost")
+	}
+	if containerHost != "" {
+		t.Error("containerHost must be empty, but it was not.")
+		t.Log("containerHost:", containerHost)
+	}
+	if containerName != "" {
+		t.Error("containerName must be empty, but it was not.")
+		t.Log("containerName:", containerName)
+	}
+}
+
+func TestExplodeNodeString_ContainerWithoutHost(t *testing.T) {
+	node := "testhost>category/name"
+	host, containerHost, containerName := explodeNodeString(node)
+	if host != "testhost" {
+		t.Errorf("host => %s, wants %s", host, "testhost")
+	}
+	if containerHost != "" {
+		t.Error("containerHost must be empty, but it was not.")
+		t.Log("containerHost:", containerHost)
+	}
+	if containerName != "category/name" {
+		t.Errorf("containerName => %s, wants %s", containerName, "category/name")
+	}
+}
+
+func TestExplodeNodeString_ContainerWithHost(t *testing.T) {
+	node := "testhost>tcp://hostname/category/name"
+	host, containerHost, containerName := explodeNodeString(node)
+	if host != "testhost" {
+		t.Errorf("host => %s, wants %s", host, "testhost")
+	}
+	if containerHost != "tcp://hostname" {
+		t.Errorf("containerHost => %s, wants %s", containerHost, "tcp://hostname")
+	}
+	if containerName != "category/name" {
+		t.Errorf("containerName => %s, wants %s", containerName, "category/name")
+	}
+}

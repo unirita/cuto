@@ -5,6 +5,7 @@ package jobnet
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 	"time"
 
@@ -484,4 +485,22 @@ func (j *Job) createJoblogFileName(r *message.Response) string {
 	timestamp = strings.Replace(timestamp, ":", "", -1)
 
 	return fmt.Sprintf("%v.%v.%v.%v.log", j.Instance.ID, job, j.ID(), timestamp)
+}
+
+func explodeNodeString(node string) (string, string, string) {
+	hostAndContainer := strings.SplitN(node, ">", 2)
+	if len(hostAndContainer) == 1 {
+		return node, "", ""
+	}
+
+	host := hostAndContainer[0]
+	container := hostAndContainer[1]
+	containerURL, err := url.Parse(container)
+	if err != nil || (containerURL.Scheme == "" && containerURL.Host == "") {
+		return host, "", container
+	}
+
+	containerHost := fmt.Sprintf("%s://%s", containerURL.Scheme, containerURL.Host)
+	containerName := strings.TrimLeft(containerURL.Path, "/")
+	return host, containerHost, containerName
 }
