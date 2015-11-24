@@ -487,6 +487,33 @@ func (j *Job) createJoblogFileName(r *message.Response) string {
 	return fmt.Sprintf("%v.%v.%v.%v.log", j.Instance.ID, job, j.ID(), timestamp)
 }
 
+func (j *Job) createRequest() *message.Request {
+	req := new(message.Request)
+	req.NID = j.Instance.ID
+	req.JID = j.ID()
+	req.Path = j.FilePath
+	req.Param = j.Param
+	req.Env = j.Env
+	req.Workspace = j.Workspace
+	req.WarnRC = j.WrnRC
+	req.WarnStr = j.WrnPtn
+	req.ErrRC = j.ErrRC
+	req.ErrStr = j.ErrPtn
+	req.Timeout = j.Timeout
+
+	_, cntHost, cntName := explodeNodeString(j.Node)
+	if cntName != "" {
+		req.Path = "<docker>"
+
+		req.Param = fmt.Sprintf("exec %s %s %s", cntName, j.FilePath, j.Param)
+		if cntHost != "" {
+			req.Param = fmt.Sprintf("-H=%s %s", cntHost, req.Param)
+		}
+	}
+
+	return req
+}
+
 func explodeNodeString(node string) (string, string, string) {
 	hostAndContainer := strings.SplitN(node, ">", 2)
 	if len(hostAndContainer) == 1 {

@@ -483,6 +483,97 @@ func TestCreateJoblogFileName(t *testing.T) {
 	}
 }
 
+func TestCreateRequest_NotContainerJob(t *testing.T) {
+	n := &Network{ID: 1234}
+	j, err := NewJob("j1", "testjob", n)
+	if err != nil {
+		t.Fatal("Unexpected error:", err)
+	}
+	j.Node = "testnode"
+	j.FilePath = "/path/to/test.sh"
+	j.Param = "param1 param2"
+	j.Env = "ENAME1=EVAL1+ENAME2=EVAL2"
+	j.Workspace = "/path/to/workspace"
+	j.WrnRC = 5
+	j.WrnPtn = "warning"
+	j.ErrRC = 10
+	j.ErrPtn = "error"
+	j.Timeout = 100
+
+	req := j.createRequest()
+	if req.NID != 1234 {
+		t.Errorf("req.NID => %d, wants %d", req.NID, 1234)
+	}
+	if req.JID != "j1" {
+		t.Errorf("req.JID => %s, wants %s", req.JID, "j1")
+	}
+	if req.Path != j.FilePath {
+		t.Errorf("req.Path => %s, wants %s", req.Path, j.FilePath)
+	}
+	if req.Param != j.Param {
+		t.Errorf("req.Param => %s, wants %s", req.Param, j.Param)
+	}
+	if req.Env != j.Env {
+		t.Errorf("req.Env => %s, wants %s", req.Env, j.Env)
+	}
+	if req.Workspace != j.Workspace {
+		t.Errorf("req.Workspace => %s, wants %s", req.Workspace, j.Workspace)
+	}
+	if req.WarnRC != j.WrnRC {
+		t.Errorf("req.WarnRC => %d, wants %d", req.WarnRC, j.WrnRC)
+	}
+	if req.WarnStr != j.WrnPtn {
+		t.Errorf("req.WarnStr => %s, wants %s", req.WarnStr, j.WrnPtn)
+	}
+	if req.ErrRC != j.ErrRC {
+		t.Errorf("req.ErrRC => %d, wants %d", req.ErrRC, j.ErrRC)
+	}
+	if req.ErrStr != j.ErrPtn {
+		t.Errorf("req.ErrStr => %s, wants %s", req.ErrStr, j.ErrPtn)
+	}
+	if req.Timeout != j.Timeout {
+		t.Errorf("req.Timeout => %d, wants %d", req.Timeout, j.Timeout)
+	}
+}
+
+func TestCreateRequest_ContainerJob(t *testing.T) {
+	n := &Network{ID: 1234}
+	j, err := NewJob("j1", "testjob", n)
+	if err != nil {
+		t.Fatal("Unexpected error:", err)
+	}
+	j.Node = "testhost>container"
+	j.FilePath = "/path/to/test.sh"
+	j.Param = "param1 param2"
+
+	req := j.createRequest()
+	if req.Path != "<docker>" {
+		t.Errorf("req.Path => %s, wants %s", req.Path, "<docker>")
+	}
+	if req.Param != "exec container /path/to/test.sh param1 param2" {
+		t.Errorf("req.Param => %s, wants %s", req.Param, "exec container /path/to/test.sh param1 param2")
+	}
+}
+
+func TestCreateRequest_ContainerJobWithHost(t *testing.T) {
+	n := &Network{ID: 1234}
+	j, err := NewJob("j1", "testjob", n)
+	if err != nil {
+		t.Fatal("Unexpected error:", err)
+	}
+	j.Node = "testhost>tcp://host/container"
+	j.FilePath = "/path/to/test.sh"
+	j.Param = "param1 param2"
+
+	req := j.createRequest()
+	if req.Path != "<docker>" {
+		t.Errorf("req.Path => %s, wants %s", req.Path, "<docker>")
+	}
+	if req.Param != "-H=tcp://host exec container /path/to/test.sh param1 param2" {
+		t.Errorf("req.Param => %s, wants %s", req.Param, "-H=tcp://host exec container /path/to/test.sh param1 param2")
+	}
+}
+
 func TestExplodeNodeString_NoContainer(t *testing.T) {
 	node := "testhost"
 	host, containerHost, containerName := explodeNodeString(node)
