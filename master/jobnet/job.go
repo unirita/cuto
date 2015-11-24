@@ -523,7 +523,7 @@ func explodeNodeString(node string) (string, string, string) {
 	host := hostAndContainer[0]
 	container := hostAndContainer[1]
 	containerURL, err := url.Parse(container)
-	if err != nil || (containerURL.Scheme == "" && containerURL.Host == "") {
+	if err != nil || !containerURL.IsAbs() {
 		return host, "", container
 	}
 
