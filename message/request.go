@@ -29,6 +29,7 @@ type Request struct {
 }
 
 const requestMessageType = "request"
+const DockerTag = "<docker>"
 
 // ジョブ実行要求JSONメッセージをパースし、Requestオブジェクトのメンバをセットする。
 //

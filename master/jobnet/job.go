@@ -503,7 +503,7 @@ func (j *Job) createRequest() *message.Request {
 
 	_, cntHost, cntName := explodeNodeString(j.Node)
 	if cntName != "" {
-		req.Path = "<docker>"
+		req.Path = message.DockerTag
 
 		req.Param = fmt.Sprintf("exec %s %s %s", cntName, j.FilePath, j.Param)
 		if cntHost != "" {

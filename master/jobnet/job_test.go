@@ -547,8 +547,8 @@ func TestCreateRequest_ContainerJob(t *testing.T) {
 	j.Param = "param1 param2"
 
 	req := j.createRequest()
-	if req.Path != "<docker>" {
-		t.Errorf("req.Path => %s, wants %s", req.Path, "<docker>")
+	if req.Path != message.DockerTag {
+		t.Errorf("req.Path => %s, wants %s", req.Path, message.DockerTag)
 	}
 	if req.Param != "exec container /path/to/test.sh param1 param2" {
 		t.Errorf("req.Param => %s, wants %s", req.Param, "exec container /path/to/test.sh param1 param2")
@@ -566,8 +566,8 @@ func TestCreateRequest_ContainerJobWithHost(t *testing.T) {
 	j.Param = "param1 param2"
 
 	req := j.createRequest()
-	if req.Path != "<docker>" {
-		t.Errorf("req.Path => %s, wants %s", req.Path, "<docker>")
+	if req.Path != message.DockerTag {
+		t.Errorf("req.Path => %s, wants %s", req.Path, message.DockerTag)
 	}
 	if req.Param != "-H=tcp://host exec container /path/to/test.sh param1 param2" {
 		t.Errorf("req.Param => %s, wants %s", req.Param, "-H=tcp://host exec container /path/to/test.sh param1 param2")
