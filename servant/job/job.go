@@ -84,36 +84,40 @@ func newJobInstance(req *message.Request, conf *config.ServantConfig) *jobInstan
 // return : マスタへ返信するメッセージ。
 func DoJobRequest(req *message.Request, conf *config.ServantConfig, stCh chan<- string) *message.Response {
 	job := newJobInstance(req, conf)
-
-	cmd := job.createShell()
-
-	err := job.run(cmd, stCh)
-	if err != nil {
+	if err := job.do(stCh); err != nil {
 		console.DisplayError("CTS019E", err)
 		job.stat = db.ABNORMAL
 		job.detail = err.Error()
-	} else {
-		rcSt, rcMsg := job.judgeRC()
-		ptnSt, ptnMsg, err := job.writeFileAndJodgeJoblog()
-		if err != nil {
-			console.DisplayError("CTS019E", err)
-			job.stat = db.ABNORMAL
-			job.detail = err.Error()
-		} else {
-			// RCからの結果と、出力MSGの結果を比較し、大きい方（異常の方）を採用する
-			if rcSt > ptnSt {
-				job.stat = rcSt
-				job.detail = rcMsg
-			} else {
-				job.stat = ptnSt
-				job.detail = ptnMsg
-			}
-		}
-		console.Display("CTS011I", job.path, job.nID, job.jID, job.stat, job.rc)
-		job.setVariableValue()
+		return job.createResponse()
 	}
 
+	console.Display("CTS011I", job.path, job.nID, job.jID, job.stat, job.rc)
+	job.setVariableValue()
 	return job.createResponse()
+}
+
+func (j *jobInstance) do(stCh chan<- string) error {
+	cmd := j.createShell()
+	if err := j.run(cmd, stCh); err != nil {
+		return err
+	}
+
+	rcSt, rcMsg := j.judgeRC()
+	ptnSt, ptnMsg, err := j.writeFileAndJodgeJoblog()
+	if err != nil {
+		return err
+	}
+
+	// RCからの結果と、出力MSGの結果を比較し、大きい方（異常の方）を採用する
+	if rcSt > ptnSt {
+		j.stat = rcSt
+		j.detail = rcMsg
+	} else {
+		j.stat = ptnSt
+		j.detail = ptnMsg
+	}
+
+	return nil
 }
 
 // ジョブファイルの拡張子を確認して、実行シェルを作成します。
