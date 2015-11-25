@@ -156,7 +156,7 @@ func (j *jobInstance) organizePathAndParam() (string, []string) {
 		// コンテナ上での実行ファイル名を用いてジョブログが作成されるよう、j.pathを上書き
 		for index, param := range params {
 			if param == "exec" {
-				index++
+				index += 2
 				if index < len(params) {
 					j.path = params[index]
 				} else {

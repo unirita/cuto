@@ -94,18 +94,31 @@ func TestJobCreateShell_Docker_CommandPathIsSet(t *testing.T) {
 	j := createTestJobInstance()
 	j.config.Job.DockerCommandPath = "/usr/bin/docker"
 	j.path = message.DockerTag
+	j.param = "exec containerName command param1 param2"
 	cmd := j.createShell()
 	if cmd.Path != "/usr/bin/docker" {
 		t.Errorf("cmd.Path => %s, wants %s", cmd.Path, "/usr/bin/docker")
 	}
-	if len(cmd.Args) != 3 {
-		t.Fatalf("len(cmd.Args) => %d, wants %d", len(cmd.Args), 2)
+	if len(cmd.Args) != 6 {
+		t.Fatalf("len(cmd.Args) => %d, wants %d", len(cmd.Args), 6)
 	}
-	if cmd.Args[1] != "param1" {
-		t.Errorf("cmd.Args[1] => %s, wants %s", cmd.Args[1], "param1")
+	if cmd.Args[1] != "exec" {
+		t.Errorf("cmd.Args[1] => %s, wants %s", cmd.Args[1], "exec")
 	}
-	if cmd.Args[2] != "param2" {
-		t.Errorf("cmd.Args[2] => %s, wants %s", cmd.Args[2], "param2")
+	if cmd.Args[2] != "containerName" {
+		t.Errorf("cmd.Args[2] => %s, wants %s", cmd.Args[2], "containerName")
+	}
+	if cmd.Args[3] != "command" {
+		t.Errorf("cmd.Args[3] => %s, wants %s", cmd.Args[3], "command")
+	}
+	if cmd.Args[4] != "param1" {
+		t.Errorf("cmd.Args[4] => %s, wants %s", cmd.Args[4], "param1")
+	}
+	if cmd.Args[5] != "param2" {
+		t.Errorf("cmd.Args[5] => %s, wants %s", cmd.Args[5], "param2")
+	}
+	if j.path != "command" {
+		t.Errorf("j.path => %s, wants %s", j.path, "command")
 	}
 }
 
