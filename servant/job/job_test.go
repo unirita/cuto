@@ -80,7 +80,7 @@ func TestJobCreateShell_Normal(t *testing.T) {
 		t.Errorf("cmd.Path => %s, wants %s", cmd.Path, expectedPath)
 	}
 	if len(cmd.Args) != 3 {
-		t.Fatalf("len(cmd.Args) => %d, wants %d", len(cmd.Args), 2)
+		t.Fatalf("len(cmd.Args) => %d, wants %d", len(cmd.Args), 3)
 	}
 	if cmd.Args[1] != "param1" {
 		t.Errorf("cmd.Args[1] => %s, wants %s", cmd.Args[1], "param1")
