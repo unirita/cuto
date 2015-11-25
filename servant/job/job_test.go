@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"testing"
 	"time"
 
 	"github.com/unirita/cuto/message"
@@ -52,4 +53,169 @@ func createJoblogFileName(req *message.Request, st string, nID int, jID string) 
 	}
 	joblogFile := fmt.Sprintf("%v.%v.%v.%v.log", nID, job, jID, st)
 	return filepath.Join(conf.Dir.JoblogDir, st[:8], joblogFile)
+}
+
+func createTestJobInstance() *jobInstance {
+	j := new(jobInstance)
+	j.config = config.DefaultServantConfig()
+	j.nID = 1234
+	j.jID = "JID"
+	j.path = "test.sh"
+	j.param = "param1 param2"
+	j.env = "env1 env2"
+	j.workDir = ""
+	j.wrnRC = 5
+	j.wrnPtn = "warn"
+	j.errRC = 10
+	j.errPtn = "error"
+	j.timeout = 100
+	return j
+}
+
+func TestJobCreateShell_Normal(t *testing.T) {
+	j := createTestJobInstance()
+	cmd := j.createShell()
+	expectedPath := filepath.Join(j.config.Dir.JobDir, j.path)
+	if cmd.Path != expectedPath {
+		t.Errorf("cmd.Path => %s, wants %s", cmd.Path, expectedPath)
+	}
+	if len(cmd.Args) != 3 {
+		t.Fatalf("len(cmd.Args) => %d, wants %d", len(cmd.Args), 2)
+	}
+	if cmd.Args[1] != "param1" {
+		t.Errorf("cmd.Args[1] => %s, wants %s", cmd.Args[1], "param1")
+	}
+	if cmd.Args[2] != "param2" {
+		t.Errorf("cmd.Args[2] => %s, wants %s", cmd.Args[2], "param2")
+	}
+}
+
+func TestJobCreateShell_Docker_CommandPathIsSet(t *testing.T) {
+	j := createTestJobInstance()
+	j.config.Job.DockerCommandPath = "/usr/bin/docker"
+	j.path = message.DockerTag
+	cmd := j.createShell()
+	if cmd.Path != "/usr/bin/docker" {
+		t.Errorf("cmd.Path => %s, wants %s", cmd.Path, "/usr/bin/docker")
+	}
+	if len(cmd.Args) != 3 {
+		t.Fatalf("len(cmd.Args) => %d, wants %d", len(cmd.Args), 2)
+	}
+	if cmd.Args[1] != "param1" {
+		t.Errorf("cmd.Args[1] => %s, wants %s", cmd.Args[1], "param1")
+	}
+	if cmd.Args[2] != "param2" {
+		t.Errorf("cmd.Args[2] => %s, wants %s", cmd.Args[2], "param2")
+	}
+}
+
+func TestJobCreateShell_Docker_CommandPathIsNotSet(t *testing.T) {
+	j := createTestJobInstance()
+	j.config.Job.DockerCommandPath = ""
+	j.path = message.DockerTag
+	cmd := j.createShell()
+	if cmd.Path != "" {
+		t.Errorf("cmd.Path => %s, wants %s", cmd.Path, "")
+	}
+}
+
+func TestJobCreateShell_VBScript(t *testing.T) {
+	j := createTestJobInstance()
+	j.path = "test.vbs"
+	cmd := j.createShell()
+	if !strings.Contains(cmd.Path, "cscript") {
+		t.Errorf("cmd.Path must contains '%s', but it did not.", "cscript")
+		t.Logf("cmd.Path => %s", cmd.Path)
+	}
+	if len(cmd.Args) != 5 {
+		t.Fatalf("len(cmd.Args) => %d, wants %d", len(cmd.Args), 5)
+	}
+	if cmd.Args[1] != "/nologo" {
+		t.Errorf("cmd.Args[1] => %s, wants %s", cmd.Args[1], "/nologo")
+	}
+	expectedPath := filepath.Join(j.config.Dir.JobDir, j.path)
+	if cmd.Args[2] != expectedPath {
+		t.Errorf("cmd.Args[2] => %s, wants %s", cmd.Args[2], expectedPath)
+	}
+	if cmd.Args[3] != "param1" {
+		t.Errorf("cmd.Args[3] => %s, wants %s", cmd.Args[3], "param1")
+	}
+	if cmd.Args[4] != "param2" {
+		t.Errorf("cmd.Args[4] => %s, wants %s", cmd.Args[4], "param2")
+	}
+}
+
+func TestJobCreateShell_JScript(t *testing.T) {
+	j := createTestJobInstance()
+	j.path = "test.js"
+	cmd := j.createShell()
+	if !strings.Contains(cmd.Path, "cscript") {
+		t.Errorf("cmd.Path must contains '%s', but it did not.", "cscript")
+		t.Logf("cmd.Path => %s", cmd.Path)
+	}
+	if len(cmd.Args) != 5 {
+		t.Fatalf("len(cmd.Args) => %d, wants %d", len(cmd.Args), 5)
+	}
+	if cmd.Args[1] != "/nologo" {
+		t.Errorf("cmd.Args[1] => %s, wants %s", cmd.Args[1], "/nologo")
+	}
+	expectedPath := filepath.Join(j.config.Dir.JobDir, j.path)
+	if cmd.Args[2] != expectedPath {
+		t.Errorf("cmd.Args[2] => %s, wants %s", cmd.Args[2], expectedPath)
+	}
+	if cmd.Args[3] != "param1" {
+		t.Errorf("cmd.Args[3] => %s, wants %s", cmd.Args[3], "param1")
+	}
+	if cmd.Args[4] != "param2" {
+		t.Errorf("cmd.Args[4] => %s, wants %s", cmd.Args[4], "param2")
+	}
+}
+
+func TestJobCreateShell_JAR(t *testing.T) {
+	j := createTestJobInstance()
+	j.path = "test.jar"
+	cmd := j.createShell()
+	if !strings.Contains(cmd.Path, "java") {
+		t.Errorf("cmd.Path must contains '%s', but it did not.", "java")
+		t.Logf("cmd.Path => %s", cmd.Path)
+	}
+	if len(cmd.Args) != 5 {
+		t.Fatalf("len(cmd.Args) => %d, wants %d", len(cmd.Args), 5)
+	}
+	if cmd.Args[1] != "-jar" {
+		t.Errorf("cmd.Args[1] => %s, wants %s", cmd.Args[1], "-jar")
+	}
+	expectedPath := filepath.Join(j.config.Dir.JobDir, j.path)
+	if cmd.Args[2] != expectedPath {
+		t.Errorf("cmd.Args[2] => %s, wants %s", cmd.Args[2], expectedPath)
+	}
+	if cmd.Args[3] != "param1" {
+		t.Errorf("cmd.Args[3] => %s, wants %s", cmd.Args[3], "param1")
+	}
+	if cmd.Args[4] != "param2" {
+		t.Errorf("cmd.Args[4] => %s, wants %s", cmd.Args[4], "param2")
+	}
+}
+
+func TestJobCreateShell_PowerShell(t *testing.T) {
+	j := createTestJobInstance()
+	j.path = "test.ps1"
+	cmd := j.createShell()
+	if !strings.Contains(cmd.Path, "powershell") {
+		t.Errorf("cmd.Path must contains '%s', but it did not.", "powershell")
+		t.Logf("cmd.Path => %s", cmd.Path)
+	}
+	if len(cmd.Args) != 4 {
+		t.Fatalf("len(cmd.Args) => %d, wants %d", len(cmd.Args), 5)
+	}
+	expectedPath := filepath.Join(j.config.Dir.JobDir, j.path)
+	if cmd.Args[1] != expectedPath {
+		t.Errorf("cmd.Args[1] => %s, wants %s", cmd.Args[1], expectedPath)
+	}
+	if cmd.Args[2] != "param1" {
+		t.Errorf("cmd.Args[2] => %s, wants %s", cmd.Args[2], "param1")
+	}
+	if cmd.Args[3] != "param2" {
+		t.Errorf("cmd.Args[3] => %s, wants %s", cmd.Args[3], "param2")
+	}
 }

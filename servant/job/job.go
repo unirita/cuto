@@ -98,6 +98,10 @@ func DoJobRequest(req *message.Request, conf *config.ServantConfig, stCh chan<- 
 
 func (j *jobInstance) do(stCh chan<- string) error {
 	cmd := j.createShell()
+	if j.path == message.DockerTag && cmd.Path == "" {
+		return errors.New("Cannot execute job on Docker, because docker_command_path is lacked in servant.ini")
+	}
+
 	if err := j.run(cmd, stCh); err != nil {
 		return err
 	}
@@ -130,7 +134,10 @@ func (j *jobInstance) createShell() *exec.Cmd {
 		script = j.path
 	}
 	// 拡張子に応じた、実行シェルを作成
-	if strings.HasSuffix(j.path, ".vbs") || strings.HasSuffix(j.path, ".js") { // WSH
+	if j.path == message.DockerTag { // Docker
+		shell = j.config.Job.DockerCommandPath
+		param = j.param
+	} else if strings.HasSuffix(j.path, ".vbs") || strings.HasSuffix(j.path, ".js") { // WSH
 		shell = "cscript"
 		param = fmt.Sprintf("/nologo %s %s", script, j.param)
 	} else if strings.HasSuffix(j.path, ".jar") { // JAVA
