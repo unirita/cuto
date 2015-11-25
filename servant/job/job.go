@@ -153,6 +153,18 @@ func (j *jobInstance) organizePathAndParam() (string, []string) {
 	if j.path == message.DockerTag {
 		shell = j.config.Job.DockerCommandPath
 		params = paramSplit(j.param)
+		// コンテナ上での実行ファイル名を用いてジョブログが作成されるよう、j.pathを上書き
+		for index, param := range params {
+			if param == "exec" {
+				index++
+				if index < len(params) {
+					j.path = params[index]
+				} else {
+					j.path = ""
+				}
+				break
+			}
+		}
 	} else {
 		// ジョブファイル名のみの場合は、デフォルト場所を指定
 		if !filepath.IsAbs(j.path) {
