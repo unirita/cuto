@@ -163,25 +163,12 @@ func (j *Job) Execute() (Element, error) {
 }
 
 func (j *Job) executeRequest() (*message.Response, error) {
-	req := new(message.Request)
-	req.NID = j.Instance.ID
-	req.JID = j.ID()
-	req.Path = j.FilePath
-	req.Param = j.Param
-	req.Env = j.Env
-	req.Workspace = j.Workspace
-	req.WarnRC = j.WrnRC
-	req.WarnStr = j.WrnPtn
-	req.ErrRC = j.ErrRC
-	req.ErrStr = j.ErrPtn
-	req.Timeout = j.Timeout
-
 	if !j.IsRerunJob {
-		j.start(req)
+		j.start()
 	}
-
 	console.Display("CTM023I", j.Name, j.Node, j.Instance.ID, j.id)
 
+	req := j.createRequest()
 	err := req.ExpandMasterVars()
 	if err != nil {
 		return nil, err
@@ -192,21 +179,11 @@ func (j *Job) executeRequest() (*message.Response, error) {
 		return nil, err
 	}
 
-	stCh := make(chan string, 1)
-	go j.waitAndSetResultStartDate(stCh)
-
 	timerEndCh := make(chan struct{}, 1)
 	go j.startTimer(timerEndCh)
 	defer close(timerEndCh)
 
-	resMsg, err := j.sendRequestWithRetry(reqMsg, stCh)
-	if j.isNecessaryToRetry(err) && j.SecondaryNode != "" {
-		j.useSecondaryNode()
-		console.Display("CTM028W", j.Name, j.SecondaryNode)
-		resMsg, err = j.sendRequestWithRetry(reqMsg, stCh)
-	}
-
-	close(stCh)
+	resMsg, err := j.requestAndWaitResult(reqMsg)
 	if err != nil {
 		return nil, err
 	}
@@ -218,6 +195,32 @@ func (j *Job) executeRequest() (*message.Response, error) {
 	}
 
 	return res, nil
+}
+
+func (j *Job) requestAndWaitResult(reqMsg string) (string, error) {
+	stCh := make(chan string, 1)
+	defer close(stCh)
+	go j.waitAndSetResultStartDate(stCh)
+
+	resMsg, err := j.sendRequestWithRetry(reqMsg, stCh)
+	if j.isNecessaryToRetry(err) && j.SecondaryNode != "" {
+		j.useSecondaryNode()
+		console.Display("CTM028W", j.Name, j.SecondaryNode)
+
+		secondaryReq := j.createRequest()
+		err := secondaryReq.ExpandMasterVars()
+		if err != nil {
+			return "", err
+		}
+
+		secondaryReqMsg, err := secondaryReq.GenerateJSON()
+		if err != nil {
+			return "", err
+		}
+		return j.sendRequestWithRetry(secondaryReqMsg, stCh)
+	}
+
+	return resMsg, err
 }
 
 func (j *Job) requestLatestJobResult() (*message.JobResult, error) {
@@ -255,7 +258,8 @@ func (j *Job) sendRequestWithRetry(reqMsg string, stCh chan<- string) (string, e
 			console.Display("CTM027W", j.Name, i, limit-1)
 		}
 
-		resMsg, err = j.sendRequest(j.Node, j.Port, reqMsg, stCh)
+		host, _, _ := explodeNodeString(j.Node)
+		resMsg, err = j.sendRequest(host, j.Port, reqMsg, stCh)
 		if !j.isNecessaryToRetry(err) {
 			break
 		}
@@ -276,7 +280,8 @@ func (j *Job) sendResultCheckRequestWithRetry(chkMsg string) (string, error) {
 			console.Display("CTM027W", j.Name, i, limit-1)
 		}
 
-		resultMsg, err = j.sendRequest(j.Node, j.Port, chkMsg, stCh)
+		host, _, _ := explodeNodeString(j.Node)
+		resultMsg, err = j.sendRequest(host, j.Port, chkMsg, stCh)
 		if err == nil {
 			break
 		}
@@ -310,7 +315,7 @@ func isAbnormalEnd(r *message.Response) bool {
 }
 
 // ジョブの開始処理を行う。
-func (j *Job) start(req *message.Request) {
+func (j *Job) start() {
 	jobres := db.NewJobResult(int(j.Instance.ID))
 	jobres.JobId = j.ID()
 	jobres.JobName = j.Name
