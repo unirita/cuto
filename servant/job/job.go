@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"syscall"
 	"time"
@@ -97,8 +98,9 @@ func DoJobRequest(req *message.Request, conf *config.ServantConfig, stCh chan<- 
 }
 
 func (j *jobInstance) do(stCh chan<- string) error {
+	isDockerJob := j.path == message.DockerTag
 	cmd := j.createShell()
-	if j.path == message.DockerTag && cmd.Path == "" {
+	if isDockerJob && cmd.Path == "" {
 		return errors.New("Cannot execute job on Docker, because docker_command_path is lacked in servant.ini")
 	}
 
@@ -126,31 +128,36 @@ func (j *jobInstance) do(stCh chan<- string) error {
 
 // ジョブファイルの拡張子を確認して、実行シェルを作成します。
 func (j *jobInstance) createShell() *exec.Cmd {
-	var shell, param, script string
-	// ジョブファイル名のみの場合は、デフォルト場所を指定
-	if !strings.Contains(j.path, "\\") && !strings.Contains(j.path, "/") {
-		script = fmt.Sprintf("%s%c%s", j.config.Dir.JobDir, os.PathSeparator, j.path)
-	} else {
-		script = j.path
-	}
 	// 拡張子に応じた、実行シェルを作成
+	var shell string
+	var params []string
 	if j.path == message.DockerTag { // Docker
 		shell = j.config.Job.DockerCommandPath
-		param = j.param
-	} else if strings.HasSuffix(j.path, ".vbs") || strings.HasSuffix(j.path, ".js") { // WSH
-		shell = "cscript"
-		param = fmt.Sprintf("/nologo %s %s", script, j.param)
-	} else if strings.HasSuffix(j.path, ".jar") { // JAVA
-		shell = "java"
-		param = fmt.Sprintf("-jar %s %s", script, j.param)
-	} else if strings.HasSuffix(j.path, ".ps1") { // PowerShell
-		shell = "powershell"
-		param = fmt.Sprintf("%s %s", script, j.param)
-	} else { // bat or exe or shell
-		shell = script
-		param = j.param
+		params = paramSplit(j.param)
+	} else {
+		// ジョブファイル名のみの場合は、デフォルト場所を指定
+		if !filepath.IsAbs(j.path) {
+			j.path = filepath.Join(j.config.Dir.JobDir, j.path)
+		}
+		var paramStr string
+		switch filepath.Ext(j.path) {
+		case ".vbs":
+			fallthrough
+		case ".js":
+			shell = "cscript"
+			paramStr = fmt.Sprintf("/nologo %s %s", j.path, j.param)
+		case ".jar":
+			shell = "java"
+			paramStr = fmt.Sprintf("-jar %s %s", j.path, j.param)
+		case ".ps1":
+			shell = "powershell"
+			paramStr = fmt.Sprintf("%s %s", j.path, j.param)
+		default:
+			shell = j.path
+			paramStr = j.param
+		}
+		params = paramSplit(paramStr)
 	}
-	params := paramSplit(param)
 	cmd := exec.Command(shell, params...)
 
 	// 環境変数指定がない場合は、既存の物のみを追加する。

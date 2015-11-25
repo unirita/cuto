@@ -75,7 +75,7 @@ func createTestJobInstance() *jobInstance {
 func TestJobCreateShell_Normal(t *testing.T) {
 	j := createTestJobInstance()
 	cmd := j.createShell()
-	expectedPath := filepath.Join(j.config.Dir.JobDir, j.path)
+	expectedPath := filepath.Join(j.config.Dir.JobDir, "test.sh")
 	if cmd.Path != expectedPath {
 		t.Errorf("cmd.Path => %s, wants %s", cmd.Path, expectedPath)
 	}
@@ -133,7 +133,7 @@ func TestJobCreateShell_VBScript(t *testing.T) {
 	if cmd.Args[1] != "/nologo" {
 		t.Errorf("cmd.Args[1] => %s, wants %s", cmd.Args[1], "/nologo")
 	}
-	expectedPath := filepath.Join(j.config.Dir.JobDir, j.path)
+	expectedPath := filepath.Join(j.config.Dir.JobDir, "test.vbs")
 	if cmd.Args[2] != expectedPath {
 		t.Errorf("cmd.Args[2] => %s, wants %s", cmd.Args[2], expectedPath)
 	}
@@ -159,7 +159,7 @@ func TestJobCreateShell_JScript(t *testing.T) {
 	if cmd.Args[1] != "/nologo" {
 		t.Errorf("cmd.Args[1] => %s, wants %s", cmd.Args[1], "/nologo")
 	}
-	expectedPath := filepath.Join(j.config.Dir.JobDir, j.path)
+	expectedPath := filepath.Join(j.config.Dir.JobDir, "test.js")
 	if cmd.Args[2] != expectedPath {
 		t.Errorf("cmd.Args[2] => %s, wants %s", cmd.Args[2], expectedPath)
 	}
@@ -185,7 +185,7 @@ func TestJobCreateShell_JAR(t *testing.T) {
 	if cmd.Args[1] != "-jar" {
 		t.Errorf("cmd.Args[1] => %s, wants %s", cmd.Args[1], "-jar")
 	}
-	expectedPath := filepath.Join(j.config.Dir.JobDir, j.path)
+	expectedPath := filepath.Join(j.config.Dir.JobDir, "test.jar")
 	if cmd.Args[2] != expectedPath {
 		t.Errorf("cmd.Args[2] => %s, wants %s", cmd.Args[2], expectedPath)
 	}
@@ -208,7 +208,7 @@ func TestJobCreateShell_PowerShell(t *testing.T) {
 	if len(cmd.Args) != 4 {
 		t.Fatalf("len(cmd.Args) => %d, wants %d", len(cmd.Args), 5)
 	}
-	expectedPath := filepath.Join(j.config.Dir.JobDir, j.path)
+	expectedPath := filepath.Join(j.config.Dir.JobDir, "test.ps1")
 	if cmd.Args[1] != expectedPath {
 		t.Errorf("cmd.Args[1] => %s, wants %s", cmd.Args[1], expectedPath)
 	}
