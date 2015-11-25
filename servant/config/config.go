@@ -16,17 +16,18 @@ import (
 )
 
 const (
-	defaultBindAddress      = `0.0.0.0`
-	defaultBindPort         = 2015
-	defaultHeartbeatSpanSec = 30
-	defaultMultiProc        = 20
-	defaultJobDir           = `jobscript`
-	defaultJoblogDir        = `joblog`
-	defaultLogDir           = `log`
-	defaultOutputLevel      = `info`
-	defaultMaxSizeKB        = 10240
-	defaultMaxGeneration    = 2
-	defaultTimeoutSec       = 1
+	defaultBindAddress       = `0.0.0.0`
+	defaultBindPort          = 2015
+	defaultHeartbeatSpanSec  = 30
+	defaultMultiProc         = 20
+	defaultDockerCommandPath = ``
+	defaultJobDir            = `jobscript`
+	defaultJoblogDir         = `joblog`
+	defaultLogDir            = `log`
+	defaultOutputLevel       = `info`
+	defaultMaxSizeKB         = 10240
+	defaultMaxGeneration     = 2
+	defaultTimeoutSec        = 1
 )
 
 const dirName = "bin"
@@ -40,6 +41,7 @@ func DefaultServantConfig() *ServantConfig {
 	cfg.Sys.BindPort = defaultBindPort
 	cfg.Job.HeartbeatSpanSec = defaultHeartbeatSpanSec
 	cfg.Job.MultiProc = defaultMultiProc
+	cfg.Job.DockerCommandPath = defaultDockerCommandPath
 	cfg.Dir.JobDir = defaultJobDir
 	cfg.Dir.JoblogDir = defaultJoblogDir
 	cfg.Dir.LogDir = defaultLogDir
@@ -68,8 +70,9 @@ type sysSection struct {
 
 // サーバント設定のjobセクション
 type jobSection struct {
-	MultiProc        int `toml:"multi_proc"`
-	HeartbeatSpanSec int `toml:"heartbeat_span_sec"`
+	MultiProc         int    `toml:"multi_proc"`
+	HeartbeatSpanSec  int    `toml:"heartbeat_span_sec"`
+	DockerCommandPath string `toml:"docker_command_path"`
 }
 
 // サーバント設定のdirセクション
