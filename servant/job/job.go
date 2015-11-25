@@ -128,10 +128,29 @@ func (j *jobInstance) do(stCh chan<- string) error {
 
 // ジョブファイルの拡張子を確認して、実行シェルを作成します。
 func (j *jobInstance) createShell() *exec.Cmd {
-	// 拡張子に応じた、実行シェルを作成
+	shell, params := j.organizePathAndParam()
+	cmd := exec.Command(shell, params...)
+
+	// 環境変数指定がない場合は、既存の物のみを追加する。
+	if len(j.env) > 0 {
+		envs := strings.Split(j.env, "+")
+		cmd.Env = append(envs, os.Environ()...)
+	} else {
+		cmd.Env = os.Environ()
+	}
+	if len(j.workDir) > 0 {
+		cmd.Dir = j.workDir
+	} else {
+		cmd.Dir = j.config.Dir.JobDir
+	}
+
+	return cmd
+}
+
+func (j *jobInstance) organizePathAndParam() (string, []string) {
 	var shell string
 	var params []string
-	if j.path == message.DockerTag { // Docker
+	if j.path == message.DockerTag {
 		shell = j.config.Job.DockerCommandPath
 		params = paramSplit(j.param)
 	} else {
@@ -158,22 +177,8 @@ func (j *jobInstance) createShell() *exec.Cmd {
 		}
 		params = paramSplit(paramStr)
 	}
-	cmd := exec.Command(shell, params...)
 
-	// 環境変数指定がない場合は、既存の物のみを追加する。
-	if len(j.env) > 0 {
-		envs := strings.Split(j.env, "+")
-		cmd.Env = append(envs, os.Environ()...)
-	} else {
-		cmd.Env = os.Environ()
-	}
-	if len(j.workDir) > 0 {
-		cmd.Dir = j.workDir
-	} else {
-		cmd.Dir = j.config.Dir.JobDir
-	}
-
-	return cmd
+	return shell, params
 }
 
 // ジョブ実行を行い、そのリターンコードを返す。
