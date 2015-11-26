@@ -5,7 +5,6 @@ package job
 
 import (
 	"bufio"
-	"bytes"
 	"errors"
 	"fmt"
 	"os"
@@ -195,9 +194,9 @@ func (j *jobInstance) organizePathAndParam() (string, []string) {
 
 // ジョブ実行を行い、そのリターンコードを返す。
 func (j *jobInstance) run(cmd *exec.Cmd, stCh chan<- string) error {
-	var stdout bytes.Buffer
-	cmd.Stdout = &stdout
-	cmd.Stderr = &stdout
+	buf := NewStdoutBuffer(false)
+	cmd.Stdout = buf
+	cmd.Stderr = buf
 
 	if err := cmd.Start(); err != nil {
 		return err
@@ -224,7 +223,7 @@ func (j *jobInstance) run(cmd *exec.Cmd, stCh chan<- string) error {
 	} else {
 		j.rc = 0
 	}
-	j.joblog = stdout.String()
+	j.joblog = buf.String()
 	return err
 }
 
