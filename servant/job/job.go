@@ -107,13 +107,13 @@ func (j *jobInstance) do(stCh chan<- string) error {
 		return err
 	}
 
-	rcSt, rcMsg := j.judgeRC()
-	ptnSt, ptnMsg, err := j.writeFileAndJodgeJoblog()
-	if err != nil {
+	if err := j.writeJoblog(); err != nil {
 		return err
 	}
 
 	// RCからの結果と、出力MSGの結果を比較し、大きい方（異常の方）を採用する
+	rcSt, rcMsg := j.judgeRC()
+	ptnSt, ptnMsg := j.judgeJoblog()
 	if rcSt > ptnSt {
 		j.stat = rcSt
 		j.detail = rcMsg
@@ -268,8 +268,23 @@ func (j *jobInstance) judgeRC() (int, string) {
 }
 
 // ジョブログ結果を確認し、ステータスを返す。
+func (j *jobInstance) judgeJoblog() (int, string) {
+	if len(j.errPtn) > 0 {
+		if strings.Contains(j.joblog, j.errPtn) {
+			return db.ABNORMAL, detailErrPtn
+		}
+	}
+	if len(j.wrnPtn) > 0 {
+		if strings.Contains(j.joblog, j.wrnPtn) {
+			return db.WARN, detailWarnPtn
+		}
+	}
+	return db.NORMAL, ""
+}
+
+// ジョブログ結果を確認し、ステータスを返す。
 // joblog内に指定された文字列が存在する場合は、それぞれのステータスを返します。
-func (j *jobInstance) writeFileAndJodgeJoblog() (int, string, error) {
+func (j *jobInstance) writeJoblog() error {
 	// ジョブログファイル名の作成
 	j.joblogFile = j.createJoblogFileName()
 	log.Debug("joblogFile = ", j.joblogFile)
@@ -277,26 +292,12 @@ func (j *jobInstance) writeFileAndJodgeJoblog() (int, string, error) {
 	// ファイルは存在しない場合の新規作成モード。
 	file, err := os.OpenFile(j.joblogFile, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0666)
 	if err != nil {
-		return 0, "", err
+		return err
 	}
 	defer file.Close()
 
 	_, err = file.WriteString(j.joblog)
-	if err != nil {
-		return 0, "", err
-	}
-
-	if len(j.errPtn) > 0 {
-		if strings.Contains(j.joblog, j.errPtn) {
-			return db.ABNORMAL, detailErrPtn, nil
-		}
-	}
-	if len(j.wrnPtn) > 0 {
-		if strings.Contains(j.joblog, j.wrnPtn) {
-			return db.WARN, detailWarnPtn, nil
-		}
-	}
-	return db.NORMAL, "", nil
+	return err
 }
 
 // ジョブログファイル名をフルパスで作成する。
