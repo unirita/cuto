@@ -107,8 +107,10 @@ func (j *jobInstance) do(stCh chan<- string) error {
 		return err
 	}
 
-	if err := j.writeJoblog(); err != nil {
-		return err
+	if j.config.Job.DisuseJoblog == 0 {
+		if err := j.writeJoblog(); err != nil {
+			return err
+		}
 	}
 
 	// RCからの結果と、出力MSGの結果を比較し、大きい方（異常の方）を採用する
@@ -194,7 +196,8 @@ func (j *jobInstance) organizePathAndParam() (string, []string) {
 
 // ジョブ実行を行い、そのリターンコードを返す。
 func (j *jobInstance) run(cmd *exec.Cmd, stCh chan<- string) error {
-	buf := NewStdoutBuffer(false)
+	isJoblogDisabled := j.config.Job.DisuseJoblog != 0
+	buf := NewStdoutBuffer(isJoblogDisabled)
 	cmd.Stdout = buf
 	cmd.Stderr = buf
 
