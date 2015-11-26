@@ -12,6 +12,7 @@ func generateTestConfig() *ServantConfig {
 	c.Job.HeartbeatSpanSec = 1
 	c.Job.MultiProc = 1
 	c.Job.DockerCommandPath = `/usr/bin/docker`
+	c.Job.DisuseJoblog = 1
 	c.Dir.JobDir = `.\jobscript`
 	c.Dir.JoblogDir = `.\joblog`
 	c.Dir.LogDir = `.\log`
@@ -40,6 +41,9 @@ func TestReadConfig_設定ファイルが開けない場合はデフォルト値
 	}
 	if Servant.Job.DockerCommandPath != defaultDockerCommandPath {
 		t.Errorf("docker_command_pathの設定値[%s]が想定と違っている。", Servant.Job.DockerCommandPath)
+	}
+	if Servant.Job.DisuseJoblog != defaultDisuseJoblog {
+		t.Errorf("disuse_joblog[%d]が想定と違っている。", Servant.Job.DisuseJoblog)
 	}
 	if Servant.Dir.JobDir != defaultJobDir {
 		t.Errorf("job_dirの設定値[%s]が想定と違っている。", Servant.Dir.JobDir)
@@ -71,6 +75,7 @@ bind_port=2015
 multi_proc=20
 heartbeat_span_sec=30
 docker_command_path='/usr/bin/docker'
+disuse_joblog=1
 
 [dir]
 joblog_dir='.\joblog'
@@ -104,6 +109,9 @@ max_generation=2
 	if cfg.Job.DockerCommandPath != `/usr/bin/docker` {
 		t.Errorf("docker_command_pathの設定値[%s]が想定と違っている。", cfg.Job.DockerCommandPath)
 	}
+	if cfg.Job.DisuseJoblog != 1 {
+		t.Errorf("disuse_joblog[%d]が想定と違っている。", cfg.Job.DisuseJoblog)
+	}
 	if cfg.Dir.JoblogDir != `.\joblog` {
 		t.Errorf("joblog_dirの値[%s]が想定と違っている。", cfg.Dir.JoblogDir)
 	}
@@ -134,6 +142,7 @@ bind_port=2015
 multi_proc=20
 heartbeat_span_sec=30
 docker_command_path='/usr/bin/docker'
+disuse_joblog=1
 
 [dir]
 joblog_dir='<CUTOROOT>\joblog'
@@ -173,6 +182,7 @@ bind_port=2015
 multi_proc=20
 heartbeat_span_sec=30
 docker_command_path='/usr/bin/docker'
+disuse_joblog=1
 
 [dir]
 joblog_dir='.\joblog'

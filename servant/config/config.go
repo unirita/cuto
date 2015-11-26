@@ -21,6 +21,7 @@ const (
 	defaultHeartbeatSpanSec  = 30
 	defaultMultiProc         = 20
 	defaultDockerCommandPath = ``
+	defaultDisuseJoblog      = 0
 	defaultJobDir            = `jobscript`
 	defaultJoblogDir         = `joblog`
 	defaultLogDir            = `log`
@@ -42,6 +43,7 @@ func DefaultServantConfig() *ServantConfig {
 	cfg.Job.HeartbeatSpanSec = defaultHeartbeatSpanSec
 	cfg.Job.MultiProc = defaultMultiProc
 	cfg.Job.DockerCommandPath = defaultDockerCommandPath
+	cfg.Job.DisuseJoblog = defaultDisuseJoblog
 	cfg.Dir.JobDir = defaultJobDir
 	cfg.Dir.JoblogDir = defaultJoblogDir
 	cfg.Dir.LogDir = defaultLogDir
@@ -73,6 +75,7 @@ type jobSection struct {
 	MultiProc         int    `toml:"multi_proc"`
 	HeartbeatSpanSec  int    `toml:"heartbeat_span_sec"`
 	DockerCommandPath string `toml:"docker_command_path"`
+	DisuseJoblog      int    `toml:"disuse_joblog"`
 }
 
 // サーバント設定のdirセクション
