@@ -344,13 +344,8 @@ func (j *jobInstance) createResponse() *message.Response {
 
 // ジョブログファイルから変数情報を取得する。
 func (j *jobInstance) setVariableValue() {
-	file, err := os.Open(j.joblogFile)
-	if err != nil {
-		console.DisplayError("CTS019E", err)
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
+	reader := strings.NewReader(j.joblog)
+	scanner := bufio.NewScanner(reader)
 	var line string
 	for scanner.Scan() {
 		line = scanner.Text()
