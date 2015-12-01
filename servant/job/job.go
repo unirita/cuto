@@ -197,9 +197,18 @@ func (j *jobInstance) organizePathAndParam() (string, []string) {
 // ジョブ実行を行い、そのリターンコードを返す。
 func (j *jobInstance) run(cmd *exec.Cmd, stCh chan<- string) error {
 	isJoblogDisabled := j.config.Job.DisuseJoblog != 0
-	buf := NewStdoutBuffer(isJoblogDisabled)
-	cmd.Stdout = buf
-	cmd.Stderr = buf
+	pipeBuffer := NewOutputPipeBuffer(isJoblogDisabled)
+
+	pStdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	defer pStdout.Close()
+	pStderr, err := cmd.StderrPipe()
+	if err != nil {
+		return err
+	}
+	defer pStderr.Close()
 
 	if err := cmd.Start(); err != nil {
 		return err
@@ -211,7 +220,9 @@ func (j *jobInstance) run(cmd *exec.Cmd, stCh chan<- string) error {
 
 	console.Display("CTS010I", j.path, j.nID, j.jID, cmd.Process.Pid)
 
-	err := j.waitCmdTimeout(cmd)
+	pipeBuffer.ReadPipe(pStdout, pStderr)
+
+	err = j.waitCmdTimeout(cmd)
 	j.et = utctime.Now().String() // ジョブ終了日時の取得
 
 	if err != nil {
@@ -226,7 +237,7 @@ func (j *jobInstance) run(cmd *exec.Cmd, stCh chan<- string) error {
 	} else {
 		j.rc = 0
 	}
-	j.joblog = buf.String()
+	j.joblog = pipeBuffer.String()
 	return err
 }
 
