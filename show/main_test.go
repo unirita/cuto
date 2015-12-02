@@ -346,7 +346,7 @@ func TestRealMain_RuntimeErrorX(t *testing.T) {
 		to:     "20150416",
 		status: "",
 		format: "",
-		config: fmt.Sprintf("%v%c%v", confPath, os.PathSeparator, "show_testX.ini"),
+		config: filepath.Join(confPath, "show_testX.ini"),
 	}
 	ce := testutil.NewStderrCapturer()
 	ce.Start()
@@ -375,7 +375,7 @@ func TestRealMain_RuntimeErrorY(t *testing.T) {
 		to:     "20150416",
 		status: "",
 		format: "",
-		config: fmt.Sprintf("%v%c%v", confPath, os.PathSeparator, "show_testY.ini"),
+		config: filepath.Join(confPath, "show_testY.ini"),
 	}
 	ce := testutil.NewStderrCapturer()
 	ce.Start()

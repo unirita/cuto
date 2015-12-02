@@ -45,13 +45,13 @@ func TestReadConfig_設定ファイルが開けない場合はデフォルト値
 	if Servant.Job.DisuseJoblog != defaultDisuseJoblog {
 		t.Errorf("disuse_joblog[%d]が想定と違っている。", Servant.Job.DisuseJoblog)
 	}
-	if Servant.Dir.JobDir != defaultJobDir {
+	if !strings.HasSuffix(Servant.Dir.JobDir, defaultJobDir) {
 		t.Errorf("job_dirの設定値[%s]が想定と違っている。", Servant.Dir.JobDir)
 	}
-	if Servant.Dir.JoblogDir != defaultJoblogDir {
+	if !strings.HasSuffix(Servant.Dir.JoblogDir, defaultJoblogDir) {
 		t.Errorf("joblog_dirの設定値[%s]が想定と違っている。", Servant.Dir.JoblogDir)
 	}
-	if Servant.Dir.LogDir != defaultLogDir {
+	if !strings.HasSuffix(Servant.Dir.LogDir, defaultLogDir) {
 		t.Errorf("log_dirの設定値[%s]が想定と違っている。", Servant.Dir.LogDir)
 	}
 	if Servant.Log.OutputLevel != defaultOutputLevel {

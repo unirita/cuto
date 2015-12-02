@@ -19,16 +19,6 @@ func init() {
 	os.Mkdir("log", 0777)
 }
 
-func getTestDataPath(names ...string) string {
-	const s = string(os.PathSeparator)
-	path := testDataDir
-	for _, n := range names {
-		path += s
-		path += n
-	}
-	return path
-}
-
 func runTestServant(t *testing.T, waitInitCh chan<- struct{}) {
 	listener, lerr := net.Listen("tcp", "localhost:15243")
 	waitInitCh <- struct{}{}

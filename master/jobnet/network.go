@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strconv"
 	"sync"
 
@@ -46,14 +47,9 @@ func NewNetwork(name string) (*Network, error) {
 	nwk := new(Network)
 	nwk.Name = name
 	nwk.elements = make(map[string]Element)
-	nwk.MasterPath = fmt.Sprintf("%s%c%s.bpmn",
-		config.Dir.JobnetDir,
-		os.PathSeparator,
-		name)
-	nwk.JobExPath = fmt.Sprintf("%s%c%s.csv",
-		config.Dir.JobnetDir,
-		os.PathSeparator,
-		name)
+	filePrefix := filepath.Join(config.Dir.JobnetDir, name)
+	nwk.MasterPath = filePrefix + ".bpmn"
+	nwk.JobExPath = filePrefix + ".csv"
 
 	var err error
 	nwk.globalLock, err = util.InitLock(lock_name)

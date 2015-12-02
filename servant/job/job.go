@@ -329,12 +329,13 @@ func (j *jobInstance) createJoblogFileName() string {
 		job = job[:extpos]
 	}
 	// 開始日フォルダの作成
-	joblogDir := fmt.Sprintf("%v%c%v", j.config.Dir.JoblogDir, os.PathSeparator, j.joblogTimestamp[:8])
+	joblogDir := filepath.Join(j.config.Dir.JoblogDir, j.joblogTimestamp[:8])
 	if _, err := os.Stat(joblogDir); err != nil {
 		os.Mkdir(joblogDir, 0777)
 	}
 	log.Debug("joblogDir = ", joblogDir)
-	return fmt.Sprintf("%v%c%v.%v.%v.%v.log", joblogDir, os.PathSeparator, j.nID, job, j.jID, j.joblogTimestamp)
+	joblogFileName := fmt.Sprintf("%v.%v.%v.%v.log", j.nID, job, j.jID, j.joblogTimestamp)
+	return filepath.Join(joblogDir, joblogFileName)
 }
 
 // レスポンスメッセージの作成

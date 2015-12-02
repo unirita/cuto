@@ -6,6 +6,7 @@ package log
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/cihub/seelog"
 
@@ -50,15 +51,15 @@ func Init(dir string, name string, identifer string, level string, maxSizeKB int
 		lockTimeout = timeoutSec * 1000
 	}
 
-	logfile := fmt.Sprintf("%s%c%s.log", dir, os.PathSeparator, name)
-	if err := makeFileIfNotExist(logfile); err != nil {
+	logfile := filepath.Join(dir, name) + ".log"
+	config := generateConfigString(logfile, level, maxSizeKB, maxRolls)
+	logger, err := seelog.LoggerFromConfigAsString(config)
+	if err != nil {
 		Term()
 		return err
 	}
 
-	config := generateConfigString(logfile, level, maxSizeKB, maxRolls)
-	logger, err := seelog.LoggerFromConfigAsString(config)
-	if err != nil {
+	if err := makeFileIfNotExist(logfile); err != nil {
 		Term()
 		return err
 	}

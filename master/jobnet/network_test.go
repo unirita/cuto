@@ -1,8 +1,6 @@
 package jobnet
 
 import (
-	"fmt"
-	"os"
 	"path/filepath"
 	"reflect"
 	"strings"
@@ -60,11 +58,11 @@ func TestNewNetwork_各メンバの初期値をセットできる(t *testing.T) 
 	if n.elements == nil {
 		t.Error("elementsがmakeされていません。")
 	}
-	expectedNwkPath := fmt.Sprintf("jobnet%ctest.bpmn", os.PathSeparator)
+	expectedNwkPath := filepath.Join("jobnet", "test.bpmn")
 	if n.MasterPath != expectedNwkPath {
 		t.Errorf("セットされたネットワーク定義ファイルパス[%s]が間違っています。", n.MasterPath)
 	}
-	expectedExPath := fmt.Sprintf("jobnet%ctest.csv", os.PathSeparator)
+	expectedExPath := filepath.Join("jobnet", "test.csv")
 	if n.JobExPath != expectedExPath {
 		t.Errorf("セットされた拡張ジョブ定義ファイルパス[%s]が間違っています。", n.JobExPath)
 	}

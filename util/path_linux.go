@@ -6,6 +6,7 @@ package util
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 )
 
 var rootPath = getCutoRoot()
@@ -25,5 +26,5 @@ func GetRootPath() string {
 
 // 現在のフォルダパスを返す。
 func GetCurrentPath() string {
-	return fmt.Sprintf("%s%c%s", rootPath, os.PathSeparator, "bin")
+	return filepath.Join(rootPath, "bin")
 }

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/BurntSushi/toml"
@@ -99,8 +100,7 @@ var RootPath string
 
 func init() {
 	RootPath = util.GetRootPath()
-	//	FilePath = fmt.Sprintf("%s%c%s%c%s", RootPath, os.PathSeparator, dirName, os.PathSeparator, fileName)
-	FilePath = fmt.Sprintf(".%c%s", os.PathSeparator, fileName)
+	FilePath = fileName
 }
 
 // 設定ファイルを読み込む
@@ -182,13 +182,13 @@ func (s *ServantConfig) replaceCutoroot() {
 
 // 設定値の相対パスを絶対パスへ変換する。
 func (s *ServantConfig) convertFullpath() {
-	if strings.HasPrefix(s.Dir.JoblogDir, ".\\") || strings.HasPrefix(s.Dir.JoblogDir, "./") {
-		s.Dir.JoblogDir = strings.Replace(s.Dir.JoblogDir, ".", RootPath, 1)
+	if !filepath.IsAbs(s.Dir.JoblogDir) {
+		s.Dir.JoblogDir = filepath.Join(RootPath, s.Dir.JoblogDir)
 	}
-	if strings.HasPrefix(s.Dir.JobDir, ".\\") || strings.HasPrefix(s.Dir.JobDir, "./") {
-		s.Dir.JobDir = strings.Replace(s.Dir.JobDir, ".", RootPath, 1)
+	if !filepath.IsAbs(s.Dir.JobDir) {
+		s.Dir.JobDir = filepath.Join(RootPath, s.Dir.JobDir)
 	}
-	if strings.HasPrefix(s.Dir.LogDir, ".\\") || strings.HasPrefix(s.Dir.LogDir, "./") {
-		s.Dir.LogDir = strings.Replace(s.Dir.LogDir, ".", RootPath, 1)
+	if !filepath.IsAbs(s.Dir.LogDir) {
+		s.Dir.LogDir = filepath.Join(RootPath, s.Dir.LogDir)
 	}
 }

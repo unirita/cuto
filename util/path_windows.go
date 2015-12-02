@@ -5,8 +5,7 @@ package util
 
 import (
 	"fmt"
-	"os"
-	"strings"
+	"path/filepath"
 	"unsafe"
 )
 
@@ -18,15 +17,12 @@ const max_path = 520
 
 // Rootフォルダを取得する（実行ファイルはRootパス下のbinフォルダにあると想定）
 func GetRootPath() string {
-	c := modulePath[:strings.LastIndex(modulePath, fmt.Sprintf("%c", os.PathSeparator))]
-	rootPath := modulePath[:strings.LastIndex(c, fmt.Sprintf("%c", os.PathSeparator))]
-	return rootPath
+	return filepath.Dir(filepath.Dir(modulePath))
 }
 
 // 現在のフォルダパスを返す。
 func GetCurrentPath() string {
-	c := modulePath[:strings.LastIndex(modulePath, fmt.Sprintf("%c", os.PathSeparator))]
-	return c
+	return filepath.Dir(modulePath)
 }
 
 func getModulePath() string {
