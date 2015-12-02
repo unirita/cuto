@@ -5,8 +5,10 @@ package job
 
 import (
 	"bufio"
+	"bytes"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -197,18 +199,16 @@ func (j *jobInstance) organizePathAndParam() (string, []string) {
 // ジョブ実行を行い、そのリターンコードを返す。
 func (j *jobInstance) run(cmd *exec.Cmd, stCh chan<- string) error {
 	isJoblogDisabled := j.config.Job.DisuseJoblog != 0
-	pipeBuffer := NewOutputPipeBuffer(isJoblogDisabled)
+	outputBuffer := new(bytes.Buffer)
 
-	pStdout, err := cmd.StdoutPipe()
-	if err != nil {
-		return err
+	if isJoblogDisabled {
+		outputWriter := io.MultiWriter(os.Stdout, outputBuffer)
+		cmd.Stdout = outputWriter
+		cmd.Stderr = outputWriter
+	} else {
+		cmd.Stdout = outputBuffer
+		cmd.Stderr = outputBuffer
 	}
-	defer pStdout.Close()
-	pStderr, err := cmd.StderrPipe()
-	if err != nil {
-		return err
-	}
-	defer pStderr.Close()
 
 	if err := cmd.Start(); err != nil {
 		return err
@@ -220,10 +220,7 @@ func (j *jobInstance) run(cmd *exec.Cmd, stCh chan<- string) error {
 
 	console.Display("CTS010I", j.path, j.nID, j.jID, cmd.Process.Pid)
 
-	// このgoroutineはpStdoutとpStderrがCloseすると自然に終了する。
-	go pipeBuffer.ReadPipe(pStdout, pStderr)
-
-	err = j.waitCmdTimeout(cmd)
+	err := j.waitCmdTimeout(cmd)
 	j.et = utctime.Now().String() // ジョブ終了日時の取得
 
 	if err != nil {
@@ -238,7 +235,7 @@ func (j *jobInstance) run(cmd *exec.Cmd, stCh chan<- string) error {
 	} else {
 		j.rc = 0
 	}
-	j.joblog = pipeBuffer.String()
+	j.joblog = outputBuffer.String()
 	return err
 }
 

@@ -31,7 +31,7 @@ func NewOutputPipeBuffer(enableOutput bool) *OutputPipeBuffer {
 	return &OutputPipeBuffer{enableOutput: enableOutput}
 }
 
-func (b *OutputPipeBuffer) ReadPipe(pStdout io.ReadCloser, pStderr io.ReadCloser) error {
+func (b *OutputPipeBuffer) ReadPipe(pStdout io.Reader, pStderr io.Reader) error {
 	reader := io.MultiReader(pStdout, pStderr)
 	buf := make([]byte, 1024)
 	for {
