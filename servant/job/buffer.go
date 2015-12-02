@@ -42,7 +42,9 @@ func (b *OutputPipeBuffer) ReadPipe(pStdout io.ReadCloser, pStderr io.ReadCloser
 		if err != nil {
 			return err
 		}
-		os.Stdout.Write(buf[:n])
+		if b.enableOutput {
+			os.Stdout.Write(buf[:n])
+		}
 		b.Buffer.Write(buf[:n])
 	}
 	return nil
