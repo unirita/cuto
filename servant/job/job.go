@@ -220,10 +220,10 @@ func (j *jobInstance) run(cmd *exec.Cmd, stCh chan<- string) error {
 
 	console.Display("CTS010I", j.path, j.nID, j.jID, cmd.Process.Pid)
 
-	pipeBuffer.ReadPipe(pStdout, pStderr)
-
 	err = j.waitCmdTimeout(cmd)
 	j.et = utctime.Now().String() // ジョブ終了日時の取得
+
+	pipeBuffer.ReadPipe(pStdout, pStderr)
 
 	if err != nil {
 		if e2, ok := err.(*exec.ExitError); ok {
