@@ -82,7 +82,7 @@ func realMain(args *arguments) (rc int) {
 	if err := config.DetectError(); err != nil {
 		console.Display("CTM005E", err)
 		rc = rc_ERROR
-		return rc_ERROR
+		return
 	}
 
 	if err := log.Init(config.Dir.LogDir,
