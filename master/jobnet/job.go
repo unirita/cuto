@@ -168,22 +168,12 @@ func (j *Job) executeRequest() (*message.Response, error) {
 	}
 	console.Display("CTM023I", j.Name, j.Node, j.Instance.ID, j.id)
 
-	req := j.createRequest()
-	err := req.ExpandMasterVars()
-	if err != nil {
-		return nil, err
+	resMsg, err := j.requestAndWaitResult()
+	if j.isNecessaryToRetry(err) && j.SecondaryNode != "" {
+		j.useSecondaryNode()
+		console.Display("CTM028W", j.Name, j.SecondaryNode)
+		resMsg, err = j.requestAndWaitResult()
 	}
-
-	reqMsg, err := req.GenerateJSON()
-	if err != nil {
-		return nil, err
-	}
-
-	timerEndCh := make(chan struct{}, 1)
-	go j.startTimer(timerEndCh)
-	defer close(timerEndCh)
-
-	resMsg, err := j.requestAndWaitResult(reqMsg)
 	if err != nil {
 		return nil, err
 	}
@@ -197,30 +187,27 @@ func (j *Job) executeRequest() (*message.Response, error) {
 	return res, nil
 }
 
-func (j *Job) requestAndWaitResult(reqMsg string) (string, error) {
+func (j *Job) requestAndWaitResult() (string, error) {
+	req := j.createRequest()
+	err := req.ExpandMasterVars()
+	if err != nil {
+		return "", err
+	}
+
+	reqMsg, err := req.GenerateJSON()
+	if err != nil {
+		return "", err
+	}
+
+	timerEndCh := make(chan struct{}, 1)
+	go j.startTimer(timerEndCh)
+	defer close(timerEndCh)
+
 	stCh := make(chan string, 1)
 	defer close(stCh)
 	go j.waitAndSetResultStartDate(stCh)
 
-	resMsg, err := j.sendRequestWithRetry(reqMsg, stCh)
-	if j.isNecessaryToRetry(err) && j.SecondaryNode != "" {
-		j.useSecondaryNode()
-		console.Display("CTM028W", j.Name, j.SecondaryNode)
-
-		secondaryReq := j.createRequest()
-		err := secondaryReq.ExpandMasterVars()
-		if err != nil {
-			return "", err
-		}
-
-		secondaryReqMsg, err := secondaryReq.GenerateJSON()
-		if err != nil {
-			return "", err
-		}
-		return j.sendRequestWithRetry(secondaryReqMsg, stCh)
-	}
-
-	return resMsg, err
+	return j.sendRequestWithRetry(reqMsg, stCh)
 }
 
 func (j *Job) requestLatestJobResult() (*message.JobResult, error) {
