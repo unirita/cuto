@@ -318,8 +318,6 @@ func (j *Job) start() {
 func (j *Job) useSecondaryNode() {
 	j.Node = j.SecondaryNode
 	j.Port = j.SecondaryPort
-	j.SecondaryNode = ""
-	j.SecondaryPort = 0
 
 	jobres, exist := j.Instance.Result.Jobresults[j.id]
 	if !exist {
@@ -330,6 +328,9 @@ func (j *Job) useSecondaryNode() {
 	jobres.Node = j.SecondaryNode
 	jobres.Port = j.SecondaryPort
 	tx.UpdateJob(j.Instance.Result.GetConnection(), jobres, &j.Instance.localMutex)
+
+	j.SecondaryNode = ""
+	j.SecondaryPort = 0
 }
 
 // ジョブ実行結果にジョブの開始時刻をセットする。
