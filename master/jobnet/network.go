@@ -134,7 +134,7 @@ func (n *Network) setElements(proc *parser.Process) error {
 			}
 
 			if f.To == eid {
-				return fmt.Errorf("ProcessFlow is empty.")
+				return fmt.Errorf("Jobnet is empty.")
 			}
 
 			var ok bool
