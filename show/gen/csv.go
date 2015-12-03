@@ -16,11 +16,9 @@ type CsvGenerator struct {
 func (s CsvGenerator) Generate(out *OutputRoot) (string, error) {
 	var jnBuf, jobBuf bytes.Buffer
 
-	//	jnWriter := csv.NewWriter(os.Stdout)
 	jnWriter := csv.NewWriter(&jnBuf)
 	jnWriter.Write([]string{"#Type", "JobNetwork ID", "JobNetwork Name", "Start Date", "End Date",
 		"Status", "Detail Message", "Create Date", "Update Date"})
-	//	jobWriter := csv.NewWriter(os.Stdout)
 	jobWriter := csv.NewWriter(&jobBuf)
 	jobWriter.Write([]string{"#Type", "JobNework ID", "Job ID", "Job Name", "Start Date", "End Date",
 		"Status", "Detail Message", "Return Code", "Node", "Port", "Variable", "CreateDate", "Update Date"})

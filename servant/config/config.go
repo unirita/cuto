@@ -127,7 +127,6 @@ func ReadConfig(configPath string) *ServantConfig {
 //
 // 戻り値: 設定値を格納したServantConfig構造体オブジェクト
 func ReloadConfig() *ServantConfig {
-	//@TODO 今はとりあえずファイル読むだけ
 	return ReadConfig(FilePath)
 }
 
