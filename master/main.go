@@ -41,26 +41,29 @@ const (
 const defaultConfig = `master.ini`
 
 func main() {
-
 	args := fetchArgs()
 	rc := realMain(args)
 	os.Exit(rc)
 }
 
-func realMain(args *arguments) int {
+func realMain(args *arguments) (rc int) {
+	rc = rc_OK
+
 	if args.versionFlag == flag_ON {
 		showVersion()
-		return rc_OK
+		return
 	}
 
 	if args.networkName == "" && args.rerunInstance == 0 {
 		showUsage()
-		return rc_ERROR
+		rc = rc_ERROR
+		return
 	}
 
 	if args.networkName != "" && args.rerunInstance != 0 {
 		console.Display("CTM019E", "Cannot use both -n and -r option.")
-		return rc_ERROR
+		rc = rc_ERROR
+		return
 	}
 
 	if args.configPath == "" {
@@ -72,11 +75,13 @@ func realMain(args *arguments) int {
 	if err := config.Load(args.configPath); err != nil {
 		console.Display("CTM019E", err)
 		console.Display("CTM004E", args.configPath)
-		return rc_ERROR
+		rc = rc_ERROR
+		return
 	}
 
 	if err := config.DetectError(); err != nil {
 		console.Display("CTM005E", err)
+		rc = rc_ERROR
 		return rc_ERROR
 	}
 
@@ -88,12 +93,12 @@ func realMain(args *arguments) int {
 		config.Log.MaxGeneration,
 		config.Log.TimeoutSec); err != nil {
 		console.Display("CTM021E", err)
-		return rc_ERROR
+		rc = rc_ERROR
+		return
 	}
 	defer log.Term()
 	console.Display("CTM001I", os.Getpid(), Version)
 	// master終了時のコンソール出力
-	var rc int
 	defer func() {
 		console.Display("CTM002I", rc)
 	}()
@@ -102,12 +107,13 @@ func realMain(args *arguments) int {
 		nwkResult, err := getNetworkResult(args.rerunInstance)
 		if err != nil {
 			console.Display("CTM019E", err)
-			return rc_ERROR
+			rc = rc_ERROR
+			return
 		}
 
 		if nwkResult.Status == db.NORMAL || nwkResult.Status == db.WARN {
 			console.Display("CTM029I", args.rerunInstance)
-			return rc_OK
+			return
 		}
 
 		args.networkName = nwkResult.JobnetWork
@@ -117,31 +123,29 @@ func realMain(args *arguments) int {
 	nwk := jobnet.LoadNetwork(args.networkName)
 	if nwk == nil {
 		rc = rc_ERROR
-		return rc
+		return
 	}
 	defer nwk.Terminate()
 
-	err := nwk.DetectFlowError()
-	if err != nil {
+	if err := nwk.DetectFlowError(); err != nil {
 		console.Display("CTM011E", nwk.MasterPath, err)
 		rc = rc_ERROR
-		return rc
+		return
 	}
 
 	if args.startFlag == flag_OFF {
 		console.Display("CTM020I", nwk.MasterPath)
-		rc = rc_OK
-		return rc
+		return
 	}
 
-	err = nwk.LoadJobEx()
-	if err != nil {
+	if err := nwk.LoadJobEx(); err != nil {
 		console.Display("CTM004E", nwk.JobExPath)
 		log.Error(err)
 		rc = rc_ERROR
-		return rc
+		return
 	}
 
+	var err error
 	if args.rerunInstance == 0 {
 		err = nwk.Run()
 	} else {
@@ -155,11 +159,10 @@ func realMain(args *arguments) int {
 			log.Error(err)
 		}
 		rc = rc_ERROR
-		return rc
+		return
 	}
 	console.Display("CTM013I", nwk.Name, nwk.ID, "NORMAL")
-	rc = rc_OK
-	return rc
+	return
 }
 
 // コマンドライン引数を解析し、arguments構造体を返す。
