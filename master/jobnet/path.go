@@ -26,22 +26,21 @@ func NewPath(head Element) *Path {
 func (p *Path) Run(done chan<- struct{}) {
 	current := p.Head
 
-PATHLOOP:
 	for {
 		if current == nil {
 			p.Err = fmt.Errorf("Network is terminated in branch.")
-			break PATHLOOP
+			break
 		}
 
 		if current.Type() == ELM_GW {
 			p.Goal = current
-			break PATHLOOP
+			break
 		}
 
 		next, err := current.Execute()
 		if err != nil {
 			p.Err = err
-			break PATHLOOP
+			break
 		}
 
 		current = next
