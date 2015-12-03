@@ -53,12 +53,10 @@ func SendRequest(host string, port int, req string, stCh chan<- string) (string,
 	}
 
 	scanner := bufio.NewScanner(conn)
-	var res *response
 
-WAITRESPONSE:
 	for {
 		select {
-		case res = <-readResponse(scanner):
+		case res := <-readResponse(scanner):
 			if res.err != nil {
 				return ``, res.err
 			}
@@ -72,13 +70,11 @@ WAITRESPONSE:
 				continue
 			}
 
-			break WAITRESPONSE
+			return res.msg, nil
 		case <-time.After(timeout):
 			return ``, fmt.Errorf("Connetion timeout.")
 		}
 	}
-
-	return res.msg, nil
 }
 
 func readResponse(scanner *bufio.Scanner) <-chan *response {
