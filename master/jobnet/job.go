@@ -318,6 +318,8 @@ func (j *Job) start() {
 func (j *Job) useSecondaryNode() {
 	j.Node = j.SecondaryNode
 	j.Port = j.SecondaryPort
+	j.SecondaryNode = ""
+	j.SecondaryPort = 0
 
 	jobres, exist := j.Instance.Result.Jobresults[j.id]
 	if !exist {
