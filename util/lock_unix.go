@@ -1,6 +1,8 @@
 // Copyright 2015 unirita Inc.
 // Created 2015/06/03 shanxia
 
+// +build darwin linux
+
 package util
 
 import (
