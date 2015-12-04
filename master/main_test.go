@@ -1,6 +1,8 @@
 package main
 
 import (
+	"bufio"
+	"io"
 	"net"
 	"os"
 	"path/filepath"
@@ -12,11 +14,51 @@ import (
 
 var testDataDir string
 
-func init() {
+func TestMain(m *testing.M) {
+	os.Exit(realTestMain(m))
+}
+
+func realTestMain(m *testing.M) int {
 	testDataDir = filepath.Join(testutil.GetBaseDir(), "master", "_testdata")
 	os.Chdir(testDataDir)
 	os.RemoveAll("log")
 	os.Mkdir("log", 0777)
+
+	dbBase := filepath.Join(testDataDir, "data", "test.sqlite.org")
+	dbFile := filepath.Join(testDataDir, "data", "test.sqlite")
+	copyFile(dbBase, dbFile)
+	defer os.RemoveAll(dbFile)
+
+	return m.Run()
+}
+
+func copyFile(srcPath string, targetPath string) error {
+	src, err := os.Open(srcPath)
+	if err != nil {
+		return err
+	}
+	defer src.Close()
+
+	target, err := os.Create(targetPath)
+	if err != nil {
+		return err
+	}
+	defer target.Close()
+
+	r := bufio.NewReader(src)
+	w := bufio.NewWriter(target)
+	buf := make([]byte, 1024)
+	for {
+		n, err := r.Read(buf)
+		if err != nil && err != io.EOF {
+			return err
+		}
+		if n == 0 {
+			break
+		}
+		w.Write(buf[:n])
+	}
+	return w.Flush()
 }
 
 func runTestServant(t *testing.T, waitInitCh chan<- struct{}) {
@@ -304,6 +346,46 @@ func TestRealMain_ジョブ実行を行う_ジョブ実行中にエラー発生(
 	}
 	if !strings.Contains(out, "STATUS [ABNORMAL]") {
 		t.Error("出力内容が想定と違っている。")
+		t.Logf("出力: %s", out)
+	}
+}
+
+func TestRealMain_リラン実行_既に正常終了済みの場合(t *testing.T) {
+	c := testutil.NewStdoutCapturer()
+
+	args := new(arguments)
+	args.rerunInstance = 1
+	args.startFlag = flag_ON
+
+	c.Start()
+	rc := realMain(args)
+	out := c.Stop()
+
+	if rc != rc_OK {
+		t.Errorf("想定外のrc[%d]が返された。", rc)
+	}
+	if !strings.Contains(out, "CTM029I") {
+		t.Errorf("想定されるメッセージ[%s]が出力されていない。", "CTM029I")
+		t.Logf("出力: %s", out)
+	}
+}
+
+func TestRealMain_リラン実行_存在しないインスタンスIDの場合(t *testing.T) {
+	c := testutil.NewStdoutCapturer()
+
+	args := new(arguments)
+	args.rerunInstance = 2
+	args.startFlag = flag_ON
+
+	c.Start()
+	rc := realMain(args)
+	out := c.Stop()
+
+	if rc != rc_ERROR {
+		t.Errorf("想定外のrc[%d]が返された。", rc)
+	}
+	if !strings.Contains(out, "CTM019E") {
+		t.Errorf("想定されるメッセージ[%s]が出力されていない。", "CTM019I")
 		t.Logf("出力: %s", out)
 	}
 }
