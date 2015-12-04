@@ -158,7 +158,7 @@ func makeFileIfNotExist(logfile string) error {
 		return nil
 	}
 
-	file, err := os.OpenFile(logfile, os.O_WRONLY|os.O_CREATE, 0777)
+	file, err := os.Create(logfile)
 	if err != nil {
 		return err
 	}
