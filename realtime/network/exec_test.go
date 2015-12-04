@@ -1,9 +1,32 @@
 package network
 
 import (
+	"regexp"
 	"testing"
 	"time"
 )
+
+func TestNewCommand_WithEmptyRealtimeName(t *testing.T) {
+	cmd := NewCommand("")
+
+	pattern := `^realtime_\d{14}$`
+	matcher := regexp.MustCompile(pattern)
+	if !matcher.MatchString(cmd.GetNetworkName()) {
+		t.Errorf("Unexpected Jobnet name format.")
+		t.Logf("Jobnet name: %s", cmd.GetNetworkName())
+	}
+}
+
+func TestNewCommand_WithRealtimeName(t *testing.T) {
+	cmd := NewCommand("test")
+
+	pattern := `^realtime_test_\d{14}$`
+	matcher := regexp.MustCompile(pattern)
+	if !matcher.MatchString(cmd.GetNetworkName()) {
+		t.Errorf("Unexpected Jobnet name format.")
+		t.Logf("Jobnet name: %s", cmd.GetNetworkName())
+	}
+}
 
 func TestWaitID(t *testing.T) {
 	cmd := new(Command)
