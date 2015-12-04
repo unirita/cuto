@@ -75,6 +75,13 @@ func testSendRequest_NotJSON(host string, port int, reqMsg string, stCh chan<- s
 	return "notjson", nil
 }
 
+func testSendRequest_Rerun_AllreadyNormalEnd(host string, port int, reqMsg string, stCh chan<- string) (string, error) {
+	res := new(message.JobResult)
+	res.Stat = db.NORMAL
+	resMsg, _ := res.GenerateJSON()
+	return resMsg, nil
+}
+
 func TestNewJob_ジョブ構造体にデフォルト値がセットされる(t *testing.T) {
 	id := "1234"
 	name := "testjob"
@@ -461,6 +468,57 @@ func TestJobExecute_レスポンスがJSON形式でないケース(t *testing.T)
 	}
 }
 
+func TestJobExecute_リラン実行_DB内の実績が既に正常終了していた場合(t *testing.T) {
+	config.Job.AttemptLimit = 1
+	n := newTestNetwork()
+	n.ID = 1
+
+	j1, _ := NewJob("jobid1", "job1", n)
+	j2, _ := NewJob("jobid1", "job1", n)
+	j1.IsRerunJob = true
+	j1.Node = "testnode"
+	j1.Port = 1234
+	j1.Next = j2
+
+	n.Result.Jobresults[j1.id] = &db.JobResult{
+		Status: db.NORMAL,
+	}
+
+	elm, err := j1.Execute()
+	if err != nil {
+		t.Errorf("想定外のエラーが発生した： %s", err)
+	}
+	if elm != j2 {
+		t.Error("次のジョブが返されていない。")
+	}
+}
+
+func TestJobExecute_リラン実行_リモートの実行結果が既に正常終了していた場合(t *testing.T) {
+	config.Job.AttemptLimit = 1
+	n := newTestNetwork()
+	n.ID = 1
+
+	j1, _ := NewJob("jobid1", "job1", n)
+	j2, _ := NewJob("jobid1", "job1", n)
+	j1.sendRequest = testSendRequest_Rerun_AllreadyNormalEnd
+	j1.IsRerunJob = true
+	j1.Node = "testnode"
+	j1.Port = 1234
+	j1.Next = j2
+
+	n.Result.Jobresults[j1.id] = &db.JobResult{
+		Status: db.ABNORMAL,
+	}
+
+	elm, err := j1.Execute()
+	if err != nil {
+		t.Errorf("想定外のエラーが発生した： %s", err)
+	}
+	if elm != j2 {
+		t.Error("次のジョブが返されていない。")
+	}
+}
+
 func TestCreateJoblogFileName(t *testing.T) {
 	n := newTestNetwork()
 	j, _ := NewJob("jobid1", "job1", n)
@@ -616,5 +674,32 @@ func TestExplodeNodeString_ContainerWithHost(t *testing.T) {
 	}
 	if containerName != "category/name" {
 		t.Errorf("containerName => %s, wants %s", containerName, "category/name")
+	}
+}
+
+func TestUseSecondNode(t *testing.T) {
+	n := newTestNetwork()
+
+	j1, _ := NewJob("jobid1", "job1", n)
+	j1.IsRerunJob = true
+	j1.Node = "testnode"
+	j1.Port = 1234
+	j1.SecondaryNode = "secondarynode"
+	j1.SecondaryPort = 2345
+
+	n.Result.Jobresults[j1.id] = &db.JobResult{}
+
+	j1.useSecondaryNode()
+	if j1.Node != "secondarynode" {
+		t.Errorf("j1.Node => %s, wants %s", j1.Node, "secondarynode")
+	}
+	if j1.Port != 2345 {
+		t.Errorf("j1.Port => %d, wants %d", j1.Port, 2345)
+	}
+	if j1.SecondaryNode != "" {
+		t.Error("j1.SecondaryNode must be empty, but it was not.")
+	}
+	if j1.SecondaryPort != 0 {
+		t.Errorf("j1.SecondaryPort => %d, wants %d", j1.SecondaryPort, 0)
 	}
 }
