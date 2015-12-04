@@ -301,8 +301,7 @@ func (n *Network) scanFlowParallel(e Element, novisit map[string]Element) (Eleme
 //
 // return : エラー情報。
 func (n *Network) Run() error {
-	current := n.Start
-	if current == nil {
+	if n.Start == nil {
 		return fmt.Errorf("Start element of network is nil.")
 	}
 
@@ -313,28 +312,14 @@ func (n *Network) Run() error {
 	}
 	console.Display("CTM012I", n.Name, n.ID)
 
-	for {
-		next, err := current.Execute()
-		if err != nil {
-			return n.end(err)
-		}
-		if current == n.End {
-			return n.end(nil)
-		} else if next == nil {
-			err := fmt.Errorf("Element[id = %s] cannot terminate network because it is not a endEvent.", current.ID())
-			return n.end(err)
-		}
-		current = next
-	}
-	panic("Not reached.")
+	return n.runNodes()
 }
 
 // ネットワークをリランする。
 //
 // return : エラー情報。
 func (n *Network) Rerun() error {
-	current := n.Start
-	if current == nil {
+	if n.Start == nil {
 		return fmt.Errorf("Start element of network is nil.")
 	}
 
@@ -352,6 +337,11 @@ func (n *Network) Rerun() error {
 	console.Display("CTM012I", n.Name, n.ID)
 	n.setIsRerunJob()
 
+	return n.runNodes()
+}
+
+func (n *Network) runNodes() error {
+	current := n.Start
 	for {
 		next, err := current.Execute()
 		if err != nil {
