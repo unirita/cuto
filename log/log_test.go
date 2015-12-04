@@ -1,6 +1,8 @@
 package log
 
 import (
+	"os"
+	"path/filepath"
 	"runtime"
 	"testing"
 
@@ -40,6 +42,20 @@ func TestInit_ログレベルの指定が不正な場合にエラーが発生す
 	err := Init("", "test", "", "invalid", 1000, 2, 1)
 	if err == nil {
 		t.Error("エラーが発生していない。")
+	}
+}
+
+func TestInit_初期化処理終了時点でログファイルがあらかじめ生成される(t *testing.T) {
+	testDir := filepath.Join(os.Getenv("GOPATH"), "src", "github.com",
+		"unirita", "cuto", "log", "_tmp")
+	os.RemoveAll(testDir)
+	os.MkdirAll(testDir, 0777)
+
+	Init(testDir, "test", "", "info", 1000, 2, 1)
+	expectedFile := filepath.Join(testDir, "test.log")
+	if _, err := os.Stat(expectedFile); err != nil {
+		t.Error("Log file must be created, but it was not.")
+		t.Logf("filepath: %s", expectedFile)
 	}
 }
 
