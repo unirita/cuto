@@ -46,8 +46,7 @@ func TestInit_ログレベルの指定が不正な場合にエラーが発生す
 }
 
 func TestInit_初期化処理終了時点でログファイルがあらかじめ生成される(t *testing.T) {
-	testDir := filepath.Join(os.Getenv("GOPATH"), "src", "github.com",
-		"unirita", "cuto", "log", "_tmp")
+	testDir := filepath.Join(testutil.GetBaseDir(), "log", "_tmp")
 	os.RemoveAll(testDir)
 	os.MkdirAll(testDir, 0777)
 
