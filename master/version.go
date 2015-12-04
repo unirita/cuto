@@ -4,4 +4,4 @@
 package main
 
 // マスタのバージョン情報
-const Version = "0.9.6.0"
+const Version = "0.9.7.0"

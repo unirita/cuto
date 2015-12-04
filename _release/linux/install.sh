@@ -1,13 +1,13 @@
 #!/bin/sh
 
-VERSION="V0.9.6L0"
+VERSION="V0.9.7L0"
 
 echo ""
 echo "***********************************************************"
 echo "*                                                         *"
 echo "*                                                         *"
 echo "*           GoCuto $VERSION Instaler                      *"
-echo "*                         Last Update 2015/11/11          *"
+echo "*                         Last Update 2015/12/4           *"
 echo "*                                           UNIRITA Inc.  *"
 echo "*                                                         *"
 echo "***********************************************************"
