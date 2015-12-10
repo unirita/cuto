@@ -17,4 +17,4 @@ start,localhost,2015,$SSROOT$/jobscript/testscript/start.sh,$MSJOBNET:ID$ $MSJOB
 108,localhost,2015,$SSROOT$/jobscript/testscript/108.sh,,,$SSROOT$,1,war,12,err,1
 109,localhost,2015,$SSROOT$/jobscript/testscript/109.sh,,TEST05=$MJ05:OUT$,$SSROOT$,1,war,12,err,1
 110,localhost,2015,$SSROOT$/jobscript/testscript/110.sh,$MJ06:RC$,,$SSROOT$,1,war,12,err,1
-end,localhost,2015,$SSROOT$/jobscript/testscript/end.jar,,,$SSROOT$,1,war,12,err,1
+end,localhost,2015,$SSROOT$/jobscript/testscript/end.sh,,,$SSROOT$,1,war,12,err,1

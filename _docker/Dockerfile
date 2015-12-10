@@ -4,4 +4,6 @@ RUN mkdir /cuto/joblog
 RUN mkdir /cuto/log
 ENV CUTOROOT /cuto
 EXPOSE 2015
-CMD /cuto/bin/servant
+
+ENTRYPOINT ["/bin/sh", "-c"]
+CMD ["/cuto/bin/servant"]
