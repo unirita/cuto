@@ -28,11 +28,12 @@ var ErrBusy = errors.New("Locked by other process.")
 // プロセス間で共通に使用する名前を指定する。
 func InitLock(name string) (*LockHandle, error) {
 	mutexName := fmt.Sprintf("Global\\%s", name)
-	hMutex, _, err := procCreateMutexW.Call(
+	hMutex, _, _ := procCreateMutexW.Call(
 		0, 0, uintptr(unsafe.Pointer(syscall.StringToUTF16Ptr(mutexName))))
 	if hMutex == 0 {
-		fmt.Fprintf(os.Stderr, "Failed InitMutexW() err = %v", err)
-		return nil, err
+		lastErr := syscall.GetLastError()
+		fmt.Fprintf(os.Stderr, "Failed InitMutexW() EC = %v", lastErr)
+		return nil, lastErr
 	}
 	return &LockHandle{hMutex, false}, nil
 }
@@ -40,17 +41,20 @@ func InitLock(name string) (*LockHandle, error) {
 // ロックを開始する。
 // 引数でタイムアウト時間（ミリ秒）を指定する。
 func (l *LockHandle) Lock(timeout_milisec int) error {
-	r1, _, err := procWaitForSingleObject.Call(l.handle, uintptr(timeout_milisec))
+	var lastErr error
+	r1, _, _ := procWaitForSingleObject.Call(l.handle, uintptr(timeout_milisec))
 	if int(r1) == wAIT_OBJECT_0 || int(r1) == wAIT_ABANDONED {
 		// Lock成功
 		l.isLock = true
 		return nil
 	} else if int(r1) == wAIT_TIMEOUT {
-		msg := fmt.Sprintf("Lock Timeout. Detail( %v )", err)
+		lastErr = syscall.GetLastError()
+		msg := fmt.Sprintf("Lock Timeout. EC( %v )", lastErr)
 		fmt.Fprintf(os.Stderr, "%v\n", msg)
 		return ErrBusy
 	}
-	return fmt.Errorf("Lock Unknown Error. Detail( %v )", err)
+	lastErr = syscall.GetLastError()
+	return fmt.Errorf("Lock Unknown Error. EC( %v )", lastErr)
 }
 
 // ロック中であれば、解除する。
@@ -58,7 +62,7 @@ func (l *LockHandle) Unlock() error {
 	if l.isLock {
 		r1, _, err := procReleaseMutex.Call(l.handle)
 		if int(r1) == 0 { // 失敗
-			return fmt.Errorf("Unlock Error. Detail( %v )", err)
+			return fmt.Errorf("Unlock Error. EC( %v )", err)
 		}
 		l.isLock = false
 		return nil
