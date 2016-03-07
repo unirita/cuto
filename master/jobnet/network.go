@@ -361,7 +361,7 @@ func (n *Network) runNodes() error {
 func (n *Network) setIsRerunJob() {
 	for _, e := range n.elements {
 		if j, ok := e.(*Job); ok {
-			if _, exists := n.Result.Jobresults[j.ID()]; exists {
+			if _, exists := n.Result.GetJobResults(j.id); exists {
 				j.IsRerunJob = true
 			}
 		}

@@ -14,7 +14,7 @@ import (
 
 func newTestNetwork() *Network {
 	n, _ := NewNetwork("test")
-	n.Result = &tx.ResultMap{JobnetResult: nil, Jobresults: make(tx.JobMap)}
+	n.Result = tx.NewResultMap()
 
 	dbpath := getTestDBPath()
 	conn, err := db.Open(dbpath)
@@ -188,7 +188,7 @@ func TestJobExecute_レスポンスにエラーが無いケース(t *testing.T) 
 		t.Errorf("次に実行されるのとは違うノード[%s]が返された。", next.ID())
 	}
 
-	jobres, ok := n.Result.Jobresults[j1.id]
+	jobres, ok := n.Result.GetJobResults(j1.id)
 	if !ok {
 		t.Fatal("ジョブ実行結果がセットされなかった。")
 	}
@@ -246,7 +246,7 @@ func TestJobExecute_使用できない変数を使用したケース(t *testing.
 		t.Errorf("nilが返される想定に対し、ノード[%s]が返された。", next.ID())
 	}
 
-	jobres, ok := n.Result.Jobresults[j1.id]
+	jobres, ok := n.Result.GetJobResults(j1.id)
 	if !ok {
 		t.Fatal("ジョブ実行結果がセットされなかった。")
 	}
@@ -291,7 +291,7 @@ func TestJobExecute_ジョブが異常終了したケース(t *testing.T) {
 		t.Errorf("nilが返される想定に対し、ノード[%s]が返された。", next.ID())
 	}
 
-	jobres, ok := n.Result.Jobresults[j1.id]
+	jobres, ok := n.Result.GetJobResults(j1.id)
 	if !ok {
 		t.Fatal("ジョブ実行結果がセットされなかった。")
 	}
@@ -348,7 +348,7 @@ func TestJobExecute_リクエスト送信に失敗したケース(t *testing.T) 
 		t.Errorf("nilが返される想定に対し、ノード[%s]が返された。", next.ID())
 	}
 
-	jobres, ok := n.Result.Jobresults[j1.id]
+	jobres, ok := n.Result.GetJobResults(j1.id)
 	if !ok {
 		t.Fatal("ジョブ実行結果がセットされなかった。")
 	}
@@ -393,7 +393,7 @@ func TestJobExecute_リクエスト送信に失敗したケース_失敗前に�
 		t.Errorf("nilが返される想定に対し、ノード[%s]が返された。", next.ID())
 	}
 
-	jobres, ok := n.Result.Jobresults[j1.id]
+	jobres, ok := n.Result.GetJobResults(j1.id)
 	if !ok {
 		t.Fatal("ジョブ実行結果がセットされなかった。")
 	}
@@ -441,7 +441,7 @@ func TestJobExecute_レスポンスがJSON形式でないケース(t *testing.T)
 		t.Errorf("nilが返される想定に対し、ノード[%s]が返された。", next.ID())
 	}
 
-	jobres, ok := n.Result.Jobresults[j1.id]
+	jobres, ok := n.Result.GetJobResults(j1.id)
 	if !ok {
 		t.Fatal("ジョブ実行結果がセットされなかった。")
 	}
@@ -480,9 +480,7 @@ func TestJobExecute_リラン実行_DB内の実績が既に正常終了してい
 	j1.Port = 1234
 	j1.Next = j2
 
-	n.Result.Jobresults[j1.id] = &db.JobResult{
-		Status: db.NORMAL,
-	}
+	n.Result.AddJobResults(j1.id, &db.JobResult{Status: db.NORMAL})
 
 	elm, err := j1.Execute()
 	if err != nil {
@@ -506,9 +504,7 @@ func TestJobExecute_リラン実行_リモートの実行結果が既に正常�
 	j1.Port = 1234
 	j1.Next = j2
 
-	n.Result.Jobresults[j1.id] = &db.JobResult{
-		Status: db.ABNORMAL,
-	}
+	n.Result.AddJobResults(j1.id, &db.JobResult{Status: db.ABNORMAL})
 
 	elm, err := j1.Execute()
 	if err != nil {
@@ -687,7 +683,7 @@ func TestUseSecondNode(t *testing.T) {
 	j1.SecondaryNode = "secondarynode"
 	j1.SecondaryPort = 2345
 
-	n.Result.Jobresults[j1.id] = &db.JobResult{}
+	n.Result.AddJobResults(j1.id, &db.JobResult{})
 
 	j1.useSecondaryNode()
 	if j1.Node != "secondarynode" {

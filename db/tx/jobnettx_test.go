@@ -106,13 +106,13 @@ func TestResumeJobNetwork_前回の実行実績を取得できる(t *testing.T) 
 	if res.JobnetResult.JobnetWork != "JNet1" {
 		t.Errorf("ジョブネット[%s]が見つかるはずが、異なるジョブネット[%s]が返りました。", res.JobnetResult.JobnetWork, "JNet1")
 	}
-	if len(res.Jobresults) != 2 {
-		t.Fatalf("ジョブ実行結果の件数が%d件取得されるはずが、%d件取得された。", 2, len(res.Jobresults))
+	if len(res.jobresults) != 2 {
+		t.Fatalf("ジョブ実行結果の件数が%d件取得されるはずが、%d件取得された。", 2, len(res.jobresults))
 	}
-	if _, ok := res.Jobresults["JOB001"]; !ok {
+	if _, ok := res.jobresults["JOB001"]; !ok {
 		t.Errorf("ジョブ[%s]の実行結果が取得されるはずが、されなかった。", "JOB001")
 	}
-	if _, ok := res.Jobresults["JOB002"]; !ok {
+	if _, ok := res.jobresults["JOB002"]; !ok {
 		t.Errorf("ジョブ[%s]の実行結果が取得されるはずが、されなかった。", "JOB002")
 	}
 }

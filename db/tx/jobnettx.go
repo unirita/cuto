@@ -5,6 +5,7 @@ package tx
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/unirita/cuto/db"
 	"github.com/unirita/cuto/db/query"
@@ -18,7 +19,7 @@ type JobMap map[string]*db.JobResult
 // ジョブ実行結果を保持する。
 type ResultMap struct {
 	JobnetResult *db.JobNetworkResult // ジョブネットワーク情報の構造体。
-	Jobresults   JobMap               // ジョブネットワーク内のジョブ状態を保存するMap。
+	jobresults   JobMap               // ジョブネットワーク内のジョブ状態を保存するMap。
 	conn         db.IConnection       // DBコネクション
 }
 
@@ -64,7 +65,7 @@ func ResumeJobNetwork(nid int, dbname string) (*ResultMap, error) {
 
 	resMap := &ResultMap{
 		JobnetResult: jn,
-		Jobresults:   jr,
+		jobresults:   jr,
 		conn:         conn,
 	}
 
@@ -91,7 +92,7 @@ func (r *ResultMap) EndJobNetwork(status int, detail string) error {
 	r.JobnetResult.Status = status
 	r.JobnetResult.Detail = detail
 
-	for _, jobresult := range r.Jobresults {
+	for _, jobresult := range r.jobresults {
 		if r.JobnetResult.Status < jobresult.Status {
 			r.JobnetResult.Status = jobresult.Status
 		}
@@ -164,4 +165,27 @@ func (r *ResultMap) updateJobNetwork() error {
 // DBコネクションを外部から渡す。テスト用のメソッド。
 func (r *ResultMap) SetConnection(conn db.IConnection) {
 	r.conn = conn
+}
+
+var localMutex sync.Mutex // JobMap dedicated mutex.
+
+// getter JobResult
+func (r *ResultMap) GetJobResults(jobId string) (*db.JobResult, bool) {
+	res, exist := r.jobresults[jobId]
+	return res, exist
+}
+
+// setter JobResult. (thread safe)
+func (r *ResultMap) AddJobResults(jobId string, jobRes *db.JobResult) {
+	localMutex.Lock()
+	defer localMutex.Unlock()
+	r.jobresults[jobId] = jobRes
+}
+
+// test function
+func NewResultMap() *ResultMap {
+	return &ResultMap{
+		JobnetResult: nil,
+		jobresults:   make(JobMap),
+	}
 }

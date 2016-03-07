@@ -123,7 +123,7 @@ func (j *Job) SetDefaultEx() {
 // return : エラー情報。
 func (j *Job) Execute() (Element, error) {
 	if j.IsRerunJob {
-		jobres := j.Instance.Result.Jobresults[j.id]
+		jobres,_ := j.Instance.Result.GetJobResults(j.id)
 		if jobres.Status == db.NORMAL || jobres.Status == db.WARN {
 			j.resumeJobValue()
 			return j.Next, nil
@@ -281,7 +281,7 @@ func (j *Job) sendResultCheckRequestWithRetry(chkMsg string) (string, error) {
 // 判定条件：リクエスト送信でエラーが発生しており、スタート時刻がセットされていないこと
 func (j *Job) isNecessaryToRetry(err error) bool {
 	if err != nil {
-		jobres, exist := j.Instance.Result.Jobresults[j.id]
+		jobres, exist := j.Instance.Result.GetJobResults(j.id)
 		if !exist {
 			return true
 		} else if jobres.StartDate == "" {
@@ -310,7 +310,7 @@ func (j *Job) start() {
 	jobres.Port = j.Port
 	jobres.Status = db.RUNNING
 
-	j.Instance.Result.Jobresults[j.ID()] = jobres
+	j.Instance.Result.AddJobResults(j.id, jobres)
 	tx.InsertJob(j.Instance.Result.GetConnection(), jobres, &j.Instance.localMutex)
 }
 
@@ -319,7 +319,7 @@ func (j *Job) useSecondaryNode() {
 	j.Node = j.SecondaryNode
 	j.Port = j.SecondaryPort
 
-	jobres, exist := j.Instance.Result.Jobresults[j.id]
+	jobres, exist := j.Instance.Result.GetJobResults(j.id)
 	if !exist {
 		log.Error(fmt.Errorf("Job result[id = %s] is unregisted.", j.id))
 		return
@@ -342,7 +342,7 @@ func (j *Job) waitAndSetResultStartDate(stCh <-chan string) {
 	}
 	log.Debug(fmt.Sprintf("JOB[%s] StartDate[%s]", j.Name, st))
 
-	jobres, exist := j.Instance.Result.Jobresults[j.id]
+	jobres, exist := j.Instance.Result.GetJobResults(j.id)
 	if !exist {
 		log.Error(fmt.Errorf("Job result[id = %s] is unregisted.", j.id))
 		return
@@ -356,7 +356,7 @@ func (j *Job) end(res *message.Response) {
 	var jobres *db.JobResult
 	var exist bool
 
-	if jobres, exist = j.Instance.Result.Jobresults[j.id]; !exist {
+	if jobres, exist = j.Instance.Result.GetJobResults(j.id); !exist {
 		log.Error(fmt.Errorf("Job result[id = %s] is unregisted.", j.id))
 		return
 	}
@@ -388,7 +388,7 @@ func (j *Job) end(res *message.Response) {
 
 // サーバントへ送受信失敗した場合の異常終了処理
 func (j *Job) abnormalEnd(err error) error {
-	jobres, exist := j.Instance.Result.Jobresults[j.id]
+	jobres, exist := j.Instance.Result.GetJobResults(j.id)
 	if !exist {
 		return fmt.Errorf("Job result[id = %s] is unregisted.", j.id)
 	}
@@ -401,7 +401,7 @@ func (j *Job) abnormalEnd(err error) error {
 }
 
 func (j *Job) resumeJobValue() {
-	jobres := j.Instance.Result.Jobresults[j.id]
+	jobres,_ := j.Instance.Result.GetJobResults(j.id)
 
 	res := new(message.Response)
 	res.JID = j.id
@@ -413,7 +413,7 @@ func (j *Job) resumeJobValue() {
 }
 
 func (j *Job) updateNormalEndResult(result *message.JobResult) {
-	jobres, exists := j.Instance.Result.Jobresults[j.id]
+	jobres, exists := j.Instance.Result.GetJobResults(j.id)
 	if !exists {
 		log.Error(fmt.Errorf("Job result[id = %s] is unregisted.", j.id))
 		return
@@ -431,7 +431,7 @@ func (j *Job) updateNormalEndResult(result *message.JobResult) {
 }
 
 func (j *Job) changeStatusRunning() {
-	jobres, exists := j.Instance.Result.Jobresults[j.id]
+	jobres, exists := j.Instance.Result.GetJobResults(j.id)
 	if !exists {
 		log.Error(fmt.Errorf("Job result[id = %s] is unregisted.", j.id))
 		return
