@@ -12,14 +12,15 @@ import (
 
 // USAGE表示用の定義メッセージ
 const USAGE = `Usage :
-    master.exe [-v] [-n Jobnetwork] [-s] [-c ConfigFile]
+    master.exe [-v] [-n Jobnetwork] [-s] [-c ConfigFile] [-r Instance Id]
 
 Option :
-    -v            :   Print master version.
-    -n bpmn name  :   Designate a bpmn file name.(Without extensions.)
-    -s            :   Execute Jobnetwork.
-    -c ConfigFile :   Designate config file path.
-                      If it is omitted, '<Current Directory>/master.ini' will be used.
+    -v             :   Print master version.
+    -n bpmn name   :   Designate a bpmn file name.(Without extensions.)
+    -s             :   Execute Jobnetwork.
+    -c ConfigFile  :   Designate config file path.
+                       If it is omitted, '<Current Directory>/master.ini' will be used.
+    -r Instance Id :   To re-run the abnormally terminated Jobnetwork.
 
 Copyright 2015 unirita Inc.
 `
@@ -28,7 +29,7 @@ var stack_msg = []string{"CTM019E", "CTS019E", "CTU003E"}
 
 // showユーティリティのUSAGE表示用の定義メッセージ
 const USAGE_SHOW = `Usage :
-    show.exe [-v] [-jobnet="bpmn file name"] [-From="From date"] [-to="To date"] [-status="normal" | "abnormal" | "running"] [-format="json" | "csv"]
+    show.exe [-v] [-jobnet="bpmn file name"] [-From="From date"] [-to="To date"] [-status="normal" | "abnormal" | "running"] [-format="json" | "csv"] [-nid="Instance Id"]
 
 Option :
     -v                 :   Print master version.
@@ -41,6 +42,7 @@ Option :
     -format=json       :   It outputs by the form of JSON.
     -format=csv        :   It outputs by the form of CSV.
 	-utc               :   Consider timezone as UTC.
+	-nid=InstanceId    :   Designate a instance id.
     
 When omitting [-from] and [-to], only Jobnetwork begun today is indicated.
 	
