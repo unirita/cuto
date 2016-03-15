@@ -96,3 +96,17 @@ func TestParamSplit_F(t *testing.T) {
 		t.Errorf("F\" G\"が返るべきところ、%vが返りました。", m[3])
 	}
 }
+
+func TestShellFormat_Exist(t *testing.T) {
+	s := shellFormat("A B C")
+	if s != "\"A B C\"" {
+		t.Errorf("Invalid Format - %v", s)
+	}
+}
+
+func TestShellFormat_NoExist(t *testing.T) {
+	s := shellFormat("ABC")
+	if s != "ABC" {
+		t.Errorf("Invalid Format - %v", s)
+	}
+}

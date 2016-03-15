@@ -179,18 +179,24 @@ func (j *jobInstance) organizePathAndParam() (string, []string) {
 			fallthrough
 		case ".js":
 			shell = "cscript"
-			paramStr = fmt.Sprintf("/nologo %s %s", j.path, j.param)
+			paramStr = fmt.Sprintf("/nologo %s %s", shellFormat(j.path), j.param)
 		case ".jar":
 			shell = "java"
-			paramStr = fmt.Sprintf("-jar %s %s", j.path, j.param)
+			paramStr = fmt.Sprintf("-jar %s %s", shellFormat(j.path), j.param)
 		case ".ps1":
 			shell = "powershell"
-			paramStr = fmt.Sprintf("%s %s", j.path, j.param)
+			if sep := strings.IndexRune(j.path, ' '); sep != -1 {
+				paramStr = fmt.Sprintf("\"& '%s' %s\"", j.path, j.param)
+			} else {
+				paramStr = fmt.Sprintf("%s %s", j.path, j.param)
+			}
 		default:
 			shell = j.path
 			paramStr = j.param
 		}
 		params = paramSplit(paramStr)
+		fmt.Printf("#### %v\n", shell)
+		fmt.Printf("#### %v\n", paramStr)
 	}
 
 	return shell, params

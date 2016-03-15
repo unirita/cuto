@@ -6,6 +6,7 @@ package job
 import (
 	"fmt"
 	"regexp"
+	"strings"
 )
 
 // 引数のセパレータ用正規表現オブジェクト
@@ -35,4 +36,13 @@ func paramSplit(params string) []string {
 		p = append(p, tmp)
 	}
 	return p
+}
+
+// 実行ファイル内に半角スペースが存在する場合に、二重引用符で括る
+func shellFormat(shell string) string {
+	rc := shell
+	if sep := strings.IndexRune(shell, ' '); sep != -1 {
+		rc = "\"" + shell + "\""
+	}
+	return rc
 }

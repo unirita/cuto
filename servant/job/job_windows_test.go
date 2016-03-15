@@ -211,7 +211,7 @@ func TestDoJobRequest_RCで警告終了するがチェックしないジョブ(t
 	req := &message.Request{
 		Type:      "request",
 		NID:       105,
-		JID:       "serviceTask_004",
+		JID:       "serviceTask_005",
 		Path:      "job.bat",
 		Param:     "X 4",
 		Env:       "TESTENV1=ENVENVENV",
@@ -254,7 +254,7 @@ func TestDoJobRequest_RCで警告終了しないジョブ_閾値未満(t *testin
 	req := &message.Request{
 		Type:      "request",
 		NID:       106,
-		JID:       "serviceTask_004",
+		JID:       "serviceTask_006",
 		Path:      "job.bat",
 		Param:     "X 3",
 		Env:       "TESTENV1=ENVENVENV",
@@ -299,14 +299,14 @@ func TestDoJobRequest_標準出力で警告終了するジョブ_RC確認なし(
 	req := &message.Request{
 		Type:      "request",
 		NID:       107,
-		JID:       "serviceTask_004",
+		JID:       "serviceTask_007",
 		Path:      "job.bat",
-		Param:     "\"A B\"",
+		Param:     "AB 0",
 		Env:       "TESTENV1=!!!WARNING!!!",
 		Workspace: "C:\\Go",
 		WarnRC:    0,
 		WarnStr:   "WARN",
-		ErrRC:     12,
+		ErrRC:     0,
 		ErrStr:    "ERR",
 	}
 
@@ -314,7 +314,7 @@ func TestDoJobRequest_標準出力で警告終了するジョブ_RC確認なし(
 	res := DoJobRequest(req, conf, stCh)
 	close(stCh)
 	if res.RC != 0 {
-		t.Error("RCは0のはず.")
+		t.Errorf("RCは0のはず. RC(%v)", res.RC)
 	}
 	if len(res.Detail) == 0 {
 		t.Error("異常終了メッセージが存在しない.")
@@ -323,7 +323,7 @@ func TestDoJobRequest_標準出力で警告終了するジョブ_RC確認なし(
 	}
 	if len(res.Var) == 0 {
 		t.Error("変数なし.")
-	} else if res.Var != "!!!WARNING!!! \"A B\"" {
+	} else if res.Var != "!!!WARNING!!! AB" {
 		t.Errorf("変数内容が不正.[%s]", res.Var)
 	}
 	if len(res.St) == 0 {
@@ -346,7 +346,7 @@ func TestDoJobRequest_標準出力で警告終了するがチェックしない�
 	req := &message.Request{
 		Type:      "request",
 		NID:       108,
-		JID:       "serviceTask_004",
+		JID:       "serviceTask_008",
 		Path:      "job.bat",
 		Param:     "A",
 		Env:       "TESTENV1=!!!WARNING!!!",
@@ -391,7 +391,7 @@ func TestDoJobRequest_JSジョブが正常に実行できる(t *testing.T) {
 	req := &message.Request{
 		Type:      "request",
 		NID:       109,
-		JID:       "serviceTask_005",
+		JID:       "serviceTask_009",
 		Path:      "job.js",
 		Param:     "A B",
 		Env:       "",
@@ -406,7 +406,7 @@ func TestDoJobRequest_JSジョブが正常に実行できる(t *testing.T) {
 	res := DoJobRequest(req, conf, stCh)
 	close(stCh)
 	if res.RC != 0 {
-		t.Error("ジョブが正常終了するはずなのに異常終了した.")
+		t.Errorf("ジョブが正常終了するはずなのに異常終了した. RC(%v)", res.RC)
 	}
 	if len(res.Detail) > 0 {
 		t.Error("ジョブが正常終了するはずなのに、エラーメッセージがある.", res.Detail)
@@ -436,7 +436,7 @@ func TestDoJobRequest_標準エラー出力で警告終了するVBSジョブ_RC�
 	req := &message.Request{
 		Type:      "request",
 		NID:       110,
-		JID:       "serviceTask_006",
+		JID:       "serviceTask_010",
 		Path:      "stderr.vbs",
 		Param:     "!!!WARN",
 		Env:       "",
@@ -483,7 +483,7 @@ func TestDoJobRequest_RCで異常終了するジョブ_閾値と同じ(t *testin
 	req := &message.Request{
 		Type:      "request",
 		NID:       111,
-		JID:       "serviceTask_008",
+		JID:       "serviceTask_011",
 		Path:      "job.bat",
 		Param:     "X 12",
 		Env:       "TESTENV1=ENVENVENV",
@@ -528,7 +528,7 @@ func TestDoJobRequest_RCで異常終了するがチェックしないジョブ(t
 	req := &message.Request{
 		Type:      "request",
 		NID:       112,
-		JID:       "serviceTask_008",
+		JID:       "serviceTask_012",
 		Path:      "job.bat",
 		Param:     "A 12",
 		Env:       "TESTENV1=ENVENVENV",
@@ -573,7 +573,7 @@ func TestDoJobRequest_RCで異常終了して標準出力で警告終了する�
 	req := &message.Request{
 		Type:      "request",
 		NID:       113,
-		JID:       "serviceTask_008",
+		JID:       "serviceTask_013",
 		Path:      "job.bat",
 		Param:     "X 12",
 		Env:       "TESTENV1=WARNING",
@@ -618,7 +618,7 @@ func TestDoJobRequest_RCで警告終了して標準出力で異常終了する�
 	req := &message.Request{
 		Type:      "request",
 		NID:       114,
-		JID:       "serviceTask_008",
+		JID:       "serviceTask_014",
 		Path:      "job.bat",
 		Param:     "X 11",
 		Env:       "TESTENV1=!!!ERROR!!!",
@@ -663,7 +663,7 @@ func TestDoJobRequest_日本語ジョブ(t *testing.T) {
 	req := &message.Request{
 		Type:      "request",
 		NID:       115,
-		JID:       "serviceTask_009",
+		JID:       "serviceTask_015",
 		Path:      "あ.bat",
 		Param:     "OOO 100",
 		Env:       "TESTENV1=!!!ERROR!!!",
@@ -708,7 +708,7 @@ func TestDoJobRequest_powershellジョブを実行(t *testing.T) {
 	req := &message.Request{
 		Type:      "request",
 		NID:       116,
-		JID:       "serviceTask_001",
+		JID:       "serviceTask_016",
 		Path:      "job.ps1",
 		Param:     "-a あいうえお -b 123 -z",
 		Env:       "TESTENV1=ENVENV",
@@ -729,7 +729,7 @@ func TestDoJobRequest_powershellジョブを実行(t *testing.T) {
 		t.Error("IDがリクエストとレスポンスで異なる.")
 	}
 	if res.RC != 0 {
-		t.Error("ジョブが正常終了するはずなのに異常終了した.")
+		t.Errorf("ジョブが正常終了するはずなのに異常終了した. - %v", res.RC)
 	}
 	if len(res.Detail) > 0 {
 		t.Error("ジョブが正常終了するはずなのに、エラーメッセージがある.", res.Detail)
@@ -757,7 +757,7 @@ func TestDoJobRequest_タイムアウト時間を超えたら異常終了する(
 	req := &message.Request{
 		Type:      "request",
 		NID:       117,
-		JID:       "serviceTask_001",
+		JID:       "serviceTask_017",
 		Path:      "twosec.bat",
 		Param:     "",
 		Env:       "",
