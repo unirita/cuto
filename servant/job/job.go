@@ -195,8 +195,6 @@ func (j *jobInstance) organizePathAndParam() (string, []string) {
 			paramStr = j.param
 		}
 		params = paramSplit(paramStr)
-		fmt.Printf("#### %v\n", shell)
-		fmt.Printf("#### %v\n", paramStr)
 	}
 
 	return shell, params
