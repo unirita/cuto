@@ -21,8 +21,8 @@ if %errorlevel% neq 0 (
   echo Database initialize OK.
 )
 
-exit /b %errorlevel%
+exit %errorlevel%
 
 :err
 echo master running now.
-exit /b 1
+exit 1

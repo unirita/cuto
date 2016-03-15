@@ -11,4 +11,4 @@ set CUTOROOT=%CD%
 
 cscript /nologo %CUTOROOT%\bat\deletedir.vbs %CUTOROOT%\joblog %GENERAL_NUM%
 
-exit /b %errorlevel%
+exit %errorlevel%

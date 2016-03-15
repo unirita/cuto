@@ -1,7 +1,7 @@
 @if(0)==(0) ECHO OFF
 cscript.exe //nologo //E:JScript "%~f0" %* %1
 rem goto :EOF
-exit /b %errorlevel%
+exit %errorlevel%
 @end
 
 var args = WScript.arguments;

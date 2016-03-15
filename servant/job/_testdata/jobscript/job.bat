@@ -5,4 +5,4 @@ echo ‚³‚µ‚·‚¹‚»
 echo %ENV0%
 echo %ENV2%
 echo %TESTENV1% %1
-exit /b %2
+exit %2
