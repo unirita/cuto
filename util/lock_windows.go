@@ -47,8 +47,7 @@ func (l *LockHandle) Lock(timeout_milisec int) error {
 		l.isLock = true
 		return nil
 	} else if int(r1) == wAIT_TIMEOUT {
-		msg := fmt.Sprintf("Lock Timeout. EC( %v )", syscall.GetLastError())
-		fmt.Fprintf(os.Stderr, "%v\n", msg)
+		fmt.Fprintf(os.Stderr, "Lock Timeout.\n")
 		return ErrBusy
 	}
 	return fmt.Errorf("Lock Unknown Error. EC( %v )", syscall.GetLastError())

@@ -5,7 +5,6 @@ package util
 
 import (
 	_ "runtime"
-	"strings"
 	"sync"
 	"testing"
 	"time"
@@ -88,22 +87,6 @@ func TestUnlock_ロックしていないがアンロックする(t *testing.T) {
 
 	if err = hLock.Unlock(); err != nil {
 		t.Errorf("アンロックに成功すべきところ、失敗しました。 - %s", err)
-	}
-}
-
-func TestUnlock_ロックしていないが無理矢理アンロック処理をする(t *testing.T) {
-	hLock, err := InitLock("testUnlock2")
-	if hLock == nil {
-		t.Fatal(err)
-		return
-	}
-	defer hLock.TermLock()
-
-	hLock.isLock = true
-	if err = hLock.Unlock(); err == nil {
-		t.Errorf("アンロックに失敗すべきところ、成功しました。")
-	} else if !strings.Contains(err.Error(), "Attempt to release mutex not owned by caller") {
-		t.Errorf("予想外のエラーが返りました。 - %v", err)
 	}
 }
 
