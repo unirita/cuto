@@ -4,4 +4,4 @@
 package main
 
 // サーバントのバージョン情報
-const Version = "0.9.7.0"
+const Version = "0.9.7.1"
