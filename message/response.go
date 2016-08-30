@@ -12,16 +12,17 @@ import (
 var ServantVersion string
 
 type Response struct {
-	Type    string `json:"type"`
-	Version string `json:"version"`
-	NID     int    `json:"nid"`
-	JID     string `json:"jid"`
-	RC      int    `json:"rc"`
-	Stat    int    `json:"stat"`
-	Detail  string `json:"detail"`
-	Var     string `json:"var"`
-	St      string `json:"st"`
-	Et      string `json:"et"`
+	Type       string `json:"type"`
+	Version    string `json:"version"`
+	NID        int    `json:"nid"`
+	JID        string `json:"jid"`
+	RC         int    `json:"rc"`
+	Stat       int    `json:"stat"`
+	Detail     string `json:"detail"`
+	Var        string `json:"var"`
+	St         string `json:"st"`
+	Et         string `json:"et"`
+	JoblogFile string `json:"joblogfile"`
 }
 
 const responseMessageType = "response"

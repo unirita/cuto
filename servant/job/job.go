@@ -353,6 +353,7 @@ func (j *jobInstance) createResponse() *message.Response {
 	res.Var = j.variable
 	res.St = j.st
 	res.Et = j.et
+	res.JoblogFile = filepath.Base(j.joblogFile)
 	return &res
 }
 

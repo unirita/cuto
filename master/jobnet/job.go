@@ -123,7 +123,7 @@ func (j *Job) SetDefaultEx() {
 // return : エラー情報。
 func (j *Job) Execute() (Element, error) {
 	if j.IsRerunJob {
-		jobres,_ := j.Instance.Result.GetJobResults(j.id)
+		jobres, _ := j.Instance.Result.GetJobResults(j.id)
 		if jobres.Status == db.NORMAL || jobres.Status == db.WARN {
 			j.resumeJobValue()
 			return j.Next, nil
@@ -155,7 +155,11 @@ func (j *Job) Execute() (Element, error) {
 	defer j.end(res)
 
 	if isAbnormalEnd(res) {
-		console.Display("CTM026I", j.createJoblogFileName(res), j.Node)
+		joblogFile := res.JoblogFile
+		if len(joblogFile) == 0 {
+			j.createJoblogFileName(res)
+		}
+		console.Display("CTM026I", joblogFile, j.Node)
 		return nil, fmt.Errorf("")
 	}
 
@@ -401,7 +405,7 @@ func (j *Job) abnormalEnd(err error) error {
 }
 
 func (j *Job) resumeJobValue() {
-	jobres,_ := j.Instance.Result.GetJobResults(j.id)
+	jobres, _ := j.Instance.Result.GetJobResults(j.id)
 
 	res := new(message.Response)
 	res.JID = j.id

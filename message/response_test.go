@@ -107,6 +107,7 @@ func TestResponse_プロパティ値からJSONメッセージを生成できる(
 	res.Var = `somevalue`
 	res.St = `2015-03-26 13:21:15.000`
 	res.Et = `2015-03-26 19:21:16.000`
+	res.JoblogFile = `abc.log`
 
 	msg, err := res.GenerateJSON()
 
@@ -114,7 +115,7 @@ func TestResponse_プロパティ値からJSONメッセージを生成できる(
 		t.Fatalf("想定外のエラーが発生しました: %s", err)
 	}
 
-	expect := `{"type":"response","version":"1.2.3","nid":1234,"jid":"job1","rc":10,"stat":2,"detail":"something","var":"somevalue","st":"2015-03-26 13:21:15.000","et":"2015-03-26 19:21:16.000"}`
+	expect := `{"type":"response","version":"1.2.3","nid":1234,"jid":"job1","rc":10,"stat":2,"detail":"something","var":"somevalue","st":"2015-03-26 13:21:15.000","et":"2015-03-26 19:21:16.000","joblogfile":"abc.log"}`
 	if msg != expect {
 		t.Error("生成されたJSONメッセージが想定値と違います")
 		t.Logf("生成値: %s", msg)

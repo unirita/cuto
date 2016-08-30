@@ -28,6 +28,7 @@ func doTestRequest(req *message.Request, conf *config.ServantConfig, stCh chan<-
 	res.Stat = db.NORMAL
 	res.St = "20150331131524.123456789"
 	res.Et = "20150331131525.123456789"
+	res.JoblogFile = "abc.log"
 
 	return res
 }
@@ -59,7 +60,7 @@ func TestDo_ジョブを実行し結果を送信できる(t *testing.T) {
 		t.Fatalf("想定外のエラーが発生した: %s", err)
 	}
 
-	expected := `{"type":"response","version":"2.3.4","nid":1234,"jid":"001","rc":1,"stat":1,"detail":"detail","var":"","st":"20150331131524.123456789","et":"20150331131525.123456789"}`
+	expected := `{"type":"response","version":"2.3.4","nid":1234,"jid":"001","rc":1,"stat":1,"detail":"detail","var":"","st":"20150331131524.123456789","et":"20150331131525.123456789","joblogfile":"abc.log"}`
 	expected += "\n"
 	if conn.WriteStr != expected {
 		t.Errorf("送信されたジョブ実行結果が間違っています。")
